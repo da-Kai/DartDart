@@ -45,7 +45,31 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+# https://pub.dev/packages/flutter_launcher_icons
+flutter_launcher_icons:
+  #image_path: "assets/icons/icon-colored-512.png"
+  image_path_android: "assets/icons/icon-colored-1024.png"
+  image_path_ios: "assets/icons/icon-colored-1024.png"
+  android: true
+  ios: true
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  background_color_ios: "#3e77bd"
+  web:
+    generate: true
+    image_path: "assets/icons/icon-colored-1024.png"
+    background_color: "#3e77bd"
+    theme_color: "#3e77bd"
+  windows:
+    generate: true
+    image_path: "assets/icons/icon-colored-1024.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/icons/icon-macos-1024.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
