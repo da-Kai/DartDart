@@ -5,3 +5,10 @@ Dart-Scoreboard written in dart
 ```bash
 flutter pub run flutter_launcher_icons
 ```
+
+## Build
+
+### Android
+```bash
+flutter build apk 
+```
