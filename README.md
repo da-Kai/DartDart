@@ -1,5 +1,5 @@
 # DartDart
-Dart-Scoreboard written in dart
+Dart-Scoreboard App written in Dart and Flutter
 
 #### Update Icons
 ```bash
