@@ -18,5 +18,10 @@ class ColorConstants {
   static Color secondaryLight = const Color.fromRGBO(104, 210, 248, 1.0);
   static Color secondaryShade = const Color.fromRGBO(0, 148, 245, 1.0);
   
+  static Color success = const Color.fromRGBO(137, 206, 148, 1.0);
+  static Color warning = const Color.fromRGBO(254, 186, 83, 1.0);
+  static Color fault = const Color.fromRGBO(224, 122, 95, 1.0);
+
+  static Color text = const Color.fromRGBO(5, 10, 20, 1.0);
   static Color background = const Color.fromRGBO(250, 250, 250, 1.0);
 }
