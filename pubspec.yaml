@@ -45,3 +45,7 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: dartdart
+      fonts:
+        - asset: assets/fonts/dartdart.ttf

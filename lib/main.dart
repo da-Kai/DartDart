@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:dart_dart/constants/color.dart';
+import 'package:dart_dart/constants/icon.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DartDart());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DartDart extends StatelessWidget {
+  const DartDart({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dart Dart',
+      title: 'Dart/Dart',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: ColorConstants.primary),
+        colorScheme: ColorSchemes.light,
         useMaterial3: true,
       ),
-      home: const HomePage(title: ''),
+      home: const HomePage(title: 'Dart/Dart'),
     );
   }
 }
@@ -36,7 +37,9 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        foregroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        surfaceTintColor: Theme.of(context).colorScheme.onBackground,
         title: Text(widget.title),
       ),
       body: const Center(
@@ -44,8 +47,9 @@ class _MyHomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'DartDart',
+              'Dart-Dart',
             ),
+            Icon(CustomIcons.dartDart),
           ],
         ),
       ),
