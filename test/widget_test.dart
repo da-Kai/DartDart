@@ -7,6 +7,7 @@ void main() {
     // Build my app and trigger a frame.
     await tester.pumpWidget(const DartDart());
 
-    expect(find.text('DartDart'), findsOneWidget);
+    expect(find.text('01s'), findsOneWidget);
+    expect(find.text('Cricket'), findsOneWidget);
   });
 }
