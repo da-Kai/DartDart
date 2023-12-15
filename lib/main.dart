@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:dart_dart/constants/color.dart';
-import 'package:dart_dart/constants/icon.dart';
+import 'package:dart_dart/constants/font.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(const DartDart());
@@ -12,12 +12,13 @@ class DartDart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dart/Dart',
+      title: 'DartDart',
       theme: ThemeData(
         colorScheme: ColorSchemes.light,
+        fontFamily: FontConstants.title.fontFamily,
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'Dart/Dart'),
+      home: const HomePage(title: 'Dart Dart'),
     );
   }
 }
@@ -32,24 +33,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final ButtonStyle style = ElevatedButton.styleFrom(
+        textStyle: FontConstants.text,
+        fixedSize: const Size(300, 10),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary);
+
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Theme.of(context).colorScheme.secondary,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        surfaceTintColor: Theme.of(context).colorScheme.onBackground,
+        foregroundColor: colorScheme.secondary,
+        backgroundColor: colorScheme.primary,
+        surfaceTintColor: colorScheme.onBackground,
         title: Text(widget.title),
+        centerTitle: true,
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Dart-Dart',
+            ElevatedButton(
+              style: style,
+              onPressed: () {},
+              child: const Text('01s'),
             ),
-            Icon(CustomIcons.dartDart),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              style: style,
+              onPressed: () {},
+              child: const Text('Cricket'),
+            ),
           ],
         ),
       ),
