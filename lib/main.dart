@@ -15,9 +15,16 @@ class DartDart extends StatelessWidget {
       title: 'DartDart',
       theme: ThemeData(
         colorScheme: ColorSchemes.light,
-        fontFamily: FontConstants.title.fontFamily,
+        fontFamily: FontConstants.text.fontFamily,
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorSchemes.dark,
+        fontFamily: FontConstants.text.fontFamily,
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       home: const HomePage(title: 'Dart Dart'),
     );
   }
@@ -47,8 +54,8 @@ class _MyHomePageState extends State<HomePage> {
       appBar: AppBar(
         foregroundColor: colorScheme.secondary,
         backgroundColor: colorScheme.primary,
-        surfaceTintColor: colorScheme.onBackground,
-        title: Text(widget.title),
+        surfaceTintColor: colorScheme.onPrimary,
+        title: Text(widget.title, style: FontConstants.title),
         centerTitle: true,
       ),
       body: Center(
