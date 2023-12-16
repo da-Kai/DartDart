@@ -1,5 +1,6 @@
 import 'package:dart_dart/constants/color.dart';
 import 'package:dart_dart/constants/font.dart';
+import 'package:dart_dart/games/X01.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -55,7 +56,7 @@ class _MyHomePageState extends State<HomePage> {
         foregroundColor: colorScheme.secondary,
         backgroundColor: colorScheme.primary,
         surfaceTintColor: colorScheme.onPrimary,
-        title: Text(widget.title, style: FontConstants.title),
+        title: Text(widget.title),
         centerTitle: true,
       ),
       body: Center(
@@ -64,8 +65,13 @@ class _MyHomePageState extends State<HomePage> {
           children: <Widget>[
             ElevatedButton(
               style: style,
-              onPressed: () {},
-              child: const Text('01s'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const X01()),
+                );
+              },
+              child: const Text('X01'),
             ),
             const SizedBox(height: 30),
             ElevatedButton(

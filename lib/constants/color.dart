@@ -40,11 +40,11 @@ class ColorSchemes {
   );
 
   static const ColorScheme dark = ColorScheme.dark(
-    primary: ColorConstants.secondary,
+    primary: ColorConstants.primary,
     onPrimary: ColorConstants.text,
-    secondary: ColorConstants.primary,
+    secondary: ColorConstants.secondary,
     onSecondary: ColorConstants.text_light,
-    tertiary: ColorConstants.primary,
+    tertiary: ColorConstants.secondary,
     onTertiary: ColorConstants.text_light,
     error: ColorConstants.fault,
     onError: ColorConstants.text,
