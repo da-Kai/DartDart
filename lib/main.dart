@@ -1,6 +1,7 @@
 import 'package:dart_dart/constants/color.dart';
 import 'package:dart_dart/constants/font.dart';
-import 'package:dart_dart/games/X01.dart';
+import 'package:dart_dart/constants/icon.dart';
+import 'package:dart_dart/settings/X01.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -25,7 +26,7 @@ class DartDart extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       home: const HomePage(title: 'Dart Dart'),
     );
   }
@@ -47,15 +48,22 @@ class _MyHomePageState extends State<HomePage> {
 
     final ButtonStyle style = ElevatedButton.styleFrom(
         textStyle: FontConstants.text,
-        fixedSize: const Size(300, 10),
+        padding: const EdgeInsets.all(12),
         backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary);
+        foregroundColor: colorScheme.onPrimary,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: colorScheme.secondary,
+        titleTextStyle: TextStyle(
+          fontSize: 35,
+          fontWeight: FontWeight.bold,
+          fontFamily: FontConstants.title.fontFamily
+        ),
+        foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
         surfaceTintColor: colorScheme.onPrimary,
+        leading: const Icon(CustomIcons.dartDart, size: 35),
         title: Text(widget.title),
         centerTitle: true,
       ),
@@ -63,21 +71,22 @@ class _MyHomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              style: style,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const X01()),
-                );
-              },
-              child: const Text('X01'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              style: style,
-              onPressed: () {},
-              child: const Text('Cricket'),
+            Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 30,
+                ),
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const X01()),
+                  );
+                },
+                child: const Text('X01'),
+              ),
             ),
           ],
         ),

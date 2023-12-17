@@ -19,16 +19,20 @@ class ColorConstants {
   static const Color fault = Color.fromRGBO(224, 122, 95, 1.0);
 
   static const Color text = Color.fromRGBO(5, 10, 20, 1.0);
-  static const Color text_light = Color.fromRGBO(251, 246, 236, 1.0);
+  static const Color textLight = Color.fromRGBO(251, 246, 236, 1.0);
 
   static const Color background = Color.fromRGBO(240, 240, 250, 1.0);
   static const Color shadow = Color.fromRGBO(5, 10, 20, 0.3);
+
+  // #1E303D
+  static const Color primaryContainer = Color.fromRGBO(2, 88, 155, 0.5);
+  static const Color primaryContainerLight = Color.fromRGBO(1, 63, 126, 0.5);
 }
 
 class ColorSchemes {
   static const ColorScheme light = ColorScheme.light(
     primary: ColorConstants.primary,
-    onPrimary: ColorConstants.text_light,
+    onPrimary: ColorConstants.textLight,
     secondary: ColorConstants.secondary,
     onSecondary: ColorConstants.text,
     tertiary: ColorConstants.secondary,
@@ -37,18 +41,22 @@ class ColorSchemes {
     onError: ColorConstants.text,
     errorContainer: ColorConstants.fault,
     onErrorContainer: ColorConstants.text,
+    primaryContainer: ColorConstants.primaryContainerLight,
+    onPrimaryContainer: ColorConstants.textLight,
   );
 
   static const ColorScheme dark = ColorScheme.dark(
     primary: ColorConstants.primary,
-    onPrimary: ColorConstants.text,
+    onPrimary: ColorConstants.textLight,
     secondary: ColorConstants.secondary,
-    onSecondary: ColorConstants.text_light,
+    onSecondary: ColorConstants.textLight,
     tertiary: ColorConstants.secondary,
-    onTertiary: ColorConstants.text_light,
+    onTertiary: ColorConstants.textLight,
     error: ColorConstants.fault,
     onError: ColorConstants.text,
     errorContainer: ColorConstants.fault,
     onErrorContainer: ColorConstants.text,
+    primaryContainer: ColorConstants.primaryContainer,
+    onPrimaryContainer: ColorConstants.textLight,
   );
 }
