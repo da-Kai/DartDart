@@ -47,36 +47,37 @@ class _MyHomePageState extends State<HomePage> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final ButtonStyle style = ElevatedButton.styleFrom(
-        textStyle: FontConstants.text,
-        padding: const EdgeInsets.all(12),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+      textStyle: FontConstants.text,
+      padding: const EdgeInsets.all(12),
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
     );
 
     return Scaffold(
       appBar: AppBar(
         titleTextStyle: TextStyle(
-          fontSize: 35,
-          fontWeight: FontWeight.bold,
-          fontFamily: FontConstants.title.fontFamily
-        ),
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            fontFamily: FontConstants.title.fontFamily),
         foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
         surfaceTintColor: colorScheme.onPrimary,
-        leading: const Icon(CustomIcons.dartDart, size: 35),
+        leading: const Icon(CustomIcons.dartDart, size: 50),
+        leadingWidth: 100,
         title: Text(widget.title),
         centerTitle: true,
+        toolbarHeight: 90.0,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 30,
-                ),
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 30,
+              ),
               child: ElevatedButton(
                 style: style,
                 onPressed: () {
@@ -89,6 +90,13 @@ class _MyHomePageState extends State<HomePage> {
               ),
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: Container(
+          color: colorScheme.primary,
         ),
       ),
     );

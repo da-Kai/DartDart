@@ -1,18 +1,9 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:dart_dart/constants/font.dart';
 import 'package:flutter/material.dart';
 
 enum InOut { single, double, master }
 
-class GameData {
-  int points = 301;
-  InOut gameIn = InOut.single;
-  InOut gameOut = InOut.double;
-  int legs = 1;
-  int sets = 1;
-}
+enum Games { threeOOne, fiveOOne, sevenOOne }
 
 class X01 extends StatefulWidget {
   const X01({super.key});
@@ -24,7 +15,49 @@ class X01 extends StatefulWidget {
 class _X01PageState extends State<X01> {
   final _formKey = GlobalKey<FormState>();
 
-  GameData data = GameData();
+  final List<int> _setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+  final List<int> _legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  Games _points = Games.threeOOne;
+  InOut _gameIn = InOut.single;
+  InOut _gameOut = InOut.double;
+  int _legs = 1;
+  int _sets = 1;
+  List<String> _players = [
+    'Kai',
+    'Player2',
+    'Santiago Karl Loustaunau-Matos der 4te'
+  ];
+
+  void _updateSets(int set) {
+    setState(() {
+      _sets = set;
+    });
+  }
+
+  void _updateLegs(int leg) {
+    setState(() {
+      _legs = leg;
+    });
+  }
+
+  void _setPoints(Games game) {
+    setState(() {
+      _points = game;
+    });
+  }
+
+  void _setGameIn(InOut gameIn) {
+    setState(() {
+      _gameIn = gameIn;
+    });
+  }
+
+  void _setGameOut(InOut gameOut) {
+    setState(() {
+      _gameOut = gameOut;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,43 +74,53 @@ class _X01PageState extends State<X01> {
       child: Scaffold(
         appBar: AppBar(
           titleTextStyle: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              fontFamily: FontConstants.title.fontFamily,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: FontConstants.title.fontFamily,
           ),
+          foregroundColor: colorScheme.onPrimary,
+          backgroundColor: colorScheme.primary,
+          surfaceTintColor: colorScheme.onPrimary,
           title: const Text("X01-Game"),
           centerTitle: true,
         ),
         body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _GameSettings(data),
-              const _InOutSettings(),
-              const _PlayerSettings(),
-            ],
-          ),
-        bottomNavigationBar: Container(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            const SizedBox(height: 10),
+            _GameSettingContainer(this),
+            _InOutSettingContainer(this),
+            _PlayerSettingContainer(this),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(
+                vertical: 5,
+                horizontal: 10,
+              ),
+              child: ElevatedButton(
+                style: startButtonStyle,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Processing Data')),
+                    );
+                  }
+                  setState(() {});
+                },
+                child: const Text('Start'),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+        bottomNavigationBar: SizedBox(
           width: double.infinity,
-          margin: const EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: 30,
-          ),
-          child: ElevatedButton(
-            style: startButtonStyle,
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Processing Data')),
-                );
-              }
-              setState(() {
-                
-              });
-            },
-            child: const Text('Start'),
+          height: 25,
+          child: Container(
+            color: colorScheme.primary,
           ),
         ),
-        ),
+      ),
     );
   }
 }
@@ -86,15 +129,17 @@ class _Button extends Container {
   final EdgeInsets buttonMargin = const EdgeInsets.all(5);
   final String text;
   final Function() onPressed;
+  final bool selected;
 
-  _Button(this.text, this.onPressed);
+  _Button(this.text, this.onPressed, this.selected);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: FontConstants.text,
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.primary //
+          .withOpacity(selected ? 1.0 : 0.4),
       foregroundColor: colorScheme.onPrimary,
     );
 
@@ -111,17 +156,14 @@ class _Button extends Container {
   }
 }
 
-class _GameSettings extends Container {
-  final GameData data;
+class _GameSettingContainer extends Container {
+  final _X01PageState state;
 
-  _GameSettings(this.data);
+  _GameSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    final List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-    final List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     return Container(
       padding: const EdgeInsets.all(5),
@@ -140,9 +182,21 @@ class _GameSettings extends Container {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _Button('301', () {}),
-              _Button('501', () {}),
-              _Button('701', () {}),
+              _Button(
+                '301',
+                () => state._setPoints(Games.threeOOne),
+                state._points == Games.threeOOne,
+              ),
+              _Button(
+                '501',
+                () => state._setPoints(Games.fiveOOne),
+                state._points == Games.fiveOOne,
+              ),
+              _Button(
+                '701',
+                () => state._setPoints(Games.sevenOOne),
+                state._points == Games.sevenOOne,
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -155,20 +209,16 @@ class _GameSettings extends Container {
                   )),
               const Spacer(flex: 1),
               DropdownButton(
-                value: data.sets,
-                items: setOptions.map<DropdownMenuItem<int>>((int value) {
+                value: state._sets,
+                items:
+                    state._setOptions.map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
                   );
                 }).toList(),
-
-                onTap: () {
-                  stderr.writeln('TEST');
-                },
                 onChanged: (v) {
-                  stdout.writeln(v);
-                  data.sets = v!;
+                  state._updateSets(v!);
                 },
               ),
               const Spacer(flex: 3),
@@ -178,14 +228,17 @@ class _GameSettings extends Container {
                   )),
               const Spacer(flex: 1),
               DropdownButton(
-                value: legOptions.first.toString(),
-                items: setOptions.map<DropdownMenuItem<String>>((int value) {
-                  return DropdownMenuItem<String>(
-                    value: value.toString(),
+                value: state._legs,
+                items:
+                    state._legOptions.map<DropdownMenuItem<int>>((int value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (_) {},
+                onChanged: (v) {
+                  state._updateLegs(v!);
+                },
               ),
               const Spacer(flex: 3),
             ],
@@ -196,8 +249,10 @@ class _GameSettings extends Container {
   }
 }
 
-class _InOutSettings extends StatelessWidget {
-  const _InOutSettings();
+class _InOutSettingContainer extends Container {
+  final _X01PageState state;
+
+  _InOutSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -220,9 +275,21 @@ class _InOutSettings extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _Button('Single', () {}),
-              _Button('Double', () {}),
-              _Button('Master', () {}),
+              _Button(
+                'Single',
+                () => state._setGameIn(InOut.single),
+                state._gameIn == InOut.single,
+              ),
+              _Button(
+                'Double',
+                () => state._setGameIn(InOut.double),
+                state._gameIn == InOut.double,
+              ),
+              _Button(
+                'Master',
+                () => state._setGameIn(InOut.master),
+                state._gameIn == InOut.master,
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -233,9 +300,21 @@ class _InOutSettings extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _Button('Single', () {}),
-              _Button('Double', () {}),
-              _Button('Master', () {}),
+              _Button(
+                'Single',
+                () => state._setGameOut(InOut.single),
+                state._gameOut == InOut.single,
+              ),
+              _Button(
+                'Double',
+                () => state._setGameOut(InOut.double),
+                state._gameOut == InOut.double,
+              ),
+              _Button(
+                'Master',
+                () => state._setGameOut(InOut.master),
+                state._gameOut == InOut.master,
+              ),
             ],
           ),
         ],
@@ -244,8 +323,10 @@ class _InOutSettings extends StatelessWidget {
   }
 }
 
-class _PlayerSettings extends StatelessWidget {
-  const _PlayerSettings();
+class _PlayerSettingContainer extends Container {
+  final _X01PageState state;
+
+  _PlayerSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -273,48 +354,43 @@ class _PlayerSettings extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-              padding: const EdgeInsets.all(10),
-              child:  ListView(
-                scrollDirection: Axis.vertical,
-                children: <Widget>[
-                  Container(
-                    height: 30,
-                    child: const Text('Player01'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player02'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player02'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player03'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player04'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player05'),
-                  ),
-                  Container(
-                    height: 30,
-                    child: const Text('Player06'),
-                  ),
-                ],
+                padding: const EdgeInsets.all(10),
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: state._players.map<Row>((String player) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Text(player, overflow: TextOverflow.ellipsis),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.edit),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.delete),
+                        )
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Divider(
+                color: colorScheme.onPrimaryContainer,
+                height: 0,
+                thickness: 1,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.add),
+                  onPressed: () {},
+                  icon: const Icon(Icons.add),
                 )
               ],
             ),

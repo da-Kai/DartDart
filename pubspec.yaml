@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -48,4 +47,37 @@ flutter:
   fonts:
     - family: dartdart
       fonts:
-        - asset: assets/fonts/dartdart.ttf
+        - asset: assets/fonts/dartdart/dartdart.ttf
+    - family: oswald
+      fonts:
+        - asset: assets/fonts/oswald/oswald-Regular.ttf
+        - asset: assets/fonts/oswald/oswald-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/oswald/oswald-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/oswald/oswald-Light.ttf
+          weight: 300
+    - family: mitr
+      fonts:
+        - asset: assets/fonts/mitr/Mitr-Regular.ttf
+        - asset: assets/fonts/mitr/Mitr-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/mitr/Mitr-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/mitr/Mitr-Light.ttf
+          weight: 300
+    - family: titilliumWeb
+      fonts:
+        - asset: assets/fonts/titillium_web/TitilliumWeb-Regular.ttf
+        - asset: assets/fonts/titillium_web/TitilliumWeb-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/titillium_web/TitilliumWeb-BoldItalic.ttf
+          weight: 900
+          style: italic
+        - asset: assets/fonts/titillium_web/TitilliumWeb-Italic.ttf
+          style: italic
+        - asset: assets/fonts/titillium_web/TitilliumWeb-Light.ttf
+          weight: 200
+        - asset: assets/fonts/titillium_web/TitilliumWeb-LightItalic.ttf
+          weight: 200
+          style: italic
