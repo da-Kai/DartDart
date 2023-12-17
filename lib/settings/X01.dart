@@ -23,11 +23,85 @@ class _X01PageState extends State<X01> {
   InOut _gameOut = InOut.double;
   int _legs = 1;
   int _sets = 1;
-  List<String> _players = [
-    'Kai',
-    'Player2',
-    'Santiago Karl Loustaunau-Matos der 4te'
+  final List<String> _players = [
+    'Player',
   ];
+
+  Future<void> _displayTextInputDialog(BuildContext context,
+      {String player = ''}) async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    String nextPlayer = player;
+
+    errorMsg(str) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(str, style: TextStyle(color: colorScheme.onError)),
+              backgroundColor: colorScheme.error,
+              duration: const Duration(milliseconds: 500)),
+        );
+
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(player.isEmpty ? 'New Player' : 'Edit Player',
+                textAlign: TextAlign.center),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  nextPlayer = value;
+                });
+              },
+              controller: TextEditingController(text: nextPlayer),
+              decoration: const InputDecoration(hintText: "Playername"),
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: <Widget>[
+              MaterialButton(
+                color: colorScheme.error,
+                textColor: colorScheme.onError,
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              MaterialButton(
+                color: colorScheme.primary,
+                textColor: colorScheme.onPrimary,
+                child: const Text('OK'),
+                onPressed: () {
+                  if (nextPlayer.length < 3) {
+                    errorMsg('Name to short');
+                  } else if (nextPlayer.length > 24) {
+                    errorMsg('Name to long');
+                  } else if (player == nextPlayer) {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  } else if (_players.contains(nextPlayer)) {
+                    errorMsg('Name already taken');
+                  } else {
+                    setState(() {
+                      if (player != '') {
+                        _players.remove(player);
+                      }
+                      _players.add(nextPlayer);
+                      Navigator.pop(context);
+                    });
+                  }
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _removePlayer(String ply) {
+    setState(() {
+      _players.remove(ply);
+    });
+  }
 
   void _updateSets(int set) {
     setState(() {
@@ -102,7 +176,9 @@ class _X01PageState extends State<X01> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
+                      const SnackBar(
+                          content: Text('Processing Data'),
+                          duration: Duration(seconds: 1)),
                     );
                   }
                   setState(() {});
@@ -361,14 +437,22 @@ class _PlayerSettingContainer extends Container {
                     return Row(
                       children: [
                         Expanded(
-                          child: Text(player, overflow: TextOverflow.ellipsis),
+                          child: Text(
+                            player,
+                            overflow: TextOverflow.ellipsis,
+                            style: FontConstants.text.copyWith(fontSize: 15),
+                          ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            state._displayTextInputDialog(context, player: player);
+                          },
                           icon: const Icon(Icons.edit),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            state._removePlayer(player);
+                          },
                           icon: const Icon(Icons.delete),
                         )
                       ],
@@ -389,7 +473,9 @@ class _PlayerSettingContainer extends Container {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    state._displayTextInputDialog(context);
+                  },
                   icon: const Icon(Icons.add),
                 )
               ],
