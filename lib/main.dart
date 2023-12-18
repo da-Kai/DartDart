@@ -54,6 +54,7 @@ class _MyHomePageState extends State<HomePage> {
     );
 
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         titleTextStyle: TextStyle(
             fontSize: 40,
@@ -83,7 +84,7 @@ class _MyHomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const X01()),
+                    MaterialPageRoute(builder: (context) => const X01Setting()),
                   );
                 },
                 child: const Text('X01'),

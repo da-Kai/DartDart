@@ -1,31 +1,21 @@
 import 'package:dart_dart/constants/font.dart';
+import 'package:dart_dart/game/X01.dart';
 import 'package:flutter/material.dart';
 
-enum InOut { single, double, master }
-
-enum Games { threeOOne, fiveOOne, sevenOOne }
-
-class X01 extends StatefulWidget {
-  const X01({super.key});
+class X01Setting extends StatefulWidget {
+  const X01Setting({super.key});
 
   @override
-  State<X01> createState() => _X01PageState();
+  State<X01Setting> createState() => _X01PageState();
 }
 
-class _X01PageState extends State<X01> {
+class _X01PageState extends State<X01Setting> {
   final _formKey = GlobalKey<FormState>();
 
   final List<int> _setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
   final List<int> _legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  Games _points = Games.threeOOne;
-  InOut _gameIn = InOut.single;
-  InOut _gameOut = InOut.double;
-  int _legs = 1;
-  int _sets = 1;
-  final List<String> _players = [
-    'Player',
-  ];
+  final GameData _data = GameData();
 
   Future<void> _displayTextInputDialog(BuildContext context,
       {String player = ''}) async {
@@ -79,14 +69,14 @@ class _X01PageState extends State<X01> {
                     setState(() {
                       Navigator.pop(context);
                     });
-                  } else if (_players.contains(nextPlayer)) {
+                  } else if (_data.players.contains(nextPlayer)) {
                     errorMsg('Name already taken');
                   } else {
                     setState(() {
                       if (player != '') {
-                        _players.remove(player);
+                        _data.players.remove(player);
                       }
-                      _players.add(nextPlayer);
+                      _data.players.add(nextPlayer);
                       Navigator.pop(context);
                     });
                   }
@@ -99,37 +89,37 @@ class _X01PageState extends State<X01> {
 
   void _removePlayer(String ply) {
     setState(() {
-      _players.remove(ply);
+      _data.players.remove(ply);
     });
   }
 
   void _updateSets(int set) {
     setState(() {
-      _sets = set;
+      _data.sets = set;
     });
   }
 
   void _updateLegs(int leg) {
     setState(() {
-      _legs = leg;
+      _data.legs = leg;
     });
   }
 
   void _setPoints(Games game) {
     setState(() {
-      _points = game;
+      _data.points = game;
     });
   }
 
   void _setGameIn(InOut gameIn) {
     setState(() {
-      _gameIn = gameIn;
+      _data.gameIn = gameIn;
     });
   }
 
   void _setGameOut(InOut gameOut) {
     setState(() {
-      _gameOut = gameOut;
+      _data.gameOut = gameOut;
     });
   }
 
@@ -157,6 +147,12 @@ class _X01PageState extends State<X01> {
           surfaceTintColor: colorScheme.onPrimary,
           title: const Text("X01-Game"),
           centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.question_mark),
+            ),
+          ],
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -175,10 +171,9 @@ class _X01PageState extends State<X01> {
                 style: startButtonStyle,
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Processing Data'),
-                          duration: Duration(seconds: 1)),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const X01Game()),
                     );
                   }
                   setState(() {});
@@ -261,17 +256,17 @@ class _GameSettingContainer extends Container {
               _Button(
                 '301',
                 () => state._setPoints(Games.threeOOne),
-                state._points == Games.threeOOne,
+                state._data.points == Games.threeOOne,
               ),
               _Button(
                 '501',
                 () => state._setPoints(Games.fiveOOne),
-                state._points == Games.fiveOOne,
+                state._data.points == Games.fiveOOne,
               ),
               _Button(
                 '701',
                 () => state._setPoints(Games.sevenOOne),
-                state._points == Games.sevenOOne,
+                state._data.points == Games.sevenOOne,
               ),
             ],
           ),
@@ -285,7 +280,7 @@ class _GameSettingContainer extends Container {
                   )),
               const Spacer(flex: 1),
               DropdownButton(
-                value: state._sets,
+                value: state._data.sets,
                 items:
                     state._setOptions.map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
@@ -304,7 +299,7 @@ class _GameSettingContainer extends Container {
                   )),
               const Spacer(flex: 1),
               DropdownButton(
-                value: state._legs,
+                value: state._data.legs,
                 items:
                     state._legOptions.map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
@@ -354,17 +349,17 @@ class _InOutSettingContainer extends Container {
               _Button(
                 'Single',
                 () => state._setGameIn(InOut.single),
-                state._gameIn == InOut.single,
+                state._data.gameIn == InOut.single,
               ),
               _Button(
                 'Double',
                 () => state._setGameIn(InOut.double),
-                state._gameIn == InOut.double,
+                state._data.gameIn == InOut.double,
               ),
               _Button(
                 'Master',
                 () => state._setGameIn(InOut.master),
-                state._gameIn == InOut.master,
+                state._data.gameIn == InOut.master,
               ),
             ],
           ),
@@ -379,17 +374,17 @@ class _InOutSettingContainer extends Container {
               _Button(
                 'Single',
                 () => state._setGameOut(InOut.single),
-                state._gameOut == InOut.single,
+                state._data.gameOut == InOut.single,
               ),
               _Button(
                 'Double',
                 () => state._setGameOut(InOut.double),
-                state._gameOut == InOut.double,
+                state._data.gameOut == InOut.double,
               ),
               _Button(
                 'Master',
                 () => state._setGameOut(InOut.master),
-                state._gameOut == InOut.master,
+                state._data.gameOut == InOut.master,
               ),
             ],
           ),
@@ -433,7 +428,7 @@ class _PlayerSettingContainer extends Container {
                 padding: const EdgeInsets.all(10),
                 child: ListView(
                   scrollDirection: Axis.vertical,
-                  children: state._players.map<Row>((String player) {
+                  children: state._data.players.map<Row>((String player) {
                     return Row(
                       children: [
                         Expanded(
