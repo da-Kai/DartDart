@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="225mm"
-   height="225mm"
-   viewBox="0 0 225 225"
+   width="225.00002mm"
+   height="225.00002mm"
+   viewBox="0 0 225.00002 225.00002"
    version="1.1"
    id="svg1"
    xml:space="preserve"
@@ -25,18 +25,19 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.72426347"
-     inkscape:cx="375.55394"
-     inkscape:cy="351.39146"
+     inkscape:cx="338.27469"
+     inkscape:cy="449.42209"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer4" /><defs
+     inkscape:current-layer="layer5" /><defs
      id="defs1" /><g
      inkscape:groupmode="layer"
      id="layer5"
-     inkscape:label="background"><circle
+     inkscape:label="background"
+     transform="translate(1.1492871e-5)"><circle
        style="fill:#343434;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.01806;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
        id="circle3161"
        cx="-119.10666"
@@ -63,7 +64,8 @@
      inkscape:label="tripple"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline;opacity:1"><g
+     style="display:inline;opacity:1"
+     transform="translate(1.1492871e-5)"><g
        inkscape:groupmode="layer"
        id="layer3"
        inkscape:label="color2"
@@ -156,7 +158,7 @@
      inkscape:groupmode="layer"
      id="g3096"
      style="display:inline;opacity:1"
-     transform="matrix(0.75000023,0,0,0.74999927,27.499913,31.125001)"><g
+     transform="matrix(0.75000023,0,0,0.74999927,27.499924,31.124989)"><g
        inkscape:groupmode="layer"
        id="g3085"
        inkscape:label="color2"
@@ -249,7 +251,7 @@
      inkscape:groupmode="layer"
      id="g3136"
      style="display:inline;opacity:1"
-     transform="matrix(0.50000017,0,0,0.49999951,54.230662,65.942287)"><g
+     transform="matrix(0.50000017,0,0,0.49999951,54.230673,65.942275)"><g
        inkscape:groupmode="layer"
        id="g3125"
        inkscape:label="color2"
@@ -342,7 +344,7 @@
      inkscape:groupmode="layer"
      id="g3156"
      style="display:inline;opacity:1"
-     transform="matrix(0.25000008,0,0,0.24999977,82.499907,93.374949)"><g
+     transform="matrix(0.25000008,0,0,0.24999977,82.499918,93.374937)"><g
        inkscape:groupmode="layer"
        id="g3145"
        inkscape:label="color2"
@@ -434,7 +436,8 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="bullseye"
-     style="display:inline"><circle
+     style="display:inline"
+     transform="translate(1.1492871e-5)"><circle
        style="fill:#017f01;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.71945;stroke-linejoin:round"
        id="path3156"
        cx="112.49995"

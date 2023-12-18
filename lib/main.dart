@@ -1,7 +1,7 @@
 import 'package:dart_dart/constants/color.dart';
 import 'package:dart_dart/constants/font.dart';
 import 'package:dart_dart/constants/icon.dart';
-import 'package:dart_dart/settings/X01.dart';
+import 'package:dart_dart/game/x01/settings.dart';
 import 'package:flutter/material.dart';
 
 void main() {

@@ -1,6 +1,8 @@
 import 'package:dart_dart/constants/font.dart';
-import 'package:dart_dart/game/X01.dart';
+import 'package:dart_dart/game/x01/game.dart';
 import 'package:flutter/material.dart';
+
+import 'gamedata.dart';
 
 class X01Setting extends StatefulWidget {
   const X01Setting({super.key});
@@ -15,7 +17,7 @@ class _X01PageState extends State<X01Setting> {
   final List<int> _setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
   final List<int> _legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  final GameData _data = GameData();
+  final GameSettings _data = GameSettings();
 
   Future<void> _displayTextInputDialog(BuildContext context,
       {String player = ''}) async {
@@ -136,6 +138,7 @@ class _X01PageState extends State<X01Setting> {
     return Form(
       key: _formKey,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           titleTextStyle: TextStyle(
             fontSize: 24,
@@ -173,7 +176,8 @@ class _X01PageState extends State<X01Setting> {
                   if (_formKey.currentState!.validate()) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const X01Game()),
+                      MaterialPageRoute(
+                          builder: (context) => X01Game(data: GameData(_data))),
                     );
                   }
                   setState(() {});
@@ -440,7 +444,8 @@ class _PlayerSettingContainer extends Container {
                         ),
                         IconButton(
                           onPressed: () {
-                            state._displayTextInputDialog(context, player: player);
+                            state._displayTextInputDialog(context,
+                                player: player);
                           },
                           icon: const Icon(Icons.edit),
                         ),

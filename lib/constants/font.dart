@@ -8,6 +8,8 @@ class FontConstants {
   );
   static TextStyle subtitle = const TextStyle(
     fontFamily: 'titilliumWeb',
+    fontWeight: FontWeight.bold,
+    fontSize: 20,
   );
   static TextStyle text = const TextStyle(
     fontFamily: 'mitr',

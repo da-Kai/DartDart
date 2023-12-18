@@ -43,6 +43,8 @@ flutter_launcher_icons:
     image_path: "assets/icons/icon-macos-1024.png"
 
 flutter:
+  assets:
+    - 'assets/images/dart_board-1024.png'
   uses-material-design: true
   fonts:
     - family: dartdart
