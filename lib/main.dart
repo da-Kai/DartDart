@@ -56,10 +56,7 @@ class _MyHomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        titleTextStyle: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-            fontFamily: FontConstants.title.fontFamily),
+        titleTextStyle: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, fontFamily: FontConstants.title.fontFamily),
         foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
         surfaceTintColor: colorScheme.onPrimary,

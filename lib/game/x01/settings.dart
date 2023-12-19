@@ -19,8 +19,7 @@ class _X01PageState extends State<X01Setting> {
 
   final GameSettings _data = GameSettings();
 
-  Future<void> _displayTextInputDialog(BuildContext context,
-      {String player = ''}) async {
+  Future<void> _displayTextInputDialog(BuildContext context, {String player = ''}) async {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     String nextPlayer = player;
 
@@ -35,8 +34,7 @@ class _X01PageState extends State<X01Setting> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(player.isEmpty ? 'New Player' : 'Edit Player',
-                textAlign: TextAlign.center),
+            title: Text(player.isEmpty ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
             content: TextField(
               onChanged: (value) {
                 setState(() {
@@ -176,8 +174,7 @@ class _X01PageState extends State<X01Setting> {
                   if (_formKey.currentState!.validate()) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => X01Game(data: GameData(_data))),
+                      MaterialPageRoute(builder: (context) => X01Game(data: GameData(_data))),
                     );
                   }
                   setState(() {});
@@ -285,8 +282,7 @@ class _GameSettingContainer extends Container {
               const Spacer(flex: 1),
               DropdownButton(
                 value: state._data.sets,
-                items:
-                    state._setOptions.map<DropdownMenuItem<int>>((int value) {
+                items: state._setOptions.map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
@@ -304,8 +300,7 @@ class _GameSettingContainer extends Container {
               const Spacer(flex: 1),
               DropdownButton(
                 value: state._data.legs,
-                items:
-                    state._legOptions.map<DropdownMenuItem<int>>((int value) {
+                items: state._legOptions.map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
@@ -444,8 +439,7 @@ class _PlayerSettingContainer extends Container {
                         ),
                         IconButton(
                           onPressed: () {
-                            state._displayTextInputDialog(context,
-                                player: player);
+                            state._displayTextInputDialog(context, player: player);
                           },
                           icon: const Icon(Icons.edit),
                         ),
