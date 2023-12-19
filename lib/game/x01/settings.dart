@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'gamedata.dart';
 
 class X01Setting extends StatefulWidget {
-  const X01Setting({super.key});
+  final GameSettings _data = GameSettings();
+
+  X01Setting({super.key});
 
   @override
   State<X01Setting> createState() => _X01PageState();
@@ -17,7 +19,7 @@ class _X01PageState extends State<X01Setting> {
   final List<int> _setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
   final List<int> _legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  final GameSettings _data = GameSettings();
+  late GameSettings _data;
 
   Future<void> _displayTextInputDialog(BuildContext context, {String player = ''}) async {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -125,6 +127,7 @@ class _X01PageState extends State<X01Setting> {
 
   @override
   Widget build(BuildContext context) {
+    _data = widget._data;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final ButtonStyle startButtonStyle = ElevatedButton.styleFrom(
@@ -170,7 +173,7 @@ class _X01PageState extends State<X01Setting> {
               ),
               child: ElevatedButton(
                 style: startButtonStyle,
-                onPressed: () {
+                onPressed: _data.players.isEmpty ? null : () {
                   if (_formKey.currentState!.validate()) {
                     Navigator.push(
                       context,
@@ -362,7 +365,6 @@ class _InOutSettingContainer extends Container {
               ),
             ],
           ),
-          const SizedBox(height: 10),
           Text("Out",
               style: TextStyle(
                 color: colorScheme.onPrimaryContainer,

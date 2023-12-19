@@ -82,10 +82,26 @@ class GameData {
 
   void next() {
     curThrows = Throws();
+
+    if(otherPlayer.isNotEmpty) {
+      var next = otherPlayer.removeAt(0);
+
+      if(currentPlayer.done){
+        finishedPlayer.add(currentPlayer);
+      } else {
+        otherPlayer.add(currentPlayer);
+      }
+
+      currentPlayer = next;
+    }
   }
 
   bool get isSinglePlayer {
     return otherPlayer.isEmpty && finishedPlayer.isEmpty;
+  }
+
+  bool get isMultiPlayer {
+    return !isSinglePlayer;
   }
 
   int get updatedPoints {

@@ -81,7 +81,7 @@ class _MyHomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const X01Setting()),
+                    MaterialPageRoute(builder: (context) => X01Setting()),
                   );
                 },
                 child: const Text('X01'),

@@ -63,7 +63,7 @@ class _X01PageState extends State<X01Game> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Visibility(
-            visible: data.otherPlayer.isNotEmpty,
+            visible: data.isMultiPlayer,
             child: _PlayersList(this),
           ),
           _CurrentPlayer(this),
@@ -75,13 +75,11 @@ class _X01PageState extends State<X01Game> {
               horizontal: 10,
             ),
             child: ElevatedButton(
-              onPressed: () {
-                if (data.turnDone()) {
-                  setState(() {
-                    data.curPlyApply(widget.data!.curThrows);
-                    data.next();
-                  });
-                }
+              onPressed: !data.turnDone() ? null : () {
+                setState(() {
+                  data.curPlyApply(widget.data!.curThrows);
+                  data.next();
+                });
               },
               style: ElevatedButton.styleFrom(
                 textStyle: FontConstants.text,
@@ -142,7 +140,30 @@ class _PlayersList extends Container {
                     ],
                   ),
                 );
-              }).toList()),
+              }).followedBy(
+                data.finishedPlayer.map<Container>((ply) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: colorScheme.tertiary,
+                    ),
+                    margin: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          child: Text(ply.name, overflow: TextOverflow.ellipsis),
+                        ),
+                        const SizedBox(
+                          width: 30,
+                          child: Icon(Icons.check)
+                        ),
+                      ],
+                    ),
+                  );
+                })
+              ).toList()),
         ))
       ],
     );
