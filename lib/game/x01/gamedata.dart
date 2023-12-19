@@ -95,31 +95,25 @@ class FieldCalc {
     }
 
     //BullsEye
-    if(distance <= 7.0) {
+    if(distance <= 7.1) {
       return const Field(FieldVal.bullsEye, FieldMultiplier.double);
     }
-    if(distance < 16.0 ) {
+    if(distance <= 16.0 ) {
       return const Field(FieldVal.bullsEye, FieldMultiplier.single);
     }
 
     FieldMultiplier multiplier = FieldMultiplier.single;
-    if(distance >= 22.0 && distance < 44.0) {
+    if(distance > 27.0 && distance < 46.0) {
       multiplier = FieldMultiplier.double;
-    } else if (distance >= 67.0 && distance < 89.0) {
+    } else if (distance > 69.0 && distance < 89.0) {
       multiplier = FieldMultiplier.triple;
     }
 
-    FieldVal value = FieldVal.miss;
-    if( angle < 9 ) {
-      value = FieldVal.three;
-    } else if( angle < 27 ) {
-      value = FieldVal.nineteen;
-    } else if( angle < 45 ) {
-      value = FieldVal.seven;
-    } else if( angle < 63 ) {
-      value = FieldVal.sixteen;
-    }
+    // normalize to 1(at angle 189)
+    angle = (angle >= 189) ? (angle - 189) : ((360 - 189) + angle);
 
+    int section = (angle/18.0).floor();
+    FieldVal value = FieldVal.bySegment(section);
     return Field(value, multiplier);
   }
 }

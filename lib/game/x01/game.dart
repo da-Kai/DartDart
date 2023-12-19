@@ -1,7 +1,6 @@
 import 'package:dart_dart/constants/font.dart';
-import 'package:flutter/material.dart';
-
 import 'package:dart_dart/game/x01/gamedata.dart';
+import 'package:flutter/material.dart';
 
 class X01Game extends StatefulWidget {
   final GameData? data;
@@ -236,37 +235,46 @@ class _PointSelector extends Container {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(5),
-            margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: colorScheme.primaryContainer,
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints.expand(),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: colorScheme.primaryContainer,
+                ),
+              ),
             ),
           ),
-          ConstrainedBox(
-            constraints: const BoxConstraints.expand(),
-            child: GestureDetector(
-              key: _gestureKey,
-              onTapUp: (details) {
-                var size = _gestureKey.currentContext!.size!;
-                var pos = details.localPosition;
+          Padding(
+            padding: const EdgeInsets.all(2),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints.expand(),
+              child: GestureDetector(
+                key: _gestureKey,
+                onTapUp: (details) {
+                  var size = _gestureKey.currentContext!.size!;
+                  var pos = details.localPosition;
 
-                var norm = GameMath.norm(size, pos);
-                var (distance, angle) = GameMath.vectorData(norm);
+                  var norm = GameMath.norm(size, pos);
+                  var (distance, angle) = GameMath.vectorData(norm);
 
-                var field = FieldCalc.getField(angle: angle, distance: distance);
+                  var field =
+                      FieldCalc.getField(angle: angle, distance: distance);
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(field.toString(), style: TextStyle(color: colorScheme.onError)),
-                      backgroundColor: colorScheme.error,
-                      duration: const Duration(milliseconds: 500)),
-                );
-              },
-              child: const Image(
-                image: AssetImage("assets/images/dart_board-1024.png"),
-                fit: BoxFit.fill,
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('$field',
+                            style: TextStyle(color: colorScheme.onError)),
+                        backgroundColor: colorScheme.error,
+                        duration: const Duration(milliseconds: 500)),
+                  );
+                },
+                child: const Image(
+                  image: AssetImage("assets/images/dart_board-1024.png"),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),

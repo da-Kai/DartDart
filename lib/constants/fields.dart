@@ -26,6 +26,37 @@ enum FieldVal {
 
   final String abbr;
   final int value;
+
+  static FieldVal bySegment(int segment) {
+    if(segment < 0) {
+      return FieldVal.miss;
+    } else if (segment > 19) {
+      return FieldVal.bullsEye;
+    }
+    switch(segment) {
+      case 0: return FieldVal.one;
+      case 1: return FieldVal.eighteen;
+      case 2: return FieldVal.four;
+      case 3: return FieldVal.thirteen;
+      case 4: return FieldVal.six;
+      case 5: return FieldVal.ten;
+      case 6: return FieldVal.fifteen;
+      case 7: return FieldVal.two;
+      case 8: return FieldVal.seventeen;
+      case 9: return FieldVal.three;
+      case 10: return FieldVal.nineteen;
+      case 11: return FieldVal.seven;
+      case 12: return FieldVal.sixteen;
+      case 13: return FieldVal.eight;
+      case 14: return FieldVal.eleven;
+      case 15: return FieldVal.fourteen;
+      case 16: return FieldVal.nine;
+      case 17: return FieldVal.twelve;
+      case 18: return FieldVal.five;
+      case 19: return FieldVal.twenty;
+    }
+    return FieldVal.miss;
+  }
 }
 
 enum FieldMultiplier {
