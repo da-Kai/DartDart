@@ -30,72 +30,9 @@ class _X01PageState extends State<X01Setting> {
     return (true, '');
   }
 
-  Future<(String, String)> _displayTextInputDialog(BuildContext context,
-      {String player = '', required Validator validate}) async {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final TextEditingController textController = TextEditingController(text: player);
-
-    String? errorText;
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            title: Text(player.isEmpty ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
-            content: TextField(
-              controller: textController,
-              decoration: InputDecoration(hintText: "name", errorText: errorText),
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              MaterialButton(
-                color: colorScheme.error,
-                textColor: colorScheme.onError,
-                child: const Text('CANCEL'),
-                onPressed: () => Navigator.pop(context),
-              ),
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('OK'),
-                onPressed: () {
-                  var nextPlayer = textController.value.text;
-                  var (valid, errMsg) = validate(nextPlayer);
-                  if (valid) {
-                    setState(() {
-                      errorText = '';
-                      Navigator.pop(context);
-                    });
-                  } else {
-                    setState(() => errorText = errMsg);
-                  }
-                },
-              ),
-            ],
-          );
-        });
-      },
-    ).then((value) {
-      var nextPly = textController.value.text;
-      var (valid, _) = validate(nextPly);
-      return (player, valid ? nextPly : '');
-    });
-  }
-
   void _removePlayer(String ply) => setState(() => _data.players.remove(ply));
 
-  /*void _addPlayer(String player) => setState(() {
-      _data.players.add(player);
-    });*/
-  void _addPlayer(String player) {
-    setState(() {});
-    setState(() {
-      _data.sets = 1;
-      _data.players.add(player);
-    });
-    setState(() {});
-  }
+  void _addPlayer(String player) => setState(() => _data.players.add(player));
 
   void _updatePlayer(String oldName, String newName) => setState(() {
         int index = _data.players.indexOf(oldName);
@@ -187,6 +124,69 @@ class _X01PageState extends State<X01Setting> {
         ),
       ),
     );
+  }
+}
+
+class _PlayerNameDialog {
+  final String? player;
+  final BuildContext context;
+  final Validator validate;
+
+  late final ColorScheme colorScheme;
+  late final TextEditingController textController;
+
+  String? errorText;
+
+  _PlayerNameDialog({required this.context, required this.validate, this.player}) {
+    colorScheme = Theme.of(context).colorScheme;
+    textController = TextEditingController(text: player);
+  }
+
+  Future<String?> open() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text(player == null ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
+            content: TextField(
+              controller: textController,
+              decoration: InputDecoration(hintText: "name", errorText: errorText),
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: <Widget>[
+              MaterialButton(
+                color: colorScheme.error,
+                textColor: colorScheme.onError,
+                child: const Text('CANCEL'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              MaterialButton(
+                color: colorScheme.primary,
+                textColor: colorScheme.onPrimary,
+                child: const Text('OK'),
+                onPressed: () {
+                  var nextPlayer = textController.value.text;
+                  var (valid, errMsg) = validate(nextPlayer);
+                  if (valid) {
+                    setState(() {
+                      errorText = '';
+                      Navigator.pop(context);
+                    });
+                  } else {
+                    setState(() => errorText = errMsg);
+                  }
+                },
+              ),
+            ],
+          );
+        });
+      },
+    ).then((value) {
+      var nextPly = textController.value.text;
+      var (valid, _) = validate(nextPly);
+      return valid ? nextPly : null;
+    });
   }
 }
 
@@ -433,16 +433,13 @@ class _PlayerSettingContainer extends Container {
                         ),
                         IconButton(
                           onPressed: () {
-                            state
-                                ._displayTextInputDialog(
-                              context,
+                            _PlayerNameDialog(
+                              context: context,
                               player: player,
                               validate: (str) => state.validate(str, settings.players),
-                            )
-                                .then((v) {
-                              var (oldPly, newPly) = v;
-                              if (newPly.isNotEmpty && oldPly.isNotEmpty) {
-                                state._updatePlayer(oldPly, newPly);
+                            ).open().then((newPly) {
+                              if (newPly != null) {
+                                state._updatePlayer(player, newPly);
                               }
                             });
                           },
@@ -473,14 +470,11 @@ class _PlayerSettingContainer extends Container {
               children: [
                 IconButton(
                   onPressed: () {
-                    state
-                        ._displayTextInputDialog(
-                      context,
+                    _PlayerNameDialog(
+                      context: context,
                       validate: (str) => state.validate(str, settings.players),
-                    )
-                        .then((v) {
-                      var (_, newPly) = v;
-                      if (newPly.isNotEmpty) {
+                    ).open().then((newPly) {
+                      if (newPly != null) {
                         state._addPlayer(newPly);
                       }
                     });
