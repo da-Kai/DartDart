@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class FontConstants {
   FontConstants._();
 
-  static TextStyle title = const TextStyle(
+  static const TextStyle title = TextStyle(
     fontFamily: 'oswald',
   );
-  static TextStyle subtitle = const TextStyle(
+  static const TextStyle subtitle = TextStyle(
     fontFamily: 'titilliumWeb',
     fontWeight: FontWeight.bold,
-    fontSize: 20,
+    fontSize: 22,
   );
-  static TextStyle text = const TextStyle(
+  static const TextStyle text = TextStyle(
     fontFamily: 'mitr',
     fontSize: 16,
   );

@@ -19,15 +19,15 @@ class _X01PageState extends State<X01Setting> {
 
   late GameSettings _data;
 
-  (bool, String) validate(String playerName, List<String> currentPlayers) {
+  (bool, String?) validate(String playerName) {
     if (playerName.length < 3) {
       return (false, 'Name to short');
     } else if (playerName.length > 24) {
       return (false, 'Name to long');
-    } else if (currentPlayers.contains(playerName)) {
+    } else if (!_data.isNameFree(playerName)) {
       return (false, 'Name already taken');
     }
-    return (true, '');
+    return (true, null);
   }
 
   void _removePlayer(String ply) => setState(() => _data.players.remove(ply));
@@ -76,12 +76,6 @@ class _X01PageState extends State<X01Setting> {
           surfaceTintColor: colorScheme.onPrimary,
           title: const Text("X01-Game"),
           centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.question_mark),
-            ),
-          ],
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -265,6 +259,9 @@ class _GameSettingContainer extends Container {
               ),
             ],
           ),
+
+          /*
+
           const SizedBox(height: 10),
           Row(
             children: [
@@ -307,6 +304,8 @@ class _GameSettingContainer extends Container {
               const Spacer(flex: 3),
             ],
           ),
+
+           */
         ],
       ),
     );
@@ -394,7 +393,6 @@ class _PlayerSettingContainer extends Container {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameSettings settings = state.widget._data;
 
     return Expanded(
       child: Container(
@@ -436,7 +434,7 @@ class _PlayerSettingContainer extends Container {
                             _PlayerNameDialog(
                               context: context,
                               player: player,
-                              validate: (str) => state.validate(str, settings.players),
+                              validate: state.validate,
                             ).open().then((newPly) {
                               if (newPly != null) {
                                 state._updatePlayer(player, newPly);
@@ -472,7 +470,7 @@ class _PlayerSettingContainer extends Container {
                   onPressed: () {
                     _PlayerNameDialog(
                       context: context,
-                      validate: (str) => state.validate(str, settings.players),
+                      validate: state.validate,
                     ).open().then((newPly) {
                       if (newPly != null) {
                         state._addPlayer(newPly);

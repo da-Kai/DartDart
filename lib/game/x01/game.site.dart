@@ -1,3 +1,4 @@
+import 'package:dart_dart/constants/color.dart';
 import 'package:dart_dart/constants/fields.dart';
 import 'package:dart_dart/constants/font.dart';
 import 'package:dart_dart/game/x01/game.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/material.dart';
 class X01Game extends StatefulWidget {
   late final GameData data;
 
-  X01Game({super.key, settings}) {
+  X01Game({super.key, required settings}) {
     data = GameData(settings);
   }
 
@@ -37,16 +38,6 @@ class _X01PageState extends State<X01Game> {
         ),
         backgroundColor: colorScheme.background,
         title: Text(data.settings.game.text),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.question_mark),
-          ),
-        ],
         leading: IconButton(
           onPressed: () {
             setState(() {
@@ -56,6 +47,16 @@ class _X01PageState extends State<X01Game> {
           icon: const Icon(Icons.close),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: () {
+                setState(() {
+                  data.curThrows.undo();
+                });
+              },
+          )
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -73,14 +74,27 @@ class _X01PageState extends State<X01Game> {
               horizontal: 10,
             ),
             child: ElevatedButton(
-              onPressed: !data.turnDone()
-                  ? null
-                  : () {
+              onPressed: !data.turnDone() ? null : () {
+                  var done = false;
+                  var ply = data.currentPlayer.name;
+                  setState(() {
+                    data.curPlyApply(data.curThrows);
+                    done = data.currentPlayer.done;
+                    data.next();
+                  });
+                  if(done) {
+                    _GameEnd(context: context, winner: ply).open() //
+                    .then((rematch) {
                       setState(() {
-                        data.curPlyApply(widget.data.curThrows);
-                        data.next();
+                        if(rematch) {
+                          data.reset();
+                        } else {
+                          Navigator.pop(context);
+                        }
                       });
-                    },
+                    });
+                  }
+                },
               style: ElevatedButton.styleFrom(
                 textStyle: FontConstants.text,
                 backgroundColor: colorScheme.primary,
@@ -144,7 +158,7 @@ class _PlayersList extends Container {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    color: colorScheme.tertiary,
+                    color: colorScheme.success,
                   ),
                   margin: const EdgeInsets.all(5),
                   padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -223,7 +237,7 @@ class _CurrentPlayer extends Container {
                 const Spacer(flex: 2),
                 data.updatedPoints == 0
                     ? //
-                    Icon(Icons.check, color: colorScheme.tertiary)
+                    Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
                         data.currentPlayerUpdateText(),
@@ -325,5 +339,55 @@ class _PointSelector extends Container {
         ],
       ),
     );
+  }
+}
+
+class _GameEnd {
+  final String winner;
+  final BuildContext context;
+
+  late final ColorScheme colorScheme;
+
+  _GameEnd({required this.context, required this.winner}) {
+    colorScheme = Theme.of(context).colorScheme;
+  }
+
+  Future<bool> open() async {
+    bool rematch = false;
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text('Congratulations',
+                textAlign: TextAlign.center,
+                style: FontConstants.subtitle,
+            ),
+            content: Text('"$winner" won!',
+              textAlign: TextAlign.center,
+              style: FontConstants.text,
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: <Widget>[
+              MaterialButton(
+                color: colorScheme.primary,
+                textColor: colorScheme.onPrimary,
+                child: const Text('REMATCH'),
+                onPressed: () {
+                  rematch = true;
+                  Navigator.pop(context);
+                },
+              ),
+              MaterialButton(
+                color: colorScheme.primary,
+                textColor: colorScheme.onPrimary,
+                child: const Text('QUIT'),
+                onPressed: () {
+                  rematch = false;
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+    ).then((_) => rematch);
   }
 }

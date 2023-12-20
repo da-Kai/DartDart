@@ -32,14 +32,21 @@ class ColorConstants {
   static const Color primaryContainerLight = Color.fromRGBO(202, 222, 239, 1.0);
 }
 
-class ColorSchemes {
+extension ColorSchemes on ColorScheme {
+  Color get success {
+    switch(brightness) {
+      case Brightness.light:
+        return ColorConstants.success;
+      case Brightness.dark:
+        return ColorConstants.success;
+    }
+  }
+
   static const ColorScheme light = ColorScheme.light(
     primary: ColorConstants.primary,
     onPrimary: ColorConstants.textLight,
     secondary: ColorConstants.secondary,
     onSecondary: ColorConstants.text,
-    tertiary: ColorConstants.success,
-    onTertiary: ColorConstants.text,
     error: ColorConstants.fault,
     onError: ColorConstants.text,
     errorContainer: ColorConstants.fault,
@@ -54,8 +61,6 @@ class ColorSchemes {
     onPrimary: ColorConstants.textLight,
     secondary: ColorConstants.secondary,
     onSecondary: ColorConstants.textLight,
-    tertiary: ColorConstants.success,
-    onTertiary: ColorConstants.textLight,
     error: ColorConstants.fault,
     onError: ColorConstants.text,
     errorContainer: ColorConstants.fault,

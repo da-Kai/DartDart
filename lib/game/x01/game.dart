@@ -29,6 +29,13 @@ class GameData {
     currentPlayer = otherPlayer.removeAt(0);
   }
 
+  void reset() {
+    finishedPlayer=[];
+    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
+    currentPlayer = otherPlayer.removeAt(0);
+    curThrows = Throws();
+  }
+
   void next() {
     curThrows = Throws();
 

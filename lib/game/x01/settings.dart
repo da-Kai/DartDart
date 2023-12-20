@@ -58,4 +58,13 @@ class GameSettings {
   static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   final List<String> players = [];
+
+  bool isNameFree(String name) {
+    for(var plyName in players) {
+      if(plyName.toLowerCase() == name.toLowerCase()) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

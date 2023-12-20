@@ -1,4 +1,5 @@
 enum HitNumber {
+  unthrown('', 0),
   miss('MISS', 0),
   bullsEye('BULL', 25),
   one('1', 1),
@@ -92,60 +93,66 @@ enum HitMultiplier {
 
 class Hit {
   static const Hit miss = Hit(HitNumber.miss, HitMultiplier.single);
-  static const Hit skipped = Hit(HitNumber.miss, HitMultiplier.single);
+  static const Hit skipped = Hit(HitNumber.unthrown, HitMultiplier.single);
 
-  final HitNumber value;
+  final HitNumber number;
   final HitMultiplier multiplier;
 
-  const Hit(this.value, this.multiplier);
+  const Hit(this.number, this.multiplier);
 
-  int getValue() {
-    return value.value * multiplier.multiplier;
+  int get value {
+    return number.value * multiplier.multiplier;
   }
 
   @override
   String toString() {
-    return multiplier.prefix + value.abbr;
+    return multiplier.prefix + number.abbr;
   }
 }
 
 class Throws {
-  List<Hit> hits = [];
-
-  Hit? get first{
-    return hits.isNotEmpty ? hits[0] : null;
-  }
-
-  Hit? get second{
-    return hits.length >= 2 ? hits[1] : null;
-  }
-
-  Hit? get third{
-    return hits.length >= 3 ? hits[2] : null;
-  }
+  Hit first = Hit.skipped;
+  Hit second = Hit.skipped;
+  Hit third = Hit.skipped;
 
   Hit? get last {
-    return third ?? second ?? first;
+    switch(count) {
+      case 1: return first;
+      case 2: return second;
+      case 3: return third;
+    }
+    return null;
   }
 
   int get count {
-   return third != null ? 3 : //
-       second != null ? 2 : //
-           first != null ? 1 : 0;
+    if(third != Hit.skipped) return 3;
+    if (second != Hit.skipped) return 2;
+    if (first != Hit.skipped) return 1;
+    return 0;
   }
 
   int sum() {
-    return ( first?.getValue() ?? 0 ) + ( second?.getValue() ?? 0 ) + ( third?.getValue() ?? 0);
+    return first.value + second.value + third.value;
   }
 
   void thrown(Hit hit) {
-    if(hits.length < 3) {
-      hits.add(hit);
+    switch(count) {
+      case 0: first = hit;
+      case 1: second = hit;
+      case 2: third = hit;
     }
   }
 
   bool done() {
-    return first != null && second != null && third != null;
+    return count == 3;
+  }
+
+  void undo() {
+    switch(count) {
+      case 1: first = Hit.skipped;
+      case 2: second = Hit.skipped;
+      case 3: third = Hit.skipped;
+    }
   }
 }
 
