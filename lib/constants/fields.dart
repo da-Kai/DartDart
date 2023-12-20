@@ -106,6 +106,9 @@ class Hit {
 
   @override
   String toString() {
+    if(number == HitNumber.unthrown) {
+        return '';
+    }
     return multiplier.prefix + number.abbr;
   }
 }

@@ -258,7 +258,7 @@ class _CurrentPlayer extends Container {
                 Expanded(
                   child: _ThrowBean(
                     child: Text(
-                      data.curThrows.first?.toString() ?? '',
+                      data.curThrows.first.toString(),
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
@@ -266,7 +266,7 @@ class _CurrentPlayer extends Container {
                 Expanded(
                   child: _ThrowBean(
                     child: Text(
-                      data.curThrows.second?.toString() ?? '',
+                      data.curThrows.second.toString(),
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
@@ -274,7 +274,7 @@ class _CurrentPlayer extends Container {
                 Expanded(
                   child: _ThrowBean(
                     child: Text(
-                      data.curThrows.third?.toString() ?? '',
+                      data.curThrows.third.toString(),
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),

@@ -40,9 +40,9 @@ class _X01PageState extends State<X01Setting> {
         _data.players.removeAt(index + 1);
       });
 
-  void _updateSets(int set) => setState(() => _data.sets = set);
+  //void _updateSets(int set) => setState(() => _data.sets = set);
 
-  void _updateLegs(int leg) => setState(() => _data.legs = leg);
+  //void _updateLegs(int leg) => setState(() => _data.legs = leg);
 
   void _setPoints(Games game) => setState(() => _data.game = game);
 
