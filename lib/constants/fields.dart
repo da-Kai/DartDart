@@ -110,12 +110,28 @@ class Hit {
 }
 
 class Throws {
-  Hit? first;
-  Hit? second;
-  Hit? third;
+  List<Hit> hits = [];
+
+  Hit? get first{
+    return hits.isNotEmpty ? hits[0] : null;
+  }
+
+  Hit? get second{
+    return hits.length >= 2 ? hits[1] : null;
+  }
+
+  Hit? get third{
+    return hits.length >= 3 ? hits[2] : null;
+  }
 
   Hit? get last {
     return third ?? second ?? first;
+  }
+
+  int get count {
+   return third != null ? 3 : //
+       second != null ? 2 : //
+           first != null ? 1 : 0;
   }
 
   int sum() {
@@ -123,12 +139,8 @@ class Throws {
   }
 
   void thrown(Hit hit) {
-    if(first == null) {
-      first = hit;
-    } else if (second == null) {
-      second = hit;
-    } else {
-      third ??= hit;
+    if(hits.length < 3) {
+      hits.add(hit);
     }
   }
 

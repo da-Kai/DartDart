@@ -1,336 +1,188 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:dart_dart/constants/fields.dart';
-import 'package:dart_dart/constants/font.dart';
-import 'package:dart_dart/game/x01/gamedata.dart';
-import 'package:flutter/material.dart';
+import 'package:dart_dart/game/x01/settings.dart';
 
-class X01Game extends StatefulWidget {
-  final GameData? data;
+class Player {
+  String name;
+  int points;
 
-  const X01Game({super.key, this.data});
+  Player(this.name, this.points);
 
-  @override
-  State<X01Game> createState() => _X01PageState();
+  bool get done {
+    return points == 0;
+  }
 }
 
-class _X01PageState extends State<X01Game> {
-  final _formKey = GlobalKey<FormState>();
+class GameData {
+  GameSettings settings;
+  late Player currentPlayer;
 
-  void thrown(Hit hit) {
-    setState(() {
-      if (widget.data != null) {
-        widget.data!.curThrows.thrown(hit);
+  List<Player> otherPlayer = [];
+  List<Player> finishedPlayer = [];
+
+  Throws curThrows = Throws();
+
+  GameData(this.settings) {
+    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
+    currentPlayer = otherPlayer.removeAt(0);
+  }
+
+  void next() {
+    curThrows = Throws();
+
+    if (otherPlayer.isNotEmpty) {
+      var next = otherPlayer.removeAt(0);
+
+      if (currentPlayer.done) {
+        finishedPlayer.add(currentPlayer);
+      } else {
+        otherPlayer.add(currentPlayer);
       }
-    });
+
+      currentPlayer = next;
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    final GameData data = widget.data!;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: FontConstants.title.fontFamily,
-        ),
-        backgroundColor: colorScheme.background,
-        title: Text(data.settings.points.text),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.question_mark),
-          ),
-        ],
-        leading: IconButton(
-          onPressed: () {
-            setState(() {
-              Navigator.pop(context);
-            });
-          },
-          icon: const Icon(Icons.close),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Visibility(
-            visible: data.isMultiPlayer,
-            child: _PlayersList(this),
-          ),
-          _CurrentPlayer(this),
-          _PointSelector(this),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(
-              vertical: 5,
-              horizontal: 10,
-            ),
-            child: ElevatedButton(
-              onPressed: !data.turnDone() ? null : () {
-                setState(() {
-                  data.curPlyApply(widget.data!.curThrows);
-                  data.next();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                textStyle: FontConstants.text,
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-              ),
-              child: const Text('next'),
-            ),
-          ),
-        ],
-      ),
-    );
+  bool get isSinglePlayer {
+    return otherPlayer.isEmpty && finishedPlayer.isEmpty;
   }
-}
 
-class _PlayersList extends Container {
-  final _X01PageState state;
+  bool get isMultiPlayer {
+    return !isSinglePlayer;
+  }
 
-  _PlayersList(this.state);
+  int get updatedPoints {
+    return currentPlayer.points - curThrows.sum();
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data!;
+  bool get stillLegal {
+    if (curThrows.count == 0) {
+      return true;
+    }
+    if (currentPlayer.points == settings.points) {
+      return settings.gameIn.fits(curThrows.first);
+    }
+    if (updatedPoints == 0) {
+      return settings.gameOut.fits(curThrows.last);
+    }
+    return updatedPoints > 0 && settings.gameOut.possible(updatedPoints);
+  }
 
-    return Row(
-      children: <Widget>[
-        Expanded(
-            child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: colorScheme.primaryContainer,
-          ),
-          height: 50,
-          child: ListView(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              children: data.otherPlayer.map<Container>((ply) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: colorScheme.primary,
-                  ),
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text(ply.name, overflow: TextOverflow.ellipsis),
-                      ),
-                      SizedBox(
-                        width: 30,
-                        child: Text(ply.points.toString()),
-                      ),
-                    ],
-                  ),
-                );
-              }).followedBy(
-                data.finishedPlayer.map<Container>((ply) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: colorScheme.tertiary,
-                    ),
-                    margin: const EdgeInsets.all(5),
-                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 80,
-                          child: Text(ply.name, overflow: TextOverflow.ellipsis),
-                        ),
-                        const SizedBox(
-                          width: 30,
-                          child: Icon(Icons.check)
-                        ),
-                      ],
-                    ),
-                  );
-                })
-              ).toList()),
-        ))
-      ],
-    );
+  void curPlyApply(Throws throws) {
+    //In
+    if (currentPlayer.points == settings.points) {
+      if (!settings.gameIn.fits(throws.first)) {
+        return;
+      }
+    }
+
+    //Out
+    if (updatedPoints < 0) return;
+    if (updatedPoints == 0) {
+      if (settings.gameOut.fits(throws.last)) {
+        currentPlayer.points = 0;
+        return;
+      }
+    }
+
+    if (!settings.gameOut.possible(updatedPoints)) return;
+
+    currentPlayer.points = updatedPoints;
+  }
+
+  bool turnDone() {
+    return curThrows.done() || !stillLegal || updatedPoints == 0;
+  }
+
+  bool gameFinished() {
+    if (isSinglePlayer) {
+      return currentPlayer.done;
+    } else {
+      return otherPlayer.isEmpty;
+    }
+  }
+
+  String currentPlayerUpdateText() {
+    if (!stillLegal) {
+      return '${currentPlayer.points}';
+    } else {
+      var sum = currentPlayer.points - curThrows.sum();
+      return '$sum';
+    }
   }
 }
 
-class _ThrowBean extends Container {
-  final Widget child;
+class Coordinates {
+  double x;
+  double y;
 
-  _ThrowBean({required this.child});
+  Coordinates(this.x, this.y);
 
   @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: colorScheme.primary,
-      ),
-      padding: const EdgeInsets.all(5),
-      margin: const EdgeInsets.all(5),
-      alignment: Alignment.center,
-      child: child,
-    );
+  String toString() {
+    return 'x($x)\ny($y)';
   }
 }
 
-class _CurrentPlayer extends Container {
-  final _X01PageState state;
+class GameMath {
+  GameMath._();
 
-  _CurrentPlayer(this.state);
+  static double _getDistance(Coordinates coo) {
+    return sqrt(pow(coo.x.abs(), 2) + pow(coo.y.abs(), 2));
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data!;
+  static double _getAngle(double dist, Coordinates coo) {
+    var radiant = acos(coo.y / dist);
+    var degree = radiant * (180 / pi);
+    return coo.x > 0 ? 360 - degree : degree;
+  }
 
-    final TextStyle titleStyle = TextStyle(
-      color: colorScheme.onPrimaryContainer,
-      fontSize: 24,
-      fontFamily: FontConstants.subtitle.fontFamily,
-      fontWeight: FontWeight.bold,
-    );
+  /// Returns Coordinates normalized to 100:-100 with the
+  /// center as 0:0 coordinates.
+  static Coordinates norm(Size size, Offset offset) {
+    var nx = (offset.dx / (size.width / 2)) - 1;
+    var ny = (offset.dy / (size.height / 2)) - 1;
+    return Coordinates(nx * 100.0, ny * 100.0);
+  }
 
-    return Container(
-      padding: const EdgeInsets.all(5),
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: colorScheme.primaryContainer,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
-            child: Row(
-              children: [
-                const Spacer(flex: 1),
-                Text(
-                  data.currentPlayer!.name,
-                  style: titleStyle,
-                ),
-                const Spacer(flex: 2),
-                Text(
-                  data.currentPlayerUpdateText(),
-                  style: titleStyle.copyWith(
-                    color: data.stillLegal //
-                        ? data.updatedPoints == 0 //
-                          ? colorScheme.tertiary //
-                          : colorScheme.onPrimaryContainer //
-                        : colorScheme.error
-                  ),
-                ),
-                const Spacer(flex: 1),
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.first?.toString() ?? '',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.second?.toString() ?? '',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.third?.toString() ?? '',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  static (double, double) vectorData(Coordinates coo) {
+    var distance = _getDistance(coo);
+    var angle = _getAngle(distance, coo);
+    return (distance, angle);
   }
 }
 
-class _PointSelector extends Container {
-  final _X01PageState state;
-  final _gestureKey = GlobalKey();
+class FieldCalc {
+  FieldCalc._();
 
-  _PointSelector(this.state);
+  static Hit getField({required double angle, required double distance}) {
+    //Miss
+    if (distance >= 89.0) {
+      return Hit.miss;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data!;
+    //BullsEye
+    if (distance <= 7.1) {
+      return const Hit(HitNumber.bullsEye, HitMultiplier.double);
+    }
+    if (distance <= 16.0) {
+      return const Hit(HitNumber.bullsEye, HitMultiplier.single);
+    }
 
-    return Expanded(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: colorScheme.primaryContainer,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints.tightFor(),
-              child: GestureDetector(
-                key: _gestureKey,
-                onTapUp: (details) {
-                  var size = _gestureKey.currentContext!.size!;
-                  var pos = details.localPosition;
+    HitMultiplier multiplier = HitMultiplier.single;
+    if (distance > 27.0 && distance < 46.0) {
+      multiplier = HitMultiplier.triple;
+    } else if (distance > 69.0 && distance < 89.0) {
+      multiplier = HitMultiplier.double;
+    }
 
-                  var norm = GameMath.norm(size, pos);
-                  var (distance, angle) = GameMath.vectorData(norm);
+    // normalize to 1(at angle 189)
+    angle = (angle >= 189) ? (angle - 189) : ((360 - 189) + angle);
 
-                  if (distance > 101) return;
-
-                  var field = FieldCalc.getField(angle: angle, distance: distance);
-                  state.thrown(field);
-                },
-                child: const Image(
-                  image: AssetImage("assets/images/dart_board-1024.png"),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    int section = (angle / 18.0).floor();
+    HitNumber value = HitNumber.bySegment(section);
+    return Hit(value, multiplier);
   }
 }
