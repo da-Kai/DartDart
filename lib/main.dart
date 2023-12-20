@@ -1,22 +1,33 @@
-import 'package:flutter/material.dart';
 import 'package:dart_dart/constants/color.dart';
+import 'package:dart_dart/constants/font.dart';
+import 'package:dart_dart/constants/icon.dart';
+import 'package:dart_dart/game/x01/settings.site.dart';
+import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const DartDart());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DartDart extends StatelessWidget {
+  const DartDart({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dart Dart',
+      title: 'DartDart',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: ColorConstants.primary),
+        colorScheme: ColorSchemes.light,
+        fontFamily: FontConstants.text.fontFamily,
         useMaterial3: true,
       ),
-      home: const HomePage(title: ''),
+      darkTheme: ThemeData(
+        colorScheme: ColorSchemes.dark,
+        fontFamily: FontConstants.text.fontFamily,
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: true,
+      home: const HomePage(title: 'Dart Dart'),
     );
   }
 }
@@ -31,26 +42,59 @@ class HomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<HomePage> {
-
-  void _update() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      padding: const EdgeInsets.all(12),
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+    );
+
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        titleTextStyle: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, fontFamily: FontConstants.title.fontFamily),
+        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: colorScheme.primary,
+        surfaceTintColor: colorScheme.onPrimary,
+        leading: const Icon(CustomIcons.dartDart, size: 50),
+        leadingWidth: 100,
         title: Text(widget.title),
+        centerTitle: true,
+        toolbarHeight: 90.0,
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Welcome to DartDart',
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 30,
+              ),
+              child: ElevatedButton(
+                style: style,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => X01Setting()),
+                  );
+                },
+                child: const Text('X01'),
+              ),
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: Container(
+          color: colorScheme.primary,
         ),
       ),
     );
