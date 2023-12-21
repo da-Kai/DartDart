@@ -1,6 +1,10 @@
 # DartDart
 Dart-Scoreboard App written in Dart and Flutter
 
+## Gamemodes
+
+- X01
+
 #### Update Icons
 ```bash
 flutter pub run flutter_launcher_icons
