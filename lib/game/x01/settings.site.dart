@@ -71,6 +71,7 @@ class _X01PageState extends State<X01Setting> {
             fontSize: 24,
             fontWeight: FontWeight.bold,
             fontFamily: FontConstants.title.fontFamily,
+            color: colorScheme.onPrimary,
           ),
           foregroundColor: colorScheme.onPrimary,
           backgroundColor: colorScheme.primary,

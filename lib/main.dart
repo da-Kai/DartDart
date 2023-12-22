@@ -56,7 +56,12 @@ class _MyHomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        titleTextStyle: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, fontFamily: FontConstants.title.fontFamily),
+        titleTextStyle: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            fontFamily: FontConstants.title.fontFamily,
+            color: colorScheme.onPrimary,
+        ),
         foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
         surfaceTintColor: colorScheme.onPrimary,
@@ -74,7 +79,7 @@ class _MyHomePageState extends State<HomePage> {
               width: double.infinity,
               margin: const EdgeInsets.symmetric(
                 vertical: 10,
-                horizontal: 30,
+                horizontal: 40,
               ),
               child: ElevatedButton(
                 style: style,
@@ -84,7 +89,10 @@ class _MyHomePageState extends State<HomePage> {
                     MaterialPageRoute(builder: (context) => X01Setting()),
                   );
                 },
-                child: const Text('X01'),
+                child: const Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text('X01'),
+                )
               ),
             ),
           ],
