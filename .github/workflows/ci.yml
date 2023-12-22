@@ -1,9 +1,9 @@
 name: Test DartDart
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test-dart:
@@ -17,5 +17,7 @@ jobs:
       - run: flutter --version
 
       - run: flutter pub get
+
       - run: flutter test
+      
       - run: dart analyze

@@ -35,6 +35,7 @@ class _X01PageState extends State<X01Game> {
           fontSize: 20,
           fontWeight: FontWeight.bold,
           fontFamily: FontConstants.title.fontFamily,
+          color: colorScheme.onBackground,
         ),
         backgroundColor: colorScheme.background,
         title: Text(data.settings.game.text),
@@ -49,12 +50,12 @@ class _X01PageState extends State<X01Game> {
         centerTitle: true,
         actions: [
           IconButton(
-              icon: const Icon(Icons.undo),
-              onPressed: () {
-                setState(() {
-                  data.curThrows.undo();
-                });
-              },
+            icon: const Icon(Icons.undo),
+            onPressed: () {
+              setState(() {
+                data.curThrows.undo();
+              });
+            },
           )
         ],
       ),
@@ -74,27 +75,30 @@ class _X01PageState extends State<X01Game> {
               horizontal: 10,
             ),
             child: ElevatedButton(
-              onPressed: !data.turnDone() ? null : () {
-                  var done = false;
-                  var ply = data.currentPlayer.name;
-                  setState(() {
-                    data.curPlyApply(data.curThrows);
-                    done = data.currentPlayer.done;
-                    data.next();
-                  });
-                  if(done) {
-                    _GameEnd(context: context, winner: ply).open() //
-                    .then((rematch) {
+              onPressed: !data.turnDone()
+                  ? null
+                  : () {
+                      var done = false;
+                      var ply = data.currentPlayer.name;
                       setState(() {
-                        if(rematch) {
-                          data.reset();
-                        } else {
-                          Navigator.pop(context);
-                        }
+                        data.curPlyApply(data.curThrows);
+                        done = data.currentPlayer.done;
+                        data.next();
                       });
-                    });
-                  }
-                },
+                      if (done) {
+                        _GameEnd(context: context, winner: ply)
+                            .open() //
+                            .then((rematch) {
+                          setState(() {
+                            if (rematch) {
+                              data.reset();
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          });
+                        });
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 textStyle: FontConstants.text,
                 backgroundColor: colorScheme.primary,
@@ -145,11 +149,20 @@ class _PlayersList extends Container {
                     children: [
                       SizedBox(
                         width: 80,
-                        child: Text(ply.name, overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          ply.name,
+                          overflow: TextOverflow.ellipsis,
+                          style: FontConstants.text.copyWith(
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
                       ),
                       SizedBox(
                         width: 30,
-                        child: Text(ply.points.toString()),
+                        child: Text(
+                          ply.points.toString(),
+                          style: FontConstants.text.copyWith(color: colorScheme.onPrimary),
+                        ),
                       ),
                     ],
                   ),
@@ -180,7 +193,9 @@ class _PlayersList extends Container {
 }
 
 class _ThrowBean extends Container {
-  _ThrowBean({required super.child});
+  final String text;
+
+  _ThrowBean({required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +208,13 @@ class _ThrowBean extends Container {
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
-      child: child,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 20,
+          color: colorScheme.onPrimary,
+        ),
+      ),
     );
   }
 }
@@ -256,28 +277,13 @@ class _CurrentPlayer extends Container {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.first.toString(),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
+                  child: _ThrowBean(text: '${data.curThrows.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.second.toString(),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
+                  child: _ThrowBean(text: '${data.curThrows.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(
-                    child: Text(
-                      data.curThrows.third.toString(),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
+                  child: _ThrowBean(text: '${data.curThrows.third}'),
                 ),
               ],
             ),
@@ -358,36 +364,38 @@ class _GameEnd {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Congratulations',
-                textAlign: TextAlign.center,
-                style: FontConstants.subtitle,
-            ),
-            content: Text('"$winner" won!',
-              textAlign: TextAlign.center,
-              style: FontConstants.text,
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('REMATCH'),
-                onPressed: () {
-                  rematch = true;
-                  Navigator.pop(context);
-                },
-              ),
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('QUIT'),
-                onPressed: () {
-                  rematch = false;
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+        title: const Text(
+          'Congratulations',
+          textAlign: TextAlign.center,
+          style: FontConstants.subtitle,
+        ),
+        content: Text(
+          '"$winner" won!',
+          textAlign: TextAlign.center,
+          style: FontConstants.text,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: <Widget>[
+          MaterialButton(
+            color: colorScheme.primary,
+            textColor: colorScheme.onPrimary,
+            child: const Text('REMATCH'),
+            onPressed: () {
+              rematch = true;
+              Navigator.pop(context);
+            },
           ),
+          MaterialButton(
+            color: colorScheme.primary,
+            textColor: colorScheme.onPrimary,
+            child: const Text('QUIT'),
+            onPressed: () {
+              rematch = false;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     ).then((_) => rematch);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:dart_dart/constants/color.dart';
 import 'package:dart_dart/constants/font.dart';
 import 'package:dart_dart/game/x01/game.site.dart';
 import 'package:dart_dart/game/x01/settings.dart';
@@ -147,6 +148,7 @@ class _PlayerNameDialog {
               controller: textController,
               decoration: InputDecoration(hintText: "name", errorText: errorText),
             ),
+            backgroundColor: colorScheme.primaryContainer,
             actionsAlignment: MainAxisAlignment.center,
             actions: <Widget>[
               MaterialButton(
@@ -236,9 +238,10 @@ class _GameSettingContainer extends Container {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text("Game",
-              style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
-              )),
+              style: FontConstants.subtitle.copyWith(
+                color: colorScheme.onPrimaryContainer
+              ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -332,9 +335,10 @@ class _InOutSettingContainer extends Container {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text("In",
-              style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
-              )),
+            style: FontConstants.subtitle.copyWith(
+                color: colorScheme.onPrimaryContainer
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -356,9 +360,10 @@ class _InOutSettingContainer extends Container {
             ],
           ),
           Text("Out",
-              style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
-              )),
+            style: FontConstants.subtitle.copyWith(
+                color: colorScheme.onPrimaryContainer
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -409,9 +414,10 @@ class _PlayerSettingContainer extends Container {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("Player",
-                    style: TextStyle(
-                      color: colorScheme.onPrimaryContainer,
-                    )),
+                  style: FontConstants.subtitle.copyWith(
+                      color: colorScheme.onPrimaryContainer
+                  ),
+                ),
               ],
             ),
             Expanded(
@@ -426,7 +432,7 @@ class _PlayerSettingContainer extends Container {
                           child: Text(
                             player,
                             overflow: TextOverflow.ellipsis,
-                            style: FontConstants.text.copyWith(fontSize: 15),
+                            style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         IconButton(
@@ -442,12 +448,18 @@ class _PlayerSettingContainer extends Container {
                             });
                           },
                           icon: const Icon(Icons.edit),
+                          color: colorScheme.onPrimaryContainer,
+                          iconSize: 22,
+                          visualDensity: VisualDensity.compact,
                         ),
                         IconButton(
                           onPressed: () {
                             state._removePlayer(player);
                           },
                           icon: const Icon(Icons.delete),
+                          color: colorScheme.onPrimaryContainer,
+                          iconSize: 22,
+                          visualDensity: VisualDensity.compact,
                         )
                       ],
                     );
@@ -477,7 +489,7 @@ class _PlayerSettingContainer extends Container {
                       }
                     });
                   },
-                  icon: const Icon(Icons.add),
+                  icon: Icon(Icons.add, color: colorScheme.onPrimaryContainer,),
                 )
               ],
             ),
