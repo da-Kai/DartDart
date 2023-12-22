@@ -1,3 +1,4 @@
+import 'package:dart_dart/constants/font.dart';
 import 'package:flutter/material.dart';
 
 class ColorConstants {
@@ -18,18 +19,21 @@ class ColorConstants {
   static const Color warning = Color.fromRGBO(254, 186, 83, 1.0);
   static const Color fault = Color.fromRGBO(224, 122, 95, 1.0);
 
-  static const Color text = Color.fromRGBO(5, 10, 20, 1.0);
+  //static const Color textDark = Color.fromRGBO(10, 20, 30, 1.0);
+  static const Color textDark = Color.fromRGBO(57, 47, 45, 1.0);
   static const Color textLight = Color.fromRGBO(251, 246, 236, 1.0);
 
   static const Color backgroundDark = Color.fromRGBO(33, 33, 33, 1.0);
-  static const Color backgroundLight = Color.fromRGBO(240, 240, 250, 1.0);
+  static const Color backgroundBeige = Color.fromRGBO(185, 168, 138, 1.0);
+  static const Color backgroundLight = Color.fromRGBO(220, 220, 225, 1.0);
+
   static const Color shadow = Color.fromRGBO(5, 10, 20, 0.8);
 
   // #272D33
   static const Color primaryContainer = Color.fromRGBO(39, 45, 51, 1.0);
 
   // #cadeef
-  static const Color primaryContainerLight = Color.fromRGBO(202, 222, 239, 1.0);
+  static const Color primaryContainerLight = Color.fromRGBO(221, 212, 198, 1.0);
 }
 
 extension ColorSchemes on ColorScheme {
@@ -42,18 +46,28 @@ extension ColorSchemes on ColorScheme {
     }
   }
 
+  TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow}) {
+    return FontConstants.text.copyWith(
+      color: color ?? onPrimaryContainer,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      overflow: overflow
+    );
+  }
+
   static const ColorScheme light = ColorScheme.light(
     primary: ColorConstants.primary,
     onPrimary: ColorConstants.textLight,
     secondary: ColorConstants.secondary,
-    onSecondary: ColorConstants.text,
+    onSecondary: ColorConstants.textDark,
     error: ColorConstants.fault,
-    onError: ColorConstants.text,
+    onError: ColorConstants.textDark,
     errorContainer: ColorConstants.fault,
-    onErrorContainer: ColorConstants.text,
+    onErrorContainer: ColorConstants.textDark,
     primaryContainer: ColorConstants.primaryContainerLight,
-    onPrimaryContainer: ColorConstants.textLight,
+    onPrimaryContainer: ColorConstants.textDark,
     shadow: ColorConstants.shadow,
+    background: ColorConstants.backgroundBeige,
   );
 
   static const ColorScheme dark = ColorScheme.dark(
@@ -62,9 +76,9 @@ extension ColorSchemes on ColorScheme {
     secondary: ColorConstants.secondary,
     onSecondary: ColorConstants.textLight,
     error: ColorConstants.fault,
-    onError: ColorConstants.text,
+    onError: ColorConstants.textDark,
     errorContainer: ColorConstants.fault,
-    onErrorContainer: ColorConstants.text,
+    onErrorContainer: ColorConstants.textDark,
     primaryContainer: ColorConstants.primaryContainer,
     onPrimaryContainer: ColorConstants.textLight,
     shadow: ColorConstants.shadow,
