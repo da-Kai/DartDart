@@ -3,7 +3,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test-dart:
@@ -17,5 +17,9 @@ jobs:
       - run: flutter --version
 
       - run: flutter pub get
+      
+      - run: ls -l
+      
       - run: flutter test
+      
       - run: dart analyze
