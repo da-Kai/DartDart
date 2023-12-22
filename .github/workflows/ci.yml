@@ -17,9 +17,7 @@ jobs:
       - run: flutter --version
 
       - run: flutter pub get
-      
-      - run: ls -lR assets/fonts/
-      
+
       - run: flutter test
       
       - run: dart analyze
