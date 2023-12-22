@@ -52,34 +52,34 @@ flutter:
         - asset: assets/fonts/dartdart/dartdart.ttf
     - family: oswald
       fonts:
-        - asset: assets/fonts/oswald/oswald-Regular.ttf
-        - asset: assets/fonts/oswald/oswald-Bold.ttf
+        - asset: assets/fonts/oswald/oswald-regular.ttf
+        - asset: assets/fonts/oswald/oswald-bold.ttf
           weight: 900
-        - asset: assets/fonts/oswald/oswald-Medium.ttf
+        - asset: assets/fonts/oswald/oswald-medium.ttf
           weight: 500
-        - asset: assets/fonts/oswald/oswald-Light.ttf
+        - asset: assets/fonts/oswald/oswald-light.ttf
           weight: 300
     - family: mitr
       fonts:
-        - asset: assets/fonts/mitr/Mitr-Regular.ttf
-        - asset: assets/fonts/mitr/Mitr-Bold.ttf
+        - asset: assets/fonts/mitr/mitr-regular.ttf
+        - asset: assets/fonts/mitr/mitr-bold.ttf
           weight: 900
-        - asset: assets/fonts/mitr/Mitr-Medium.ttf
+        - asset: assets/fonts/mitr/mitr-medium.ttf
           weight: 500
-        - asset: assets/fonts/mitr/Mitr-Light.ttf
+        - asset: assets/fonts/mitr/mitr-light.ttf
           weight: 300
     - family: titillium
       fonts:
-        - asset: assets/fonts/titillium_web/TitilliumWeb-Regular.ttf
-        - asset: assets/fonts/titillium_web/TitilliumWeb-Bold.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-regular.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-bold.ttf
           weight: 900
-        - asset: assets/fonts/titillium_web/TitilliumWeb-BoldItalic.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-bold-italic.ttf
           weight: 900
           style: italic
-        - asset: assets/fonts/titillium_web/TitilliumWeb-Italic.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-italic.ttf
           style: italic
-        - asset: assets/fonts/titillium_web/TitilliumWeb-Light.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-light.ttf
           weight: 200
-        - asset: assets/fonts/titillium_web/TitilliumWeb-LightItalic.ttf
+        - asset: assets/fonts/titillium_web/titillium-web-light-italic.ttf
           weight: 200
           style: italic
