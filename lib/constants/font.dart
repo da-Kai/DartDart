@@ -7,9 +7,9 @@ class FontConstants {
     fontFamily: 'oswald',
   );
   static const TextStyle subtitle = TextStyle(
-    fontFamily: 'titilliumWeb',
+    fontFamily: 'titillium',
     fontWeight: FontWeight.bold,
-    fontSize: 22,
+    fontSize: 18,
   );
   static const TextStyle text = TextStyle(
     fontFamily: 'mitr',

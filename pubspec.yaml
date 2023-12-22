@@ -68,7 +68,7 @@ flutter:
           weight: 500
         - asset: assets/fonts/mitr/Mitr-Light.ttf
           weight: 300
-    - family: titilliumWeb
+    - family: titillium
       fonts:
         - asset: assets/fonts/titillium_web/TitilliumWeb-Regular.ttf
         - asset: assets/fonts/titillium_web/TitilliumWeb-Bold.ttf
