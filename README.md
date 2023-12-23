@@ -27,3 +27,10 @@ flutter build web --base-href '/'
 ```bash
 flutter run -d "$BROWER" --web-renderer html
 ```
+
+## Planed Features
+
+- [ ] Layout for landscape mode
+- [ ] X01 improvements
+- [ ] Cricked gamemode
+- [ ] Game Statistics
