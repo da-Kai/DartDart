@@ -336,7 +336,7 @@ class _PointSelector extends Container {
                   state.thrown(field);
                 },
                 child: const Image(
-                  image: AssetImage("assets/images/dart_board-1024.png"),
+                  image: AssetImage('assets/images/dart_board-1024.png'),
                   fit: BoxFit.contain,
                 ),
               ),

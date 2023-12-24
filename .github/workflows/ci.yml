@@ -20,4 +20,4 @@ jobs:
 
       - run: flutter test
       
-      - run: dart analyze
+      - run: flutter analyze

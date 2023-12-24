@@ -76,7 +76,7 @@ class _X01PageState extends State<X01Setting> {
           foregroundColor: colorScheme.onPrimary,
           backgroundColor: colorScheme.primary,
           surfaceTintColor: colorScheme.onPrimary,
-          title: const Text("X01-Game"),
+          title: const Text('X01-Game'),
           centerTitle: true,
         ),
         body: Column(
@@ -147,7 +147,7 @@ class _PlayerNameDialog {
             title: Text(player == null ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
             content: TextField(
               controller: textController,
-              decoration: InputDecoration(hintText: "name", errorText: errorText),
+              decoration: InputDecoration(hintText: 'name', errorText: errorText),
             ),
             backgroundColor: colorScheme.primaryContainer,
             actionsAlignment: MainAxisAlignment.center,
@@ -238,7 +238,7 @@ class _GameSettingContainer extends Container {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Game",
+          Text('Game',
               style: FontConstants.subtitle.copyWith(
                 color: colorScheme.onPrimaryContainer
               ),
@@ -335,7 +335,7 @@ class _InOutSettingContainer extends Container {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("In",
+          Text('In',
             style: FontConstants.subtitle.copyWith(
                 color: colorScheme.onPrimaryContainer
             ),
@@ -360,7 +360,7 @@ class _InOutSettingContainer extends Container {
               ),
             ],
           ),
-          Text("Out",
+          Text('Out',
             style: FontConstants.subtitle.copyWith(
                 color: colorScheme.onPrimaryContainer
             ),
@@ -414,7 +414,7 @@ class _PlayerSettingContainer extends Container {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Player",
+                Text('Player',
                   style: FontConstants.subtitle.copyWith(
                       color: colorScheme.onPrimaryContainer
                   ),
