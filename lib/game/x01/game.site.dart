@@ -16,6 +16,8 @@ class X01Game extends StatefulWidget {
 }
 
 class _X01PageState extends State<X01Game> {
+  final InputType inputType = InputType();
+
   void thrown(Hit hit) {
     setState(() {
       widget.data.curThrows.thrown(hit);
@@ -25,7 +27,6 @@ class _X01PageState extends State<X01Game> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     final GameData data = widget.data;
 
     return Scaffold(
@@ -67,12 +68,13 @@ class _X01PageState extends State<X01Game> {
             child: _PlayersList(this),
           ),
           _CurrentPlayer(this),
-          _PointSelector(this),
+          _PointSelector(this, setState, inputType),
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.symmetric(
-              vertical: 5,
-              horizontal: 10,
+            margin: const EdgeInsets.only(
+              bottom: 5,
+              left: 10,
+              right: 10,
             ),
             child: ElevatedButton(
               onPressed: !data.turnDone()
@@ -296,55 +298,293 @@ class _CurrentPlayer extends Container {
 
 class _PointSelector extends Container {
   final _X01PageState state;
-  final _gestureKey = GlobalKey();
+  final Function(Function()) setState;
+  final InputType inputType;
 
-  _PointSelector(this.state);
+  _PointSelector(this.state, this.setState, this.inputType);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    const Radius borderRadius = Radius.circular(20);
 
-    return Expanded(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: colorScheme.primaryContainer,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints.tightFor(),
-              child: GestureDetector(
-                key: _gestureKey,
-                onTapUp: (details) {
-                  var size = _gestureKey.currentContext!.size!;
-                  var pos = details.localPosition;
+    void addSelection(hit) => state.thrown(hit);
 
-                  var norm = GameMath.norm(size, pos);
-                  var (distance, angle) = GameMath.vectorData(norm);
-
-                  if (distance > 101) return;
-
-                  var field = FieldCalc.getField(angle: angle, distance: distance);
-                  state.thrown(field);
-                },
-                child: const Image(
-                  image: AssetImage('assets/images/dart_board-1024.png'),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    final ButtonStyle selectedButton = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
     );
+
+    final ButtonStyle button = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+    );
+
+    return StatefulBuilder(builder: (context, setState) {
+      return Expanded(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 5),
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(topLeft: borderRadius, topRight: borderRadius),
+                        color: colorScheme.primaryContainer,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    height: 55,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(bottomLeft: borderRadius, bottomRight: borderRadius),
+                      color: colorScheme.primaryContainer,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: inputType.isBoard ? _BoardSelect(state, addSelection) : _FieldSelect(state, addSelection),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 5),
+                      height: 55,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child:  ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  inputType.isBoard = true;
+                                });
+                                },
+                              style: inputType.isBoard ? selectedButton : button,
+                              child: const Text('BOARD'),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child:  ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  inputType.isField = true;
+                                });
+                              },
+                              style: inputType.isField ? selectedButton : button,
+                              child: const Text('FIELD'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _BoardSelect extends Container {
+  final _X01PageState state;
+  final _gestureKey = GlobalKey();
+  final Function(Hit) addSelection;
+
+  _BoardSelect(this.state, this.addSelection);
+
+  @override
+  EdgeInsetsGeometry? get padding => const EdgeInsets.symmetric(horizontal: 5.0);
+
+  @override
+  AlignmentGeometry? get alignment => Alignment.center;
+
+  @override
+  Widget? get child => ConstrainedBox(
+    constraints: const BoxConstraints.tightFor(),
+    child: GestureDetector(
+      key: _gestureKey,
+      onTapUp: (details) {
+        var size = _gestureKey.currentContext!.size!;
+        var pos = details.localPosition;
+
+        var norm = GameMath.norm(size, pos);
+        var (distance, angle) = GameMath.vectorData(norm);
+
+        if (distance > 101) return;
+
+        var field = FieldCalc.getField(angle: angle, distance: distance);
+        addSelection(field);
+      },
+      child: const Image(
+        image: AssetImage('assets/images/dart_board-1024.png'),
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
+}
+
+class _MultiplierButton extends Container {
+
+  final Function(HitMultiplier) onPressed;
+  final HitMultiplier hitMultiplier;
+
+  _MultiplierButton({required this.onPressed, required this.hitMultiplier});
+
+  @override
+  Widget? get child => Expanded(
+      child: Container(
+        height: 50,
+        margin: const EdgeInsets.all(2.5),
+        padding: EdgeInsets.zero,
+        child: ElevatedButton(
+          onPressed: () => onPressed(hitMultiplier),
+          style: ElevatedButton.styleFrom(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            padding: EdgeInsets.zero,
+          ),
+          child: Text(hitMultiplier.text),
+        ),
+      )
+  );
+}
+
+class _HitButton extends Container {
+
+  final Function(Hit) onPressed;
+  final HitNumber hitNum;
+  final HitMultiplier hitMult;
+
+  Hit get hit {
+    return Hit.getFrom(hitNum, hitMult);
+  }
+
+  _HitButton({required this.onPressed, required this.hitMult, required this.hitNum});
+
+  @override
+  Widget? get child => Expanded(
+      child: Container(
+        height: 50,
+        margin: const EdgeInsets.all(2.5),
+        padding: EdgeInsets.zero,
+        child: ElevatedButton(
+          onPressed: () => onPressed(hit),
+          style: ElevatedButton.styleFrom(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            padding: EdgeInsets.zero,
+          ),
+          child: Text(
+              hit.abbreviation,
+          ),
+        ),
+      )
+  );
+}
+
+class _FieldSelect extends Container {
+  final _X01PageState state;
+  final Function(Hit) addSelection;
+  late final ColorScheme colorScheme;
+
+  _FieldSelect(this.state, this.addSelection) {
+    colorScheme = Theme.of(state.context).colorScheme;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    HitMultiplier hitMultiplier = HitMultiplier.single;
+
+    return StatefulBuilder(builder: (context, setState) {
+
+      void setHitMultiplier(HitMultiplier hm) {
+        setState((){
+          hitMultiplier = hm;
+        });
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+            constraints: const BoxConstraints.tightFor(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    _MultiplierButton(onPressed: setHitMultiplier, hitMultiplier: HitMultiplier.single),
+                    _MultiplierButton(onPressed: setHitMultiplier, hitMultiplier: HitMultiplier.double),
+                    _MultiplierButton(onPressed: setHitMultiplier, hitMultiplier: HitMultiplier.triple),
+                  ],
+                ),
+                Divider(
+                  color: colorScheme.scrim,
+                  height: 15.0,
+                  thickness: 1.5,
+                ),
+                Row(
+                  children: [
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.one),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.two),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.three),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.four),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.five),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.six),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.seven),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.eight),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.nine),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.ten),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.eleven),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.twelve),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.thirteen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.fourteen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.fifteen),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.sixteen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.seventeen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.eighteen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.nineteen),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.twenty),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.bullsEye),
+                    _HitButton(onPressed: addSelection, hitMult: hitMultiplier, hitNum: HitNumber.miss),
+                  ],
+                ),
+              ],
+            )
+        ),
+      );
+    });
   }
 }
 

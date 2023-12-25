@@ -81,13 +81,14 @@ enum HitNumber {
 }
 
 enum HitMultiplier {
-  single('', 1),
-  double('D', 2),
-  triple('T', 3);
+  single(1, '', 'x1'),
+  double(2, 'D', 'x2'),
+  triple(3, 'T', 'x3');
 
-  const HitMultiplier(this.prefix, this.multiplier);
+  const HitMultiplier(this.multiplier, this.prefix, this.text);
 
   final String prefix;
+  final String text;
   final int multiplier;
 }
 
@@ -100,16 +101,32 @@ class Hit {
 
   const Hit(this.number, this.multiplier);
 
+  static Hit getFrom(HitNumber number, HitMultiplier multiplier) {
+    if(number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
+      return Hit(number, HitMultiplier.double);
+    } else {
+      return Hit(number, multiplier);
+    }
+  }
+
   int get value {
     return number.value * multiplier.multiplier;
   }
 
+  String get abbreviation {
+    switch(number) {
+      case HitNumber.unthrown:
+        return '';
+      case HitNumber.miss:
+        return 'MISS';
+      default:
+        return multiplier.prefix + number.abbr;
+    }
+  }
+
   @override
   String toString() {
-    if(number == HitNumber.unthrown) {
-        return '';
-    }
-    return multiplier.prefix + number.abbr;
+    return abbreviation;
   }
 }
 

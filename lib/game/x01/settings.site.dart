@@ -200,16 +200,19 @@ class _Button extends Container {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: FontConstants.text,
-      backgroundColor: colorScheme.primary //
-          .withOpacity(selected ? 1.0 : 0.4),
+      backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
+    );
+
+    final ButtonStyle offStyle = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
     );
 
     return Expanded(
       child: Container(
         margin: buttonMargin,
         child: ElevatedButton(
-          style: style,
+          style: selected ? style : offStyle,
           onPressed: onPressed,
           child: Text(text),
         ),
