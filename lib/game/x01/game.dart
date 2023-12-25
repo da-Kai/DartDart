@@ -25,6 +25,10 @@ class GameData {
   Throws curThrows = Throws();
 
   GameData(this.settings) {
+    if(settings.players.isEmpty) {
+      currentPlayer = Player('ERROR', -1);
+      return;
+    }
     otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
     currentPlayer = otherPlayer.removeAt(0);
   }
@@ -191,5 +195,25 @@ class FieldCalc {
     int section = (angle / 18.0).floor();
     HitNumber value = HitNumber.bySegment(section);
     return Hit(value, multiplier);
+  }
+}
+
+class InputType {
+  bool _isBoard = true;
+
+  bool get isBoard {
+    return _isBoard;
+  }
+
+  set isBoard(val) {
+    _isBoard = val;
+  }
+
+  bool get isField {
+    return !_isBoard;
+  }
+
+  set isField(val) {
+    _isBoard = !val;
   }
 }
