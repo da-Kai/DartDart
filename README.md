@@ -1,9 +1,12 @@
-# DartDart
-Dart-Scoreboard App written in Dart and Flutter
+# <img src="assets/icons/icon-colored.svg" width=25pt height=25pt></img> DartDart
+
+DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It alows you to keep track of your dart games.
 
 ## Gamemodes
 
 - X01
+- Cricked (Planned)
+- Round the Clock (Planned)
 
 ## Build
 
@@ -25,13 +28,3 @@ flutter build web --base-href '/'
 ```bash
 flutter run -d "$BROWER" --web-renderer html
 ```
-
-## Planed Features
-
-- [x] Prototyp
-- [ ] Layout for landscape mode
-- [ ] X01 improvements
-- [ ] Cricked gamemode
-- [ ] Game Statistics
-- [ ] Improve styling
-
