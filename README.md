@@ -1,8 +1,6 @@
 # DartDart
 Dart-Scoreboard App written in Dart and Flutter
 
-*https://da-kai.github.io/DartDart/*
-
 ## Gamemodes
 
 - X01
@@ -27,3 +25,13 @@ flutter build web --base-href '/'
 ```bash
 flutter run -d "$BROWER" --web-renderer html
 ```
+
+## Planed Features
+
+- [x] Prototyp
+- [ ] Layout for landscape mode
+- [ ] X01 improvements
+- [ ] Cricked gamemode
+- [ ] Game Statistics
+- [ ] Improve styling
+
