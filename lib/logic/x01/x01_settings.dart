@@ -1,4 +1,4 @@
-import 'package:dart_dart/constants/fields.dart';
+import 'package:dart_dart/logic/constant/fields.dart';
 
 enum InOut {
   single,
