@@ -1,7 +1,8 @@
-import 'package:dart_dart/constants/color.dart';
-import 'package:dart_dart/constants/font.dart';
-import 'package:dart_dart/game/x01/game.site.dart';
-import 'package:dart_dart/game/x01/settings.dart';
+import 'package:dart_dart/style/color.dart';
+import 'package:dart_dart/style/font.dart';
+import 'package:dart_dart/pages/games/x01_game_page.dart';
+import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/widget/x01/selection_row.dart';
 import 'package:flutter/material.dart';
 
 typedef Validator = (bool, String?) Function(String);
@@ -149,7 +150,7 @@ class _PlayerNameDialog {
               controller: textController,
               decoration: InputDecoration(hintText: 'name', errorText: errorText),
             ),
-            backgroundColor: colorScheme.primaryContainer,
+            backgroundColor: colorScheme.backgroundShade,
             actionsAlignment: MainAxisAlignment.center,
             actions: <Widget>[
               MaterialButton(
@@ -187,40 +188,6 @@ class _PlayerNameDialog {
   }
 }
 
-class _Button extends Container {
-  final EdgeInsets buttonMargin = const EdgeInsets.all(5);
-  final String text;
-  final Function() onPressed;
-  final bool selected;
-
-  _Button(this.text, this.onPressed, this.selected);
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final ButtonStyle style = ElevatedButton.styleFrom(
-      textStyle: FontConstants.text,
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-    );
-
-    final ButtonStyle offStyle = ElevatedButton.styleFrom(
-      textStyle: FontConstants.text,
-    );
-
-    return Expanded(
-      child: Container(
-        margin: buttonMargin,
-        child: ElevatedButton(
-          style: selected ? style : offStyle,
-          onPressed: onPressed,
-          child: Text(text),
-        ),
-      ),
-    );
-  }
-}
-
 class _GameSettingContainer extends Container {
   final _X01PageState state;
 
@@ -231,44 +198,35 @@ class _GameSettingContainer extends Container {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final GameSettings settings = state.widget._data;
 
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      disabledBackgroundColor: colorScheme.primary,
+      disabledForegroundColor: colorScheme.onPrimary,
+    );
+
     return Container(
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: colorScheme.primaryContainer,
+        color: colorScheme.backgroundShade,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Game',
-              style: FontConstants.subtitle.copyWith(
-                color: colorScheme.onPrimaryContainer
-              ),
+          const Text('Game', style: FontConstants.subtitle),
+          SelectionRow(
+              values: const <String, Games>{
+                '301': Games.threeOOne,
+                '501': Games.fiveOOne,
+                '701': Games.sevenOOne,
+              },
+              setState: state._setPoints,
+              getState: () => settings.game,
+              expanded: true,
+              buttonStyle: buttonStyle,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _Button(
-                '301',
-                () => state._setPoints(Games.threeOOne),
-                settings.game == Games.threeOOne,
-              ),
-              _Button(
-                '501',
-                () => state._setPoints(Games.fiveOOne),
-                settings.game == Games.fiveOOne,
-              ),
-              _Button(
-                '701',
-                () => state._setPoints(Games.sevenOOne),
-                settings.game == Games.sevenOOne,
-              ),
-            ],
-          ),
-
           /*
-
           const SizedBox(height: 10),
           Row(
             children: [
@@ -328,65 +286,49 @@ class _InOutSettingContainer extends Container {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      disabledBackgroundColor: colorScheme.primary,
+      disabledForegroundColor: colorScheme.onPrimary,
+    );
+
+    final TextStyle textStyle = FontConstants.subtitle.copyWith(
+        color: colorScheme.onPrimaryContainer
+    );
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: colorScheme.primaryContainer,
+        color: colorScheme.backgroundShade,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('In',
-            style: FontConstants.subtitle.copyWith(
-                color: colorScheme.onPrimaryContainer
-            ),
+          Text('In', style: textStyle),
+          SelectionRow(
+            values: const <String, InOut>{
+              'Single': InOut.single,
+              'Double': InOut.double,
+              'Master': InOut.master,
+            },
+            setState: state._setGameIn,
+            getState: () => state._data.gameIn,
+            expanded: true,
+            buttonStyle: buttonStyle,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _Button(
-                'Single',
-                () => state._setGameIn(InOut.single),
-                state._data.gameIn == InOut.single,
-              ),
-              _Button(
-                'Double',
-                () => state._setGameIn(InOut.double),
-                state._data.gameIn == InOut.double,
-              ),
-              _Button(
-                'Master',
-                () => state._setGameIn(InOut.master),
-                state._data.gameIn == InOut.master,
-              ),
-            ],
-          ),
-          Text('Out',
-            style: FontConstants.subtitle.copyWith(
-                color: colorScheme.onPrimaryContainer
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _Button(
-                'Single',
-                () => state._setGameOut(InOut.single),
-                state._data.gameOut == InOut.single,
-              ),
-              _Button(
-                'Double',
-                () => state._setGameOut(InOut.double),
-                state._data.gameOut == InOut.double,
-              ),
-              _Button(
-                'Master',
-                () => state._setGameOut(InOut.master),
-                state._data.gameOut == InOut.master,
-              ),
-            ],
+          Text('Out', style: textStyle),
+          SelectionRow(
+            values: const <String, InOut>{
+              'Single': InOut.single,
+              'Double': InOut.double,
+              'Master': InOut.master,
+            },
+            setState: state._setGameOut,
+            getState: () => state._data.gameOut,
+            expanded: true,
+            buttonStyle: buttonStyle,
           ),
         ],
       ),
@@ -409,7 +351,7 @@ class _PlayerSettingContainer extends Container {
         margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: colorScheme.primaryContainer,
+          color: colorScheme.backgroundShade,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

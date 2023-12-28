@@ -1,4 +1,4 @@
-import 'package:dart_dart/constants/font.dart';
+import 'package:dart_dart/style/font.dart';
 import 'package:flutter/material.dart';
 
 class ColorConstants {
@@ -55,6 +55,15 @@ extension ColorSchemes on ColorScheme {
     );
   }
 
+  Color get backgroundShade {
+    switch(brightness) {
+      case Brightness.light:
+        return ColorConstants.primaryContainerLight;
+      case Brightness.dark:
+        return ColorConstants.primaryContainer;
+    }
+  }
+
   static const ColorScheme light = ColorScheme.light(
     primary: ColorConstants.primary,
     onPrimary: ColorConstants.textLight,
@@ -64,7 +73,7 @@ extension ColorSchemes on ColorScheme {
     onError: ColorConstants.textDark,
     errorContainer: ColorConstants.fault,
     onErrorContainer: ColorConstants.textDark,
-    primaryContainer: ColorConstants.primaryContainerLight,
+    primaryContainer: ColorConstants.primary,
     onPrimaryContainer: ColorConstants.textDark,
     shadow: ColorConstants.shadow,
     background: ColorConstants.backgroundBeige,
@@ -79,9 +88,10 @@ extension ColorSchemes on ColorScheme {
     onError: ColorConstants.textDark,
     errorContainer: ColorConstants.fault,
     onErrorContainer: ColorConstants.textDark,
-    primaryContainer: ColorConstants.primaryContainer,
+    primaryContainer: ColorConstants.primary,
     onPrimaryContainer: ColorConstants.textLight,
     shadow: ColorConstants.shadow,
     background: ColorConstants.backgroundDark,
+    inversePrimary: Colors.yellow,
   );
 }

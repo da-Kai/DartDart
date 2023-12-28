@@ -1,8 +1,10 @@
-import 'dart:math';
-import 'dart:ui';
+import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:dart_dart/logic/x01/x01_settings.dart';
 
-import 'package:dart_dart/constants/fields.dart';
-import 'package:dart_dart/game/x01/settings.dart';
+enum InputType {
+  board,
+  field
+}
 
 class Player {
   String name;
@@ -23,6 +25,8 @@ class GameData {
   List<Player> finishedPlayer = [];
 
   Throws curThrows = Throws();
+
+  InputType inputType = InputType.board;
 
   GameData(this.settings) {
     if(settings.players.isEmpty) {
@@ -125,46 +129,6 @@ class GameData {
   }
 }
 
-class Coordinates {
-  double x;
-  double y;
-
-  Coordinates(this.x, this.y);
-
-  @override
-  String toString() {
-    return 'x($x)\ny($y)';
-  }
-}
-
-class GameMath {
-  GameMath._();
-
-  static double _getDistance(Coordinates coo) {
-    return sqrt(pow(coo.x.abs(), 2) + pow(coo.y.abs(), 2));
-  }
-
-  static double _getAngle(double dist, Coordinates coo) {
-    var radiant = acos(coo.y / dist);
-    var degree = radiant * (180 / pi);
-    return coo.x > 0 ? 360 - degree : degree;
-  }
-
-  /// Returns Coordinates normalized to 100:-100 with the
-  /// center as 0:0 coordinates.
-  static Coordinates norm(Size size, Offset offset) {
-    var nx = (offset.dx / (size.width / 2)) - 1;
-    var ny = (offset.dy / (size.height / 2)) - 1;
-    return Coordinates(nx * 100.0, ny * 100.0);
-  }
-
-  static (double, double) vectorData(Coordinates coo) {
-    var distance = _getDistance(coo);
-    var angle = _getAngle(distance, coo);
-    return (distance, angle);
-  }
-}
-
 class FieldCalc {
   FieldCalc._();
 
@@ -195,25 +159,5 @@ class FieldCalc {
     int section = (angle / 18.0).floor();
     HitNumber value = HitNumber.bySegment(section);
     return Hit(value, multiplier);
-  }
-}
-
-class InputType {
-  bool _isBoard = true;
-
-  bool get isBoard {
-    return _isBoard;
-  }
-
-  set isBoard(val) {
-    _isBoard = val;
-  }
-
-  bool get isField {
-    return !_isBoard;
-  }
-
-  set isField(val) {
-    _isBoard = !val;
   }
 }
