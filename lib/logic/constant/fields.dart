@@ -167,12 +167,19 @@ class Throws {
     return count == 3;
   }
 
-  void undo() {
+  bool undo() {
     switch(count) {
-      case 1: first = Hit.skipped;
-      case 2: second = Hit.skipped;
-      case 3: third = Hit.skipped;
+      case 1:
+        first = Hit.skipped;
+        return true;
+      case 2:
+        second = Hit.skipped;
+        return true;
+      case 3:
+        third = Hit.skipped;
+        return true;
     }
+    return false;
   }
 }
 

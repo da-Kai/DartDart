@@ -1,7 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 
 enum InOut {
-  single,
+  straight,
   double,
   master,
 }
@@ -9,7 +9,7 @@ enum InOut {
 extension InOutExtension on InOut {
   bool fits(Hit? hit) {
     if (hit == null) return false;
-    if (this == InOut.single) return true;
+    if (this == InOut.straight) return true;
     if (this == InOut.double) {
       return hit.multiplier == HitMultiplier.double;
     }
@@ -22,7 +22,7 @@ extension InOutExtension on InOut {
 
   bool possible(int remaining) {
     if (remaining < 0) return false;
-    if (this == InOut.single) return true;
+    if (this == InOut.straight) return true;
     if (this == InOut.double) return remaining >= 2;
     if (this == InOut.master) return remaining >= 2;
     return false;
@@ -45,7 +45,7 @@ enum Games {
 
 class GameSettings {
   Games game = Games.threeOOne;
-  InOut gameIn = InOut.single;
+  InOut gameIn = InOut.straight;
   InOut gameOut = InOut.double;
   int legs = 1;
   int sets = 1;

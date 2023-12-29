@@ -7,57 +7,125 @@ enum InputType {
 }
 
 class Player {
-  String name;
-  int points;
+  final String name;
+  int score;
 
-  Player(this.name, this.points);
+  Player(this.name, this.score);
 
   bool get done {
-    return points == 0;
+    return score == 0;
+  }
+}
+
+class Round {
+  final Player player;
+  final Throws throws;
+  late final int startPoints;
+
+  Round(this.player, this.throws) {
+    startPoints = player.score;
+  }
+
+  int get subtractedScore {
+    return startPoints - sum;
+  }
+
+  int get sum {
+    return throws.sum();
+  }
+}
+
+class ActiveRound {
+  final GameSettings settings;
+  late final Round round;
+
+  ActiveRound(this.settings, Player player, {Round? roundData}) {
+    if(roundData == null) {
+      round = Round(player, Throws());
+    } else {
+      round = roundData;
+    }
+  }
+
+  Player get player {
+    return round.player;
+  }
+
+  Throws get throws {
+    return round.throws;
+  }
+
+  int get startPoints {
+    return round.startPoints;
+  }
+
+  bool get isLegal {
+    if (throws.count == 0) {
+      return true;
+    }
+    if (startPoints == settings.points) {
+      return settings.gameIn.fits(throws.first);
+    }
+    if (round.subtractedScore == 0) {
+      return settings.gameOut.fits(throws.last);
+    }
+    return round.subtractedScore > 0 && settings.gameOut.possible(round.subtractedScore);
+  }
+
+  int get updatedScore {
+    //In
+    if (player.score == settings.points) {
+      if (!settings.gameIn.fits(throws.first)) {
+        return player.score;
+      }
+    }
+    //Out
+    if (round.subtractedScore < 0) return player.score;
+    if (round.subtractedScore == 0) {
+      if (settings.gameOut.fits(throws.last)) {
+        player.score = 0;
+        return player.score;
+      }
+    }
+    if (!settings.gameOut.possible(round.subtractedScore)) return player.score;
+    return round.subtractedScore;
+  }
+
+  bool get hasEnded {
+    return throws.done() || !isLegal || updatedScore == 0;
+  }
+
+  String get text {
+    return '$updatedScore';
+  }
+
+  bool get playerFinished {
+    return updatedScore == 0;
+  }
+
+  Round apply() {
+    player.score = updatedScore;
+    return round;
   }
 }
 
 class GameData {
-  GameSettings settings;
-  late Player currentPlayer;
+  final GameSettings settings;
+
+  late ActiveRound currentRound;
 
   List<Player> otherPlayer = [];
   List<Player> finishedPlayer = [];
 
-  Throws curThrows = Throws();
-
-  InputType inputType = InputType.board;
+  List<Round> history = [];
 
   GameData(this.settings) {
-    if(settings.players.isEmpty) {
-      currentPlayer = Player('ERROR', -1);
-      return;
+    var currentPlayer = Player('ERROR', -1);
+    if(settings.players.isNotEmpty) {
+      otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
+      currentPlayer = otherPlayer.removeAt(0);
     }
-    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
-    currentPlayer = otherPlayer.removeAt(0);
-  }
-
-  void reset() {
-    finishedPlayer=[];
-    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
-    currentPlayer = otherPlayer.removeAt(0);
-    curThrows = Throws();
-  }
-
-  void next() {
-    curThrows = Throws();
-
-    if (otherPlayer.isNotEmpty) {
-      var next = otherPlayer.removeAt(0);
-
-      if (currentPlayer.done) {
-        finishedPlayer.add(currentPlayer);
-      } else {
-        otherPlayer.add(currentPlayer);
-      }
-
-      currentPlayer = next;
-    }
+    currentRound = ActiveRound(settings, currentPlayer);
   }
 
   bool get isSinglePlayer {
@@ -68,96 +136,57 @@ class GameData {
     return !isSinglePlayer;
   }
 
-  int get updatedPoints {
-    return currentPlayer.points - curThrows.sum();
-  }
-
-  bool get stillLegal {
-    if (curThrows.count == 0) {
-      return true;
-    }
-    if (currentPlayer.points == settings.points) {
-      return settings.gameIn.fits(curThrows.first);
-    }
-    if (updatedPoints == 0) {
-      return settings.gameOut.fits(curThrows.last);
-    }
-    return updatedPoints > 0 && settings.gameOut.possible(updatedPoints);
-  }
-
-  void curPlyApply(Throws throws) {
-    //In
-    if (currentPlayer.points == settings.points) {
-      if (!settings.gameIn.fits(throws.first)) {
-        return;
-      }
-    }
-
-    //Out
-    if (updatedPoints < 0) return;
-    if (updatedPoints == 0) {
-      if (settings.gameOut.fits(throws.last)) {
-        currentPlayer.points = 0;
-        return;
-      }
-    }
-
-    if (!settings.gameOut.possible(updatedPoints)) return;
-
-    currentPlayer.points = updatedPoints;
-  }
-
-  bool turnDone() {
-    return curThrows.done() || !stillLegal || updatedPoints == 0;
-  }
-
-  bool gameFinished() {
+  bool hasGameFinished() {
     if (isSinglePlayer) {
-      return currentPlayer.done;
+      return currentRound.playerFinished;
     } else {
       return otherPlayer.isEmpty;
     }
   }
 
-  String currentPlayerUpdateText() {
-    if (!stillLegal) {
-      return '${currentPlayer.points}';
-    } else {
-      var sum = currentPlayer.points - curThrows.sum();
-      return '$sum';
+  Player? get winner {
+    if(finishedPlayer.isEmpty) return null;
+    return finishedPlayer.first;
+  }
+
+  void reset() {
+    finishedPlayer=[];
+    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
+    currentRound = ActiveRound(settings, otherPlayer.removeAt(0));
+  }
+
+  void next() {
+    history.add(currentRound.apply());
+
+    var next = currentRound.player;
+    if (otherPlayer.isNotEmpty) {
+      next = otherPlayer.removeAt(0);
+
+      if(currentRound.playerFinished) {
+        finishedPlayer.add(currentRound.player);
+      } else {
+        otherPlayer.add(currentRound.player);
+      }
+    }
+
+    currentRound = ActiveRound(settings, next);
+  }
+
+  void undo() {
+    if(!currentRound.throws.undo()) {
+      Round undoData = history.removeLast();
+      Player last = currentRound.player;
+      if(isMultiPlayer) {
+        var current = currentRound.player;
+        last = otherPlayer.removeLast();
+        otherPlayer.insert(0, current);
+      }
+      currentRound = ActiveRound(settings, last, roundData: undoData);
+      last.score += undoData.sum;
     }
   }
-}
 
-class FieldCalc {
-  FieldCalc._();
-
-  static Hit getField({required double angle, required double distance}) {
-    //Miss
-    if (distance >= 89.0) {
-      return Hit.miss;
-    }
-
-    //BullsEye
-    if (distance <= 7.1) {
-      return const Hit(HitNumber.bullsEye, HitMultiplier.double);
-    }
-    if (distance <= 16.0) {
-      return const Hit(HitNumber.bullsEye, HitMultiplier.single);
-    }
-
-    HitMultiplier multiplier = HitMultiplier.single;
-    if (distance > 27.0 && distance < 46.0) {
-      multiplier = HitMultiplier.triple;
-    } else if (distance > 69.0 && distance < 89.0) {
-      multiplier = HitMultiplier.double;
-    }
-
-    // normalize to 1(at angle 189)
-    angle = (angle >= 189) ? (angle - 189) : ((360 - 189) + angle);
-
-    int section = (angle / 18.0).floor();
-    HitNumber value = HitNumber.bySegment(section);
-    return Hit(value, multiplier);
+  bool get canUndo {
+    return currentRound.throws.count > 0 || history.isNotEmpty;
   }
 }

@@ -19,7 +19,7 @@ class X01Game extends StatefulWidget {
 class _X01PageState extends State<X01Game> {
   void thrown(Hit hit) {
     setState(() {
-      widget.data.curThrows.thrown(hit);
+      widget.data.currentRound.throws.thrown(hit);
     });
   }
 
@@ -51,11 +51,11 @@ class _X01PageState extends State<X01Game> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),
-            onPressed: () {
+            onPressed: data.canUndo ? () {
               setState(() {
-                data.curThrows.undo();
+                data.undo();
               });
-            },
+            } : null,
           )
         ],
       ),
@@ -76,18 +76,15 @@ class _X01PageState extends State<X01Game> {
               right: 10,
             ),
             child: ElevatedButton(
-              onPressed: !data.turnDone()
+              onPressed: !data.currentRound.hasEnded
                   ? null
                   : () {
-                      var done = false;
-                      var ply = data.currentPlayer.name;
                       setState(() {
-                        data.curPlyApply(data.curThrows);
-                        done = data.currentPlayer.done;
                         data.next();
                       });
-                      if (done) {
-                        _GameEnd(context: context, winner: ply)
+                      if (data.hasGameFinished()) {
+                        var ply = data.winner;
+                        _GameEnd(context: context, winner: ply?.name??'')
                             .open() //
                             .then((rematch) {
                           setState(() {
@@ -129,10 +126,10 @@ class _PlayersList extends Container {
         Expanded(
             child: Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+          margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
-            color: colorScheme.primaryContainer,
+            color: colorScheme.backgroundShade,
           ),
           height: 50,
           child: ListView(
@@ -145,7 +142,7 @@ class _PlayersList extends Container {
                     color: colorScheme.primary,
                   ),
                   margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
                   child: Row(
                     children: [
                       SizedBox(
@@ -159,9 +156,9 @@ class _PlayersList extends Container {
                         ),
                       ),
                       SizedBox(
-                        width: 30,
+                        width: 35,
                         child: Text(
-                          ply.points.toString(),
+                          ply.score.toString(),
                           style: FontConstants.text.copyWith(color: colorScheme.onPrimary),
                         ),
                       ),
@@ -222,13 +219,15 @@ class _ThrowBean extends Container {
 
 class _CurrentPlayer extends Container {
   final _X01PageState state;
+  late final ActiveRound currentRound;
 
-  _CurrentPlayer(this.state);
+  _CurrentPlayer(this.state) {
+    currentRound = state.widget.data.currentRound;
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data;
 
     final TextStyle titleStyle = TextStyle(
       color: colorScheme.onPrimaryContainer,
@@ -253,18 +252,18 @@ class _CurrentPlayer extends Container {
               children: [
                 const Spacer(flex: 1),
                 Text(
-                  data.currentPlayer.name,
+                  currentRound.player.name,
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                data.updatedPoints == 0 && data.stillLegal
+                currentRound.updatedScore == 0 && currentRound.isLegal
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        data.currentPlayerUpdateText(),
+                        currentRound.text,
                         style: titleStyle.copyWith(
-                            color: data.stillLegal //
+                            color: currentRound.isLegal //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),
@@ -278,13 +277,13 @@ class _CurrentPlayer extends Container {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${data.curThrows.first}'),
+                  child: _ThrowBean(text: '${currentRound.throws.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${data.curThrows.second}'),
+                  child: _ThrowBean(text: '${currentRound.throws.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${data.curThrows.third}'),
+                  child: _ThrowBean(text: '${currentRound.throws.third}'),
                 ),
               ],
             ),

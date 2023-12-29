@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 
-import 'package:dart_dart/logic/x01/x01_game.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_board_select.dart';
 
