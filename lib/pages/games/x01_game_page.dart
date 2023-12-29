@@ -41,8 +41,12 @@ class _X01PageState extends State<X01Game> {
         title: Text(data.settings.game.text),
         leading: IconButton(
           onPressed: () {
-            setState(() {
-              Navigator.pop(context);
+            _CancelGame.open(context).then((quit) {
+              if(quit) {
+                setState(() {
+                  Navigator.pop(context);
+                });
+              }
             });
           },
           icon: const Icon(Icons.close),
@@ -343,5 +347,47 @@ class _GameEnd {
         ],
       ),
     ).then((_) => rematch);
+  }
+}
+
+class _CancelGame {
+  _CancelGame._();
+
+  static Future<bool> open(BuildContext context) async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    bool quit = false;
+
+    return showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: const Text(
+              'End the Game?',
+              textAlign: TextAlign.center,
+              style: FontConstants.subtitle,
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: <Widget>[
+              MaterialButton(
+                color: colorScheme.error,
+                textColor: colorScheme.onError,
+                child: const Text('END'),
+                onPressed: () {
+                  quit = true;
+                  Navigator.pop(context);
+                },
+              ),
+              MaterialButton(
+                color: colorScheme.primary,
+                textColor: colorScheme.onPrimary,
+                child: const Text('CONTINUE'),
+                onPressed: () {
+                  quit = false;
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+    ).then((_) => quit);
   }
 }
