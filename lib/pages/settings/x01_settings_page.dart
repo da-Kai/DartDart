@@ -202,6 +202,7 @@ class _GameSettingContainer extends Container {
       textStyle: FontConstants.text,
       disabledBackgroundColor: colorScheme.primary,
       disabledForegroundColor: colorScheme.onPrimary,
+      padding: EdgeInsets.zero,
     );
 
     return Container(
@@ -290,6 +291,7 @@ class _InOutSettingContainer extends Container {
       textStyle: FontConstants.text,
       disabledBackgroundColor: colorScheme.primary,
       disabledForegroundColor: colorScheme.onPrimary,
+      padding: EdgeInsets.zero,
     );
 
     final TextStyle textStyle = FontConstants.subtitle.copyWith(
@@ -309,7 +311,7 @@ class _InOutSettingContainer extends Container {
           Text('In', style: textStyle),
           SelectionRow(
             values: const <String, InOut>{
-              'Single': InOut.single,
+              'Straight': InOut.straight,
               'Double': InOut.double,
               'Master': InOut.master,
             },
@@ -321,7 +323,7 @@ class _InOutSettingContainer extends Container {
           Text('Out', style: textStyle),
           SelectionRow(
             values: const <String, InOut>{
-              'Single': InOut.single,
+              'Straight': InOut.straight,
               'Double': InOut.double,
               'Master': InOut.master,
             },

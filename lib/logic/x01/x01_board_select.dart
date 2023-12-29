@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:dart_dart/logic/constant/fields.dart';
+
 class Coordinates {
   double x;
   double y;
@@ -38,5 +40,38 @@ class GameMath {
     var distance = _getDistance(coo);
     var angle = _getAngle(distance, coo);
     return (distance, angle);
+  }
+}
+
+class FieldCalc {
+  FieldCalc._();
+
+  static Hit getField({required double angle, required double distance}) {
+    //Miss
+    if (distance >= 89.0) {
+      return Hit.miss;
+    }
+
+    //BullsEye
+    if (distance <= 7.1) {
+      return const Hit(HitNumber.bullsEye, HitMultiplier.double);
+    }
+    if (distance <= 16.0) {
+      return const Hit(HitNumber.bullsEye, HitMultiplier.single);
+    }
+
+    HitMultiplier multiplier = HitMultiplier.single;
+    if (distance > 27.0 && distance < 46.0) {
+      multiplier = HitMultiplier.triple;
+    } else if (distance > 69.0 && distance < 89.0) {
+      multiplier = HitMultiplier.double;
+    }
+
+    // normalize to 1(at angle 189)
+    angle = (angle >= 189) ? (angle - 189) : ((360 - 189) + angle);
+
+    int section = (angle / 18.0).floor();
+    HitNumber value = HitNumber.bySegment(section);
+    return Hit(value, multiplier);
   }
 }

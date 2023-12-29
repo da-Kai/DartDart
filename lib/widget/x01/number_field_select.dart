@@ -11,6 +11,8 @@ class FieldSelect extends StatefulWidget {
 }
 
 class _FieldSelectState extends State<FieldSelect> {
+  HitMultiplier hitMultiplier = HitMultiplier.single;
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -25,71 +27,67 @@ class _FieldSelectState extends State<FieldSelect> {
     );
 
     final List<List<HitNumber>> hitNumbers = [
-      [HitNumber.one,HitNumber.two,HitNumber.three,HitNumber.four,HitNumber.five],
-      [HitNumber.six,HitNumber.seven,HitNumber.eight,HitNumber.nine,HitNumber.ten],
-      [HitNumber.eleven,HitNumber.twelve,HitNumber.thirteen,HitNumber.fourteen,HitNumber.fifteen],
-      [HitNumber.sixteen,HitNumber.seventeen,HitNumber.eighteen,HitNumber.nineteen,HitNumber.twenty],
+      [HitNumber.one, HitNumber.two, HitNumber.three, HitNumber.four, HitNumber.five],
+      [HitNumber.six, HitNumber.seven, HitNumber.eight, HitNumber.nine, HitNumber.ten],
+      [HitNumber.eleven, HitNumber.twelve, HitNumber.thirteen, HitNumber.fourteen, HitNumber.fifteen],
+      [HitNumber.sixteen, HitNumber.seventeen, HitNumber.eighteen, HitNumber.nineteen, HitNumber.twenty],
       [HitNumber.bullsEye, HitNumber.miss],
     ];
 
-    HitMultiplier hitMultiplier = HitMultiplier.single;
+    void setHitMultiplier(HitMultiplier hm) {
+      setState(() {
+        hitMultiplier = hm;
+      });
+    }
 
-    return StatefulBuilder(builder: (context, setState) {
-      void setHitMultiplier(HitMultiplier hm) {
-        setState(() {
-          hitMultiplier = hm;
-        });
-      }
-
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        alignment: Alignment.center,
-        child: ConstrainedBox(
-            constraints: const BoxConstraints.tightFor(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    _MultiplierButton(
-                        style: buttonStyle,
-                        onPressed: setHitMultiplier,
-                        hitMultiplier: HitMultiplier.single,
-                        current: hitMultiplier,
-                    ),
-                    _MultiplierButton(
-                      style: buttonStyle,
-                        onPressed: setHitMultiplier,
-                        hitMultiplier: HitMultiplier.double,
-                        current: hitMultiplier,
-                    ),
-                    _MultiplierButton(
-                        style: buttonStyle,
-                        onPressed: setHitMultiplier,
-                        hitMultiplier: HitMultiplier.triple,
-                        current: hitMultiplier,
-                    ),
-                  ],
-                ),
-                Divider(
-                  color: colorScheme.scrim,
-                  height: 15.0,
-                  thickness: 1.5,
-                ),
-                Column(
-                  children: hitNumbers.map<Row>((numRow) => Row(
-                    children: numRow.map<Widget>((hitNum) => _HitButton(
-                        style: buttonStyle,
-                        onPressed: widget.onSelect,
-                        hitMult: hitMultiplier,
-                        hitNum: hitNum)
-                    ).toList(),
-                  )).toList(),
-                ),
-              ],
-            )),
-      );
-    });
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  _MultiplierButton(
+                    style: buttonStyle,
+                    onPressed: setHitMultiplier,
+                    hitMultiplier: HitMultiplier.single,
+                    current: hitMultiplier,
+                  ),
+                  _MultiplierButton(
+                    style: buttonStyle,
+                    onPressed: setHitMultiplier,
+                    hitMultiplier: HitMultiplier.double,
+                    current: hitMultiplier,
+                  ),
+                  _MultiplierButton(
+                    style: buttonStyle,
+                    onPressed: setHitMultiplier,
+                    hitMultiplier: HitMultiplier.triple,
+                    current: hitMultiplier,
+                  ),
+                ],
+              ),
+              Divider(
+                color: colorScheme.scrim,
+                height: 15.0,
+                thickness: 1.5,
+              ),
+              Column(
+                children: hitNumbers
+                    .map<Row>((numRow) => Row(
+                          children: numRow
+                              .map<Widget>((hitNum) => _HitButton(
+                                  style: buttonStyle, onPressed: widget.onSelect, hitMult: hitMultiplier, hitNum: hitNum))
+                              .toList(),
+                        ))
+                    .toList(),
+              ),
+            ],
+          )),
+    );
   }
 }
 
@@ -105,16 +103,15 @@ class _MultiplierButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: Container(
-          height: 50,
-          margin: const EdgeInsets.all(2.5),
-          padding: EdgeInsets.zero,
-          child: ElevatedButton(
-            onPressed: current == hitMultiplier ? null : () => onPressed(hitMultiplier),
-            style: style,
-            child: Text(hitMultiplier.text),
-          ),
-        )
-    );
+      height: 50,
+      margin: const EdgeInsets.all(2.5),
+      padding: EdgeInsets.zero,
+      child: ElevatedButton(
+        onPressed: current == hitMultiplier ? null : () => onPressed(hitMultiplier),
+        style: style,
+        child: Text(hitMultiplier.text),
+      ),
+    ));
   }
 }
 
@@ -134,17 +131,16 @@ class _HitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: Container(
-          height: 50,
-          margin: const EdgeInsets.all(2.5),
-          padding: EdgeInsets.zero,
-          child: ElevatedButton(
-            onPressed: () => onPressed(hit),
-            style: style,
-            child: Text(
-              hit.abbreviation,
-            ),
-          ),
-        )
-    );
+      height: 50,
+      margin: const EdgeInsets.all(2.5),
+      padding: EdgeInsets.zero,
+      child: ElevatedButton(
+        onPressed: () => onPressed(hit),
+        style: style,
+        child: Text(
+          hit.abbreviation,
+        ),
+      ),
+    ));
   }
 }
