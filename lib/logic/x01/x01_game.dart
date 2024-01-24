@@ -182,7 +182,6 @@ class GameData {
         otherPlayer.insert(0, current);
       }
       currentRound = ActiveRound(settings, last, roundData: undoData);
-      last.score += undoData.sum;
     }
   }
 
