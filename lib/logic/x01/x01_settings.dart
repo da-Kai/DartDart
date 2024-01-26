@@ -60,8 +60,8 @@ class GameSettings {
   final List<String> players = [];
 
   bool isNameFree(String name) {
-    for(var plyName in players) {
-      if(plyName.toLowerCase() == name.toLowerCase()) {
+    for (var plyName in players) {
+      if (plyName.toLowerCase() == name.toLowerCase()) {
         return false;
       }
     }

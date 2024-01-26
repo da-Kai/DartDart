@@ -1,7 +1,7 @@
+import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/pages/games/x01_game_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
-import 'package:dart_dart/pages/games/x01_game_page.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
 import 'package:dart_dart/widget/x01/selection_row.dart';
 import 'package:flutter/material.dart';
 
@@ -57,12 +57,6 @@ class _X01PageState extends State<X01Setting> {
     _data = widget._data;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final ButtonStyle startButtonStyle = ElevatedButton.styleFrom(
-      textStyle: FontConstants.text,
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-    );
-
     return Form(
       key: _formKey,
       child: Scaffold(
@@ -87,28 +81,7 @@ class _X01PageState extends State<X01Setting> {
             _GameSettingContainer(this),
             _InOutSettingContainer(this),
             _PlayerSettingContainer(this),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(
-                vertical: 5,
-                horizontal: 10,
-              ),
-              child: ElevatedButton(
-                style: startButtonStyle,
-                onPressed: _data.players.isEmpty
-                    ? null
-                    : () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => X01Game(settings: _data)),
-                          );
-                        }
-                        setState(() {});
-                      },
-                child: const Text('Start'),
-              ),
-            ),
+            _StartButton(this),
             const SizedBox(height: 10),
           ],
         ),
@@ -217,17 +190,16 @@ class _GameSettingContainer extends Container {
         children: [
           const Text('Game', style: FontConstants.subtitle),
           SelectionRow(
-              values: const <String, Games>{
-                '301': Games.threeOOne,
-                '501': Games.fiveOOne,
-                '701': Games.sevenOOne,
-              },
-              setState: state._setPoints,
-              getState: () => settings.game,
-              expanded: true,
-              buttonStyle: buttonStyle,
+            values: const <String, Games>{
+              '301': Games.threeOOne,
+              '501': Games.fiveOOne,
+              '701': Games.sevenOOne,
+            },
+            setState: state._setPoints,
+            getState: () => settings.game,
+            expanded: true,
+            buttonStyle: buttonStyle,
           ),
-          /*
           const SizedBox(height: 10),
           Row(
             children: [
@@ -245,9 +217,7 @@ class _GameSettingContainer extends Container {
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) {
-                  state._updateSets(v!);
-                },
+                onChanged: null, //(v) { state._updateSets(v!); },
               ),
               const Spacer(flex: 3),
               Text("Legs",
@@ -263,15 +233,11 @@ class _GameSettingContainer extends Container {
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) {
-                  state._updateLegs(v!);
-                },
+                onChanged: null, //(v) { state._updateLegs(v!); },
               ),
               const Spacer(flex: 3),
             ],
           ),
-
-           */
         ],
       ),
     );
@@ -294,9 +260,7 @@ class _InOutSettingContainer extends Container {
       padding: EdgeInsets.zero,
     );
 
-    final TextStyle textStyle = FontConstants.subtitle.copyWith(
-        color: colorScheme.onPrimaryContainer
-    );
+    final TextStyle textStyle = FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -361,10 +325,9 @@ class _PlayerSettingContainer extends Container {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Player',
-                  style: FontConstants.subtitle.copyWith(
-                      color: colorScheme.onPrimaryContainer
-                  ),
+                Text(
+                  'Player',
+                  style: FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer),
                 ),
               ],
             ),
@@ -437,12 +400,54 @@ class _PlayerSettingContainer extends Container {
                       }
                     });
                   },
-                  icon: Icon(Icons.add, color: colorScheme.onPrimaryContainer,),
+                  icon: Icon(
+                    Icons.add,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                 )
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _StartButton extends Container {
+  final _X01PageState state;
+
+  _StartButton(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final ButtonStyle startButtonStyle = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+    );
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(
+        vertical: 5,
+        horizontal: 10,
+      ),
+      child: ElevatedButton(
+        style: startButtonStyle,
+        onPressed: state._data.players.isEmpty
+            ? null
+            : () {
+                if (state._formKey.currentState!.validate()) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => X01Game(settings: state._data)),
+                  );
+                }
+              },
+        child: const Text('Start'),
       ),
     );
   }

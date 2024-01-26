@@ -42,7 +42,7 @@ class _X01PageState extends State<X01Game> {
         leading: IconButton(
           onPressed: () {
             _CancelGame.open(context).then((quit) {
-              if(quit) {
+              if (quit) {
                 setState(() {
                   Navigator.pop(context);
                 });
@@ -55,11 +55,13 @@ class _X01PageState extends State<X01Game> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),
-            onPressed: data.canUndo ? () {
-              setState(() {
-                data.undo();
-              });
-            } : null,
+            onPressed: data.canUndo
+                ? () {
+                    setState(() {
+                      data.undo();
+                    });
+                  }
+                : null,
           )
         ],
       ),
@@ -88,7 +90,7 @@ class _X01PageState extends State<X01Game> {
                       });
                       if (data.hasGameFinished()) {
                         var ply = data.winner;
-                        _GameEnd(context: context, winner: ply?.name??'')
+                        _GameEnd(context: context, winner: ply?.name ?? '')
                             .open() //
                             .then((rematch) {
                           setState(() {
@@ -359,35 +361,34 @@ class _CancelGame {
 
     return showDialog(
       context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: const Text(
-              'End the Game?',
-              textAlign: TextAlign.center,
-              style: FontConstants.subtitle,
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              MaterialButton(
-                color: colorScheme.error,
-                textColor: colorScheme.onError,
-                child: const Text('END'),
-                onPressed: () {
-                  quit = true;
-                  Navigator.pop(context);
-                },
-              ),
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('CONTINUE'),
-                onPressed: () {
-                  quit = false;
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'End the Game?',
+          textAlign: TextAlign.center,
+          style: FontConstants.subtitle,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: <Widget>[
+          MaterialButton(
+            color: colorScheme.error,
+            textColor: colorScheme.onError,
+            child: const Text('END'),
+            onPressed: () {
+              quit = true;
+              Navigator.pop(context);
+            },
           ),
+          MaterialButton(
+            color: colorScheme.primary,
+            textColor: colorScheme.onPrimary,
+            child: const Text('CONTINUE'),
+            onPressed: () {
+              quit = false;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     ).then((_) => quit);
   }
 }

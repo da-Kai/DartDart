@@ -102,7 +102,7 @@ class Hit {
   const Hit(this.number, this.multiplier);
 
   static Hit getFrom(HitNumber number, HitMultiplier multiplier) {
-    if(number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
+    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
       return Hit(number, HitMultiplier.double);
     } else {
       return Hit(number, multiplier);
@@ -114,7 +114,7 @@ class Hit {
   }
 
   String get abbreviation {
-    switch(number) {
+    switch (number) {
       case HitNumber.unthrown:
         return '';
       case HitNumber.miss:
@@ -136,16 +136,19 @@ class Throws {
   Hit third = Hit.skipped;
 
   Hit? get last {
-    switch(count) {
-      case 1: return first;
-      case 2: return second;
-      case 3: return third;
+    switch (count) {
+      case 1:
+        return first;
+      case 2:
+        return second;
+      case 3:
+        return third;
     }
     return null;
   }
 
   int get count {
-    if(third != Hit.skipped) return 3;
+    if (third != Hit.skipped) return 3;
     if (second != Hit.skipped) return 2;
     if (first != Hit.skipped) return 1;
     return 0;
@@ -156,10 +159,13 @@ class Throws {
   }
 
   void thrown(Hit hit) {
-    switch(count) {
-      case 0: first = hit;
-      case 1: second = hit;
-      case 2: third = hit;
+    switch (count) {
+      case 0:
+        first = hit;
+      case 1:
+        second = hit;
+      case 2:
+        third = hit;
     }
   }
 
@@ -168,7 +174,7 @@ class Throws {
   }
 
   bool undo() {
-    switch(count) {
+    switch (count) {
       case 1:
         first = Hit.skipped;
         return true;
@@ -182,4 +188,3 @@ class Throws {
     return false;
   }
 }
-

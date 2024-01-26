@@ -57,10 +57,10 @@ class _MyHomePageState extends State<HomePage> {
       backgroundColor: colorScheme.background,
       appBar: AppBar(
         titleTextStyle: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-            fontFamily: FontConstants.title.fontFamily,
-            color: colorScheme.onPrimary,
+          fontSize: 40,
+          fontWeight: FontWeight.bold,
+          fontFamily: FontConstants.title.fontFamily,
+          color: colorScheme.onPrimary,
         ),
         foregroundColor: colorScheme.onPrimary,
         backgroundColor: colorScheme.primary,
@@ -82,18 +82,17 @@ class _MyHomePageState extends State<HomePage> {
                 horizontal: 40,
               ),
               child: ElevatedButton(
-                style: style,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => X01Setting()),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text('X01'),
-                )
-              ),
+                  style: style,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => X01Setting()),
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Text('X01'),
+                  )),
             ),
           ],
         ),

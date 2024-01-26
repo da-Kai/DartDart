@@ -38,7 +38,7 @@ class ColorConstants {
 
 extension ColorSchemes on ColorScheme {
   Color get success {
-    switch(brightness) {
+    switch (brightness) {
       case Brightness.light:
         return ColorConstants.success;
       case Brightness.dark:
@@ -48,15 +48,14 @@ extension ColorSchemes on ColorScheme {
 
   TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow}) {
     return FontConstants.text.copyWith(
-      color: color ?? onPrimaryContainer,
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      overflow: overflow
-    );
+        color: color ?? onPrimaryContainer, //
+        fontSize: fontSize, //
+        fontWeight: fontWeight, //
+        overflow: overflow);
   }
 
   Color get backgroundShade {
-    switch(brightness) {
+    switch (brightness) {
       case Brightness.light:
         return ColorConstants.primaryContainerLight;
       case Brightness.dark:
