@@ -31,9 +31,11 @@ class _BoardSelectState extends State<BoardSelect> {
             var norm = GameMath.norm(size, pos);
             var (distance, angle) = GameMath.vectorData(norm);
 
-            if (distance > 101) return;
+            var field = Hit.miss;
+            if (distance <= 101) {
+              field = FieldCalc.getField(angle: angle, distance: distance);
+            }
 
-            var field = FieldCalc.getField(angle: angle, distance: distance);
             widget.onSelect(field);
           },
           child: const Image(

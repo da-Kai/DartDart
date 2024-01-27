@@ -117,10 +117,10 @@ class _X01PageState extends State<X01Game> {
   }
 }
 
-class _PlayersList extends Container {
+class _PlayersList extends StatelessWidget {
   final _X01PageState state;
 
-  _PlayersList(this.state);
+  const _PlayersList(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -196,10 +196,10 @@ class _PlayersList extends Container {
   }
 }
 
-class _ThrowBean extends Container {
+class _ThrowBean extends StatelessWidget {
   final String text;
 
-  _ThrowBean({required this.text});
+  const _ThrowBean({required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +223,7 @@ class _ThrowBean extends Container {
   }
 }
 
-class _CurrentPlayer extends Container {
+class _CurrentPlayer extends StatelessWidget {
   final _X01PageState state;
   late final ActiveRound currentRound;
 

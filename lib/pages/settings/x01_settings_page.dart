@@ -161,10 +161,10 @@ class _PlayerNameDialog {
   }
 }
 
-class _GameSettingContainer extends Container {
+class _GameSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _GameSettingContainer(this.state);
+  const _GameSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +204,7 @@ class _GameSettingContainer extends Container {
           Row(
             children: [
               const Spacer(flex: 3),
-              Text("Sets",
+              Text('Sets',
                   style: TextStyle(
                     color: colorScheme.onPrimaryContainer,
                   )),
@@ -220,7 +220,7 @@ class _GameSettingContainer extends Container {
                 onChanged: null, //(v) { state._updateSets(v!); },
               ),
               const Spacer(flex: 3),
-              Text("Legs",
+              Text('Legs',
                   style: TextStyle(
                     color: colorScheme.onPrimaryContainer,
                   )),
@@ -244,10 +244,10 @@ class _GameSettingContainer extends Container {
   }
 }
 
-class _InOutSettingContainer extends Container {
+class _InOutSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _InOutSettingContainer(this.state);
+  const _InOutSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -302,10 +302,10 @@ class _InOutSettingContainer extends Container {
   }
 }
 
-class _PlayerSettingContainer extends Container {
+class _PlayerSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _PlayerSettingContainer(this.state);
+  const _PlayerSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -414,10 +414,10 @@ class _PlayerSettingContainer extends Container {
   }
 }
 
-class _StartButton extends Container {
+class _StartButton extends StatelessWidget {
   final _X01PageState state;
 
-  _StartButton(this.state);
+  const _StartButton(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -440,13 +440,13 @@ class _StartButton extends Container {
         onPressed: state._data.players.isEmpty
             ? null
             : () {
-                if (state._formKey.currentState!.validate()) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => X01Game(settings: state._data)),
-                  );
-                }
-              },
+          if (state._formKey.currentState!.validate()) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => X01Game(settings: state._data)),
+            );
+          }
+        },
         child: const Text('Start'),
       ),
     );
