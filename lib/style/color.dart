@@ -19,12 +19,12 @@ class ColorConstants {
   static const Color warning = Color.fromRGBO(254, 186, 83, 1.0);
   static const Color fault = Color.fromRGBO(224, 122, 95, 1.0);
 
-  //static const Color textDark = Color.fromRGBO(10, 20, 30, 1.0);
   static const Color textDark = Color.fromRGBO(57, 47, 45, 1.0);
   static const Color textLight = Color.fromRGBO(251, 246, 236, 1.0);
 
   static const Color backgroundDark = Color.fromRGBO(33, 33, 33, 1.0);
-  static const Color backgroundBeige = Color.fromRGBO(185, 168, 138, 1.0);
+  static const Color backgroundBeige2 = Color.fromRGBO(185, 168, 138, 1.0);
+  static const Color backgroundBeige = Color.fromRGBO(245, 243, 239, 1.0);
   static const Color backgroundLight = Color.fromRGBO(220, 220, 225, 1.0);
 
   static const Color shadow = Color.fromRGBO(5, 10, 20, 0.8);
@@ -38,7 +38,7 @@ class ColorConstants {
 
 extension ColorSchemes on ColorScheme {
   Color get success {
-    switch(brightness) {
+    switch (brightness) {
       case Brightness.light:
         return ColorConstants.success;
       case Brightness.dark:
@@ -48,15 +48,14 @@ extension ColorSchemes on ColorScheme {
 
   TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow}) {
     return FontConstants.text.copyWith(
-      color: color ?? onPrimaryContainer,
-      fontSize: fontSize,
-      fontWeight: fontWeight,
-      overflow: overflow
-    );
+        color: color ?? onPrimaryContainer, //
+        fontSize: fontSize, //
+        fontWeight: fontWeight, //
+        overflow: overflow);
   }
 
   Color get backgroundShade {
-    switch(brightness) {
+    switch (brightness) {
       case Brightness.light:
         return ColorConstants.primaryContainerLight;
       case Brightness.dark:

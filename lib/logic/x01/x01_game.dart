@@ -1,10 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
 
-enum InputType {
-  board,
-  field
-}
+enum InputType { board, field }
 
 class Player {
   final String name;
@@ -40,7 +37,7 @@ class ActiveRound {
   late final Round round;
 
   ActiveRound(this.settings, Player player, {Round? roundData}) {
-    if(roundData == null) {
+    if (roundData == null) {
       round = Round(player, Throws());
     } else {
       round = roundData;
@@ -121,7 +118,7 @@ class GameData {
 
   GameData(this.settings) {
     var currentPlayer = Player('ERROR', -1);
-    if(settings.players.isNotEmpty) {
+    if (settings.players.isNotEmpty) {
       otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
       currentPlayer = otherPlayer.removeAt(0);
     }
@@ -145,12 +142,12 @@ class GameData {
   }
 
   Player? get winner {
-    if(finishedPlayer.isEmpty) return null;
+    if (finishedPlayer.isEmpty) return null;
     return finishedPlayer.first;
   }
 
   void reset() {
-    finishedPlayer=[];
+    finishedPlayer = [];
     otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
     currentRound = ActiveRound(settings, otherPlayer.removeAt(0));
   }
@@ -162,7 +159,7 @@ class GameData {
     if (otherPlayer.isNotEmpty) {
       next = otherPlayer.removeAt(0);
 
-      if(currentRound.playerFinished) {
+      if (currentRound.playerFinished) {
         finishedPlayer.add(currentRound.player);
       } else {
         otherPlayer.add(currentRound.player);
@@ -173,16 +170,15 @@ class GameData {
   }
 
   void undo() {
-    if(!currentRound.throws.undo()) {
+    if (!currentRound.throws.undo()) {
       Round undoData = history.removeLast();
       Player last = currentRound.player;
-      if(isMultiPlayer) {
+      if (isMultiPlayer) {
         var current = currentRound.player;
         last = otherPlayer.removeLast();
         otherPlayer.insert(0, current);
       }
       currentRound = ActiveRound(settings, last, roundData: undoData);
-      last.score += undoData.sum;
     }
   }
 

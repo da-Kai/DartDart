@@ -42,7 +42,7 @@ class _X01PageState extends State<X01Game> {
         leading: IconButton(
           onPressed: () {
             _CancelGame.open(context).then((quit) {
-              if(quit) {
+              if (quit) {
                 setState(() {
                   Navigator.pop(context);
                 });
@@ -55,70 +55,100 @@ class _X01PageState extends State<X01Game> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),
-            onPressed: data.canUndo ? () {
-              setState(() {
-                data.undo();
-              });
-            } : null,
+            onPressed: data.canUndo
+                ? () {
+                    setState(() {
+                      data.undo();
+                    });
+                  }
+                : null,
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Visibility(
-            visible: data.isMultiPlayer,
-            child: _PlayersList(this),
-          ),
-          _CurrentPlayer(this),
-          PointSelector(onSelect: thrown),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.only(
-              bottom: 5,
-              left: 10,
-              right: 10,
-            ),
-            child: ElevatedButton(
-              onPressed: !data.currentRound.hasEnded
-                  ? null
-                  : () {
-                      setState(() {
-                        data.next();
-                      });
-                      if (data.hasGameFinished()) {
-                        var ply = data.winner;
-                        _GameEnd(context: context, winner: ply?.name??'')
-                            .open() //
-                            .then((rematch) {
-                          setState(() {
-                            if (rematch) {
-                              data.reset();
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          });
-                        });
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                textStyle: FontConstants.text,
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-              ),
-              child: const Text('next'),
-            ),
-          ),
-        ],
-      ),
+      body: OrientationBuilder(builder: (context, orientation) {
+        return orientation == Orientation.portrait
+            ? //
+            _PortraitView(this, setState)
+            : //
+            _LandscapeView(this, setState);
+      }),
     );
   }
 }
 
-class _PlayersList extends Container {
+class _PortraitView extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _PortraitView(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final GameData data = state.widget.data;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Visibility(
+          visible: data.isMultiPlayer,
+          child: _PlayersList(state),
+        ),
+        _CurrentPlayer(state),
+        PointSelector(onSelect: ((hit) {
+          update(() {
+            data.currentRound.throws.thrown(hit);
+          });
+        })),
+        _NextButton(state, update),
+      ],
+    );
+  }
+}
+
+class _LandscapeView extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _LandscapeView(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final GameData data = state.widget.data;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              PointSelector(onSelect: ((hit) {
+                update(() {
+                  data.currentRound.throws.thrown(hit);
+                });
+              })),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Visibility(
+              visible: data.isMultiPlayer,
+              child: _PlayersList(state),
+            ),
+            _CurrentPlayer(state),
+            const Spacer(),
+            _NextButton(state, update),
+          ]),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlayersList extends StatelessWidget {
   final _X01PageState state;
 
-  _PlayersList(this.state);
+  const _PlayersList(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -194,10 +224,10 @@ class _PlayersList extends Container {
   }
 }
 
-class _ThrowBean extends Container {
+class _ThrowBean extends StatelessWidget {
   final String text;
 
-  _ThrowBean({required this.text});
+  const _ThrowBean({required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +251,7 @@ class _ThrowBean extends Container {
   }
 }
 
-class _CurrentPlayer extends Container {
+class _CurrentPlayer extends StatelessWidget {
   final _X01PageState state;
   late final ActiveRound currentRound;
 
@@ -359,35 +389,81 @@ class _CancelGame {
 
     return showDialog(
       context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: const Text(
-              'End the Game?',
-              textAlign: TextAlign.center,
-              style: FontConstants.subtitle,
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              MaterialButton(
-                color: colorScheme.error,
-                textColor: colorScheme.onError,
-                child: const Text('END'),
-                onPressed: () {
-                  quit = true;
-                  Navigator.pop(context);
-                },
-              ),
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('CONTINUE'),
-                onPressed: () {
-                  quit = false;
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'End the Game?',
+          textAlign: TextAlign.center,
+          style: FontConstants.subtitle,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: <Widget>[
+          MaterialButton(
+            color: colorScheme.error,
+            textColor: colorScheme.onError,
+            child: const Text('END'),
+            onPressed: () {
+              quit = true;
+              Navigator.pop(context);
+            },
           ),
+          MaterialButton(
+            color: colorScheme.primary,
+            textColor: colorScheme.onPrimary,
+            child: const Text('CONTINUE'),
+            onPressed: () {
+              quit = false;
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     ).then((_) => quit);
+  }
+}
+
+class _NextButton extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _NextButton(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final GameData data = state.widget.data;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: ElevatedButton(
+        onPressed: !data.currentRound.hasEnded
+            ? null
+            : () {
+                update(() {
+                  data.next();
+                });
+                if (data.hasGameFinished()) {
+                  var ply = data.winner;
+                  _GameEnd(context: context, winner: ply?.name ?? '')
+                      .open() //
+                      .then((rematch) {
+                    update(() {
+                      if (rematch) {
+                        data.reset();
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    });
+                  });
+                }
+              },
+        style: ElevatedButton.styleFrom(
+          textStyle: FontConstants.text,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+        ),
+        child: const Text('next'),
+      ),
+    );
   }
 }

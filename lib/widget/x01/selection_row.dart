@@ -8,8 +8,8 @@ class SelectionRow<T> extends StatelessWidget {
   final ButtonStyle? buttonStyle;
   final bool? expanded;
 
-  const SelectionRow({super.key, required this.values, required this.setState,
-    required this.getState, this.buttonStyle, this.expanded});
+  const SelectionRow(
+      {super.key, required this.values, required this.setState, required this.getState, this.buttonStyle, this.expanded});
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +19,16 @@ class SelectionRow<T> extends StatelessWidget {
         var button = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5),
           child: ElevatedButton(
-            onPressed: (getState() == e.value) ? null : () {
-              setState(e.value);
-            },
+            onPressed: (getState() == e.value)
+                ? null
+                : () {
+                    setState(e.value);
+                  },
             style: buttonStyle,
             child: Text(e.key),
           ),
         );
-        if(expanded??false) {
+        if (expanded ?? false) {
           return Expanded(child: button);
         } else {
           return button;

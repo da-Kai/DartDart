@@ -1,7 +1,7 @@
+import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/pages/games/x01_game_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
-import 'package:dart_dart/pages/games/x01_game_page.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
 import 'package:dart_dart/widget/x01/selection_row.dart';
 import 'package:flutter/material.dart';
 
@@ -57,12 +57,6 @@ class _X01PageState extends State<X01Setting> {
     _data = widget._data;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final ButtonStyle startButtonStyle = ElevatedButton.styleFrom(
-      textStyle: FontConstants.text,
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-    );
-
     return Form(
       key: _formKey,
       child: Scaffold(
@@ -80,37 +74,11 @@ class _X01PageState extends State<X01Setting> {
           title: const Text('X01-Game'),
           centerTitle: true,
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 10),
-            _GameSettingContainer(this),
-            _InOutSettingContainer(this),
-            _PlayerSettingContainer(this),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(
-                vertical: 5,
-                horizontal: 10,
-              ),
-              child: ElevatedButton(
-                style: startButtonStyle,
-                onPressed: _data.players.isEmpty
-                    ? null
-                    : () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => X01Game(settings: _data)),
-                          );
-                        }
-                        setState(() {});
-                      },
-                child: const Text('Start'),
-              ),
-            ),
-            const SizedBox(height: 10),
-          ],
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+          child: OrientationBuilder(builder: (context, orientation) {
+            return orientation == Orientation.portrait ? _PortraitView(this) : _LandscapeView(this);
+          }),
         ),
         bottomNavigationBar: SizedBox(
           width: double.infinity,
@@ -120,6 +88,62 @@ class _X01PageState extends State<X01Setting> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PortraitView extends StatelessWidget {
+  final _X01PageState state;
+
+  const _PortraitView(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _GameSettingContainer(state),
+        _InOutSettingContainer(state),
+        Expanded(
+          child: _PlayerSettingContainer(state),
+        ),
+        _StartButton(state),
+      ],
+    );
+  }
+}
+
+class _LandscapeView extends StatelessWidget {
+  final _X01PageState state;
+
+  const _LandscapeView(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _GameSettingContainer(state),
+                _InOutSettingContainer(state),
+              ],
+            ),
+          ),
+        ),
+        Flexible(
+          fit: FlexFit.tight,
+          child: Column(
+            children: [
+              Expanded(
+                child: _PlayerSettingContainer(state),
+              ),
+              _StartButton(state),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -188,10 +212,10 @@ class _PlayerNameDialog {
   }
 }
 
-class _GameSettingContainer extends Container {
+class _GameSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _GameSettingContainer(this.state);
+  const _GameSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -217,22 +241,21 @@ class _GameSettingContainer extends Container {
         children: [
           const Text('Game', style: FontConstants.subtitle),
           SelectionRow(
-              values: const <String, Games>{
-                '301': Games.threeOOne,
-                '501': Games.fiveOOne,
-                '701': Games.sevenOOne,
-              },
-              setState: state._setPoints,
-              getState: () => settings.game,
-              expanded: true,
-              buttonStyle: buttonStyle,
+            values: const <String, Games>{
+              '301': Games.threeOOne,
+              '501': Games.fiveOOne,
+              '701': Games.sevenOOne,
+            },
+            setState: state._setPoints,
+            getState: () => settings.game,
+            expanded: true,
+            buttonStyle: buttonStyle,
           ),
-          /*
           const SizedBox(height: 10),
           Row(
             children: [
               const Spacer(flex: 3),
-              Text("Sets",
+              Text('Sets',
                   style: TextStyle(
                     color: colorScheme.onPrimaryContainer,
                   )),
@@ -245,12 +268,10 @@ class _GameSettingContainer extends Container {
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) {
-                  state._updateSets(v!);
-                },
+                onChanged: null, //(v) { state._updateSets(v!); },
               ),
               const Spacer(flex: 3),
-              Text("Legs",
+              Text('Legs',
                   style: TextStyle(
                     color: colorScheme.onPrimaryContainer,
                   )),
@@ -263,25 +284,21 @@ class _GameSettingContainer extends Container {
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) {
-                  state._updateLegs(v!);
-                },
+                onChanged: null, //(v) { state._updateLegs(v!); },
               ),
               const Spacer(flex: 3),
             ],
           ),
-
-           */
         ],
       ),
     );
   }
 }
 
-class _InOutSettingContainer extends Container {
+class _InOutSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _InOutSettingContainer(this.state);
+  const _InOutSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
@@ -294,9 +311,7 @@ class _InOutSettingContainer extends Container {
       padding: EdgeInsets.zero,
     );
 
-    final TextStyle textStyle = FontConstants.subtitle.copyWith(
-        color: colorScheme.onPrimaryContainer
-    );
+    final TextStyle textStyle = FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -338,111 +353,150 @@ class _InOutSettingContainer extends Container {
   }
 }
 
-class _PlayerSettingContainer extends Container {
+class _PlayerSettingContainer extends StatelessWidget {
   final _X01PageState state;
 
-  _PlayerSettingContainer(this.state);
+  const _PlayerSettingContainer(this.state);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: colorScheme.backgroundShade,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Player',
-                  style: FontConstants.subtitle.copyWith(
-                      color: colorScheme.onPrimaryContainer
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  children: state._data.players.map<Row>((String player) {
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            player,
-                            overflow: TextOverflow.ellipsis,
-                            style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
-                          ),
+    return Container(
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: colorScheme.backgroundShade,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Player',
+                style: FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: ListView(
+                scrollDirection: Axis.vertical,
+                children: state._data.players.map<Row>((String player) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          player,
+                          overflow: TextOverflow.ellipsis,
+                          style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            _PlayerNameDialog(
-                              context: context,
-                              player: player,
-                              validate: state.validate,
-                            ).open().then((newPly) {
-                              if (newPly != null) {
-                                state._updatePlayer(player, newPly);
-                              }
-                            });
-                          },
-                          icon: const Icon(Icons.edit),
-                          color: colorScheme.onPrimaryContainer,
-                          iconSize: 22,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            state._removePlayer(player);
-                          },
-                          icon: const Icon(Icons.delete),
-                          color: colorScheme.onPrimaryContainer,
-                          iconSize: 22,
-                          visualDensity: VisualDensity.compact,
-                        )
-                      ],
-                    );
-                  }).toList(),
-                ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _PlayerNameDialog(
+                            context: context,
+                            player: player,
+                            validate: state.validate,
+                          ).open().then((newPly) {
+                            if (newPly != null) {
+                              state._updatePlayer(player, newPly);
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.edit),
+                        color: colorScheme.onPrimaryContainer,
+                        iconSize: 22,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          state._removePlayer(player);
+                        },
+                        icon: const Icon(Icons.delete),
+                        color: colorScheme.onPrimaryContainer,
+                        iconSize: 22,
+                        visualDensity: VisualDensity.compact,
+                      )
+                    ],
+                  );
+                }).toList(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Divider(
-                color: colorScheme.onPrimaryContainer,
-                height: 0,
-                thickness: 1,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Divider(
+              color: colorScheme.onPrimaryContainer,
+              height: 0,
+              thickness: 1,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _PlayerNameDialog(
-                      context: context,
-                      validate: state.validate,
-                    ).open().then((newPly) {
-                      if (newPly != null) {
-                        state._addPlayer(newPly);
-                      }
-                    });
-                  },
-                  icon: Icon(Icons.add, color: colorScheme.onPrimaryContainer,),
-                )
-              ],
-            ),
-          ],
-        ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed: () {
+                  _PlayerNameDialog(
+                    context: context,
+                    validate: state.validate,
+                  ).open().then((newPly) {
+                    if (newPly != null) {
+                      state._addPlayer(newPly);
+                    }
+                  });
+                },
+                icon: Icon(
+                  Icons.add,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StartButton extends StatelessWidget {
+  final _X01PageState state;
+
+  const _StartButton(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final ButtonStyle startButtonStyle = ElevatedButton.styleFrom(
+      textStyle: FontConstants.text,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+    );
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(
+        vertical: 5,
+        horizontal: 10,
+      ),
+      child: ElevatedButton(
+        style: startButtonStyle,
+        onPressed: state._data.players.isEmpty
+            ? null
+            : () {
+                if (state._formKey.currentState!.validate()) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => X01Game(settings: state._data)),
+                  );
+                }
+              },
+        child: const Text('Start'),
       ),
     );
   }

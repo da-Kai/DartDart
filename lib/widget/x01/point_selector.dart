@@ -28,7 +28,7 @@ class _PointSelectorState extends State<PointSelector> {
         alignment: Alignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Column(
               children: [
                 Expanded(
@@ -52,34 +52,34 @@ class _PointSelectorState extends State<PointSelector> {
             ),
           ),
           Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: type == InputType.board
-                        ? //
-                        BoardSelect(onSelect: widget.onSelect)
-                        : FieldSelect(onSelect: widget.onSelect),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                    height: 55,
-                    child: SelectionRow(
-                      getState: () => type,
-                      setState: (type) {
-                        setState(() => this.type = type);
-                      },
-                      values: const <String, InputType>{'BOARD': InputType.board, 'FIELD': InputType.field},
-                      expanded: true,
-                      buttonStyle: ElevatedButton.styleFrom(
-                        foregroundColor: colorScheme.onPrimary,
-                        backgroundColor: colorScheme.primary,
-                      ),
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Column(
+              children: [
+                Expanded(
+                  child: type == InputType.board
+                      ? //
+                      BoardSelect(onSelect: widget.onSelect)
+                      : FieldSelect(onSelect: widget.onSelect),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 5),
+                  padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  height: 55,
+                  child: SelectionRow(
+                    getState: () => type,
+                    setState: (type) {
+                      setState(() => this.type = type);
+                    },
+                    values: const <String, InputType>{'BOARD': InputType.board, 'FIELD': InputType.field},
+                    expanded: true,
+                    buttonStyle: ElevatedButton.styleFrom(
+                      foregroundColor: colorScheme.onPrimary,
+                      backgroundColor: colorScheme.primary,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

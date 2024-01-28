@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
-
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_board_select.dart';
-
+import 'package:flutter/cupertino.dart';
 
 class BoardSelect extends StatefulWidget {
   final Function(Hit) onSelect;
@@ -32,9 +30,11 @@ class _BoardSelectState extends State<BoardSelect> {
             var norm = GameMath.norm(size, pos);
             var (distance, angle) = GameMath.vectorData(norm);
 
-            if (distance > 101) return;
+            var field = Hit.miss;
+            if (distance <= 101) {
+              field = FieldCalc.getField(angle: angle, distance: distance);
+            }
 
-            var field = FieldCalc.getField(angle: angle, distance: distance);
             widget.onSelect(field);
           },
           child: const Image(

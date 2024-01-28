@@ -1,0 +1,24 @@
+name: Build DartDart
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-dart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter build apk --release --build-name=beta.24.1
+      - run: mv ./build/app/outputs/flutter-apk/app-release.apk ./dartdart.apk
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dartdart.apk
+          path: ./dartdart.apk
