@@ -74,9 +74,9 @@ class _MyHomePageState extends State<HomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             Container(
-              width: double.infinity,
+              width: 500,
               margin: const EdgeInsets.symmetric(
                 vertical: 10,
                 horizontal: 40,

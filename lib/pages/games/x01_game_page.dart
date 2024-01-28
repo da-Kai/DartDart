@@ -65,54 +65,82 @@ class _X01PageState extends State<X01Game> {
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Visibility(
-            visible: data.isMultiPlayer,
-            child: _PlayersList(this),
+      body: OrientationBuilder(builder: (context, orientation) {
+        return orientation == Orientation.portrait
+            ? //
+            _PortraitView(this, setState)
+            : //
+            _LandscapeView(this, setState);
+      }),
+    );
+  }
+}
+
+class _PortraitView extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _PortraitView(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final GameData data = state.widget.data;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Visibility(
+          visible: data.isMultiPlayer,
+          child: _PlayersList(state),
+        ),
+        _CurrentPlayer(state),
+        PointSelector(onSelect: ((hit) {
+          update(() {
+            data.currentRound.throws.thrown(hit);
+          });
+        })),
+        _NextButton(state, update),
+      ],
+    );
+  }
+}
+
+class _LandscapeView extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _LandscapeView(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final GameData data = state.widget.data;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              PointSelector(onSelect: ((hit) {
+                update(() {
+                  data.currentRound.throws.thrown(hit);
+                });
+              })),
+            ],
           ),
-          _CurrentPlayer(this),
-          PointSelector(onSelect: thrown),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.only(
-              bottom: 5,
-              left: 10,
-              right: 10,
+        ),
+        Expanded(
+          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Visibility(
+              visible: data.isMultiPlayer,
+              child: _PlayersList(state),
             ),
-            child: ElevatedButton(
-              onPressed: !data.currentRound.hasEnded
-                  ? null
-                  : () {
-                      setState(() {
-                        data.next();
-                      });
-                      if (data.hasGameFinished()) {
-                        var ply = data.winner;
-                        _GameEnd(context: context, winner: ply?.name ?? '')
-                            .open() //
-                            .then((rematch) {
-                          setState(() {
-                            if (rematch) {
-                              data.reset();
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          });
-                        });
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                textStyle: FontConstants.text,
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-              ),
-              child: const Text('next'),
-            ),
-          ),
-        ],
-      ),
+            _CurrentPlayer(state),
+            const Spacer(),
+            _NextButton(state, update),
+          ]),
+        ),
+      ],
     );
   }
 }
@@ -390,5 +418,52 @@ class _CancelGame {
         ],
       ),
     ).then((_) => quit);
+  }
+}
+
+class _NextButton extends StatelessWidget {
+  final _X01PageState state;
+  final Function update;
+
+  const _NextButton(this.state, this.update);
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final GameData data = state.widget.data;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: ElevatedButton(
+        onPressed: !data.currentRound.hasEnded
+            ? null
+            : () {
+                update(() {
+                  data.next();
+                });
+                if (data.hasGameFinished()) {
+                  var ply = data.winner;
+                  _GameEnd(context: context, winner: ply?.name ?? '')
+                      .open() //
+                      .then((rematch) {
+                    update(() {
+                      if (rematch) {
+                        data.reset();
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    });
+                  });
+                }
+              },
+        style: ElevatedButton.styleFrom(
+          textStyle: FontConstants.text,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+        ),
+        child: const Text('next'),
+      ),
+    );
   }
 }

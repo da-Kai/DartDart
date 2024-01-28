@@ -28,7 +28,7 @@ class _PointSelectorState extends State<PointSelector> {
         alignment: Alignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: Column(
               children: [
                 Expanded(
@@ -52,7 +52,7 @@ class _PointSelectorState extends State<PointSelector> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             child: Column(
               children: [
                 Expanded(
