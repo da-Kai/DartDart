@@ -15,10 +15,10 @@ jobs:
           channel: 'stable'
       - run: flutter --version
       - run: flutter pub get
-      - run: flutter build apk --release --build-name=beta.24.1
-      - run: mv ./build/app/outputs/flutter-apk/app-release.apk ./dartdart.apk
+      - run: flutter build apk --release
+      - run: mv ./build/app/outputs/flutter-apk/app-release.apk ./dart-dart.apk
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: dartdart.apk
-          path: ./dartdart.apk
+          name: dart-dart-android
+          path: ./dart-dart.apk
