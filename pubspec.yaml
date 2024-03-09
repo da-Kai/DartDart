@@ -1,8 +1,10 @@
 name: dart_dart
 description: "A Dart Scoreboard written in Dart"
+homepage: "https://da-kai.github.io/DartDart/"
+repository: "https://github.com/da-Kai/DartDart"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.1.0
 
 environment:
   sdk: '>=3.2.2 <4.0.0'
