@@ -28,3 +28,7 @@ flutter build web --base-href '/'
 ```bash
 flutter run -d "$BROWER" --web-renderer html
 ```
+
+https://docs.flutter.dev/get-started/install/windows/desktop?tab=download
+
+https://developer.android.com/studio/install
