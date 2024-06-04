@@ -41,7 +41,7 @@ enum HitNumber {
     if (segment == null) {
       return HitNumber.unthrown;
     } else {
-      return HitNumber.values.firstWhere((_) => _.segment == segment, orElse: () => HitNumber.miss);
+      return HitNumber.values.firstWhere((hitNum) => hitNum.segment == segment, orElse: () => HitNumber.miss);
     }
   }
 }
