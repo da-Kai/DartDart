@@ -103,20 +103,27 @@ enum HitValidity { valid, invalidStart, invalidEnd, overthrow, empty }
 
 /// A Representation of a Players 3 throws per round.
 class Throws {
-  Hit first = Hit.skipped;
-  Hit second = Hit.skipped;
-  Hit third = Hit.skipped;
+  Hit first;
+  Hit second;
+  Hit third;
+
+  Throws({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
   Hit? get last {
-    switch (count) {
-      case 1:
+    return get(count - 1);
+  }
+
+  Hit? get(int pos) {
+    switch (pos) {
+      case 0:
         return first;
-      case 2:
+      case 1:
         return second;
-      case 3:
+      case 2:
         return third;
+      default:
+        return null;
     }
-    return null;
   }
 
   /// Add Hit to throws and return the position.
@@ -143,13 +150,13 @@ class Throws {
   /// If no position is given, the last one is chosen.
   bool undo({int? pos}) {
     switch (pos ?? count) {
-      case 1:
+      case 0:
         first = Hit.skipped;
         return true;
-      case 2:
+      case 1:
         second = Hit.skipped;
         return true;
-      case 3:
+      case 2:
         third = Hit.skipped;
         return true;
     }
@@ -165,16 +172,16 @@ class Throws {
   }
 
   /// Get the total sum of throws
-  int sum() {
-    return first.value + second.value + third.value;
+  int sum({int until = 2}) {
+    int sum = 0;
+    if (until >= 0) sum += first.value;
+    if (until >= 1) sum += second.value;
+    if (until >= 2) sum += third.value;
+    return sum;
   }
 
   /// Return if all hits are taken.
   bool done() {
     return count == 3;
-  }
-
-  void reset() {
-    first = second = third = Hit.skipped;
   }
 }

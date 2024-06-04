@@ -1,92 +1,17 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
 
-class PlayerRound {
+class PlayerRound extends Throws {
   final GameSettings settings;
   final int startScore;
 
-  Hit first;
-  Hit second;
-  Hit third;
-
-  PlayerRound(this.settings, this.startScore, {this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
+  PlayerRound(this.settings, this.startScore, {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
 
   static PlayerRound from(GameSettings settings) {
     return PlayerRound(settings, settings.points);
   }
 
-  Hit? get last {
-    return get(count - 1);
-  }
-
-  Hit? get(int pos) {
-    switch (pos) {
-      case 0:
-        return first;
-      case 1:
-        return second;
-      case 2:
-        return third;
-      default:
-        return null;
-    }
-  }
-
-  /// Add Hit to throws and return the position.
-  ///
-  /// If no position is given, the next one is chosen.
-  int thrown(Hit hit, {int? pos}) {
-    switch (pos ?? count) {
-      case 0:
-        first = hit;
-        return 0;
-      case 1:
-        second = hit;
-        return 1;
-      case 2:
-        third = hit;
-        return 2;
-      default:
-        return -1;
-    }
-  }
-
-  /// Undo a Hit and return, if anything changed.
-  ///
-  /// If no position is given, the last one is chosen.
-  bool undo({int? pos}) {
-    switch (pos ?? count) {
-      case 0:
-        first = Hit.skipped;
-        return true;
-      case 1:
-        second = Hit.skipped;
-        return true;
-      case 2:
-        third = Hit.skipped;
-        return true;
-    }
-    return false;
-  }
-
-  /// Get the number of hits.
-  int get count {
-    if (third != Hit.skipped) return 3;
-    if (second != Hit.skipped) return 2;
-    if (first != Hit.skipped) return 1;
-    return 0;
-  }
-
-  /// Get the total sum of throws
-  int sum({int until = 2}) {
-    int sum = 0;
-    if (until >= 0) sum += first.value;
-    if (until >= 1) sum += second.value;
-    if (until >= 2) sum += third.value;
-    return sum;
-  }
-
-  /// Return if all hits are taken.
+  @override
   bool done() {
     return count == 3 || score == 0;
   }
