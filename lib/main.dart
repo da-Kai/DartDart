@@ -1,7 +1,7 @@
+import 'package:dart_dart/pages/settings/x01_settings_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/style/icon.dart';
-import 'package:dart_dart/pages/settings/x01_settings_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         titleTextStyle: TextStyle(
           fontSize: 40,
