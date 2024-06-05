@@ -1,15 +1,16 @@
-import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/style/font.dart';
+import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_game.dart';
+import 'package:dart_dart/style/color.dart';
+import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
 
 class X01Game extends StatefulWidget {
-  late final GameData data;
+  late final GameController data;
 
   X01Game({super.key, required settings}) {
-    data = GameData(settings);
+    data = GameController(settings);
   }
 
   @override
@@ -19,14 +20,14 @@ class X01Game extends StatefulWidget {
 class _X01PageState extends State<X01Game> {
   void thrown(Hit hit) {
     setState(() {
-      widget.data.currentRound.throws.thrown(hit);
+      widget.data.onThrow(hit);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = widget.data;
+    final GameController data = widget.data;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -35,9 +36,9 @@ class _X01PageState extends State<X01Game> {
           fontSize: 20,
           fontWeight: FontWeight.bold,
           fontFamily: FontConstants.title.fontFamily,
-          color: colorScheme.onBackground,
+          color: colorScheme.onSurface,
         ),
-        backgroundColor: colorScheme.background,
+        backgroundColor: colorScheme.surface,
         title: Text(data.settings.game.text),
         leading: IconButton(
           onPressed: () {
@@ -59,6 +60,16 @@ class _X01PageState extends State<X01Game> {
                 ? () {
                     setState(() {
                       data.undo();
+                    });
+                  }
+                : null,
+          ),
+          IconButton(
+            icon: const Icon(Icons.redo),
+            onPressed: data.canRedo
+                ? () {
+                    setState(() {
+                      data.redo();
                     });
                   }
                 : null,
@@ -84,7 +95,7 @@ class _PortraitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GameData data = state.widget.data;
+    final GameController data = state.widget.data;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -96,7 +107,7 @@ class _PortraitView extends StatelessWidget {
         _CurrentPlayer(state),
         PointSelector(onSelect: ((hit) {
           update(() {
-            data.currentRound.throws.thrown(hit);
+            data.onThrow(hit);
           });
         })),
         _NextButton(state, update),
@@ -113,7 +124,7 @@ class _LandscapeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GameData data = state.widget.data;
+    final GameController data = state.widget.data;
 
     return Row(
       children: [
@@ -123,7 +134,7 @@ class _LandscapeView extends StatelessWidget {
             children: [
               PointSelector(onSelect: ((hit) {
                 update(() {
-                  data.currentRound.throws.thrown(hit);
+                  data.onThrow(hit);
                 });
               })),
             ],
@@ -153,7 +164,7 @@ class _PlayersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data;
+    final PlayerData data = state.widget.data.playerData;
 
     return Row(
       children: <Widget>[
@@ -253,10 +264,10 @@ class _ThrowBean extends StatelessWidget {
 
 class _CurrentPlayer extends StatelessWidget {
   final _X01PageState state;
-  late final ActiveRound currentRound;
+  late final GameController game;
 
   _CurrentPlayer(this.state) {
-    currentRound = state.widget.data.currentRound;
+    game = state.widget.data;
   }
 
   @override
@@ -286,18 +297,18 @@ class _CurrentPlayer extends StatelessWidget {
               children: [
                 const Spacer(flex: 1),
                 Text(
-                  currentRound.player.name,
+                  game.curPly.name,
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                currentRound.updatedScore == 0 && currentRound.isLegal
+                game.curRound.score == 0
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        currentRound.text,
+                        game.curRound.score.toString(),
                         style: titleStyle.copyWith(
-                            color: currentRound.isLegal //
+                            color: game.isLegal() //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),
@@ -311,13 +322,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${currentRound.throws.first}'),
+                  child: _ThrowBean(text: '${game.curRound.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${currentRound.throws.second}'),
+                  child: _ThrowBean(text: '${game.curRound.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${currentRound.throws.third}'),
+                  child: _ThrowBean(text: '${game.curRound.third}'),
                 ),
               ],
             ),
@@ -430,13 +441,13 @@ class _NextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameData data = state.widget.data;
+    final GameController data = state.widget.data;
 
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.currentRound.hasEnded
+        onPressed: !data.curRound.done()
             ? null
             : () {
                 update(() {
@@ -444,7 +455,7 @@ class _NextButton extends StatelessWidget {
                 });
                 if (data.hasGameFinished()) {
                   var ply = data.winner;
-                  _GameEnd(context: context, winner: ply?.name ?? '')
+                  _GameEnd(context: context, winner: ply.name)
                       .open() //
                       .then((rematch) {
                     update(() {

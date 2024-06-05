@@ -1,85 +1,52 @@
+/// Every Number fields on a dart board
 enum HitNumber {
-  unthrown('', 0),
-  miss('MISS', 0),
-  bullsEye('BULL', 25),
-  one('1', 1),
-  two('2', 2),
-  three('3', 3),
-  four('4', 4),
-  five('5', 5),
-  six('6', 6),
-  seven('7', 7),
-  eight('8', 8),
-  nine('9', 9),
-  ten('10', 10),
-  eleven('11', 11),
-  twelve('12', 12),
-  thirteen('13', 13),
-  fourteen('14', 14),
-  fifteen('15', 15),
-  sixteen('16', 16),
-  seventeen('17', 17),
-  eighteen('18', 18),
-  nineteen('19', 19),
-  twenty('20', 20);
+  unthrown('', 0, null),
+  miss('MISS', 0, -1),
+  one('1', 1, 0),
+  two('2', 2, 7),
+  three('3', 3, 9),
+  four('4', 4, 2),
+  five('5', 5, 18),
+  six('6', 6, 4),
+  seven('7', 7, 11),
+  eight('8', 8, 13),
+  nine('9', 9, 16),
+  ten('10', 10, 5),
+  eleven('11', 11, 14),
+  twelve('12', 12, 17),
+  thirteen('13', 13, 3),
+  fourteen('14', 14, 15),
+  fifteen('15', 15, 6),
+  sixteen('16', 16, 12),
+  seventeen('17', 17, 8),
+  eighteen('18', 18, 1),
+  nineteen('19', 19, 10),
+  twenty('20', 20, 19),
+  bullsEye('BULL', 25, 20);
 
-  const HitNumber(this.abbr, this.value);
+  const HitNumber(this.abbr, this.value, this.segment);
 
   final String abbr;
   final int value;
 
-  static HitNumber bySegment(int segment) {
-    if (segment < 0) {
-      return HitNumber.miss;
-    } else if (segment > 19) {
-      return HitNumber.bullsEye;
+  /// Dartboard segment in clockwise order.
+  ///
+  /// "1":0, "18":1, ... ,"20":19 and "BE":20.
+  final int? segment;
+
+  /// Get [HitNumber] object by its segment.
+  ///
+  /// Returns [HitNumber.unthrown] if segment is null or [HitNumber.miss] if the segment is invalid.
+  static HitNumber bySegment(int? segment) {
+    if (segment == null) {
+      return HitNumber.unthrown;
+    } else {
+      return HitNumber.values.firstWhere((hitNum) => hitNum.segment == segment, orElse: () => HitNumber.miss);
     }
-    switch (segment) {
-      case 0:
-        return HitNumber.one;
-      case 1:
-        return HitNumber.eighteen;
-      case 2:
-        return HitNumber.four;
-      case 3:
-        return HitNumber.thirteen;
-      case 4:
-        return HitNumber.six;
-      case 5:
-        return HitNumber.ten;
-      case 6:
-        return HitNumber.fifteen;
-      case 7:
-        return HitNumber.two;
-      case 8:
-        return HitNumber.seventeen;
-      case 9:
-        return HitNumber.three;
-      case 10:
-        return HitNumber.nineteen;
-      case 11:
-        return HitNumber.seven;
-      case 12:
-        return HitNumber.sixteen;
-      case 13:
-        return HitNumber.eight;
-      case 14:
-        return HitNumber.eleven;
-      case 15:
-        return HitNumber.fourteen;
-      case 16:
-        return HitNumber.nine;
-      case 17:
-        return HitNumber.twelve;
-      case 18:
-        return HitNumber.five;
-      case 19:
-        return HitNumber.twenty;
-    }
-    return HitNumber.miss;
   }
 }
 
+/// Three possible Multipliers on a Dart board
 enum HitMultiplier {
   single(1, '', 'x1'),
   double(2, 'D', 'x2'),
@@ -92,6 +59,7 @@ enum HitMultiplier {
   final int multiplier;
 }
 
+/// Represents a single Dart hit.
 class Hit {
   static const Hit miss = Hit(HitNumber.miss, HitMultiplier.single);
   static const Hit skipped = Hit(HitNumber.unthrown, HitMultiplier.single);
@@ -130,23 +98,72 @@ class Hit {
   }
 }
 
+/// Possibilities for a hits impact.
+enum HitValidity { valid, invalidStart, invalidEnd, overthrow, empty }
+
+/// A Representation of a Players 3 throws per round.
 class Throws {
-  Hit first = Hit.skipped;
-  Hit second = Hit.skipped;
-  Hit third = Hit.skipped;
+  Hit first;
+  Hit second;
+  Hit third;
+
+  Throws({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
   Hit? get last {
-    switch (count) {
-      case 1:
-        return first;
-      case 2:
-        return second;
-      case 3:
-        return third;
-    }
-    return null;
+    return get(count - 1);
   }
 
+  Hit? get(int pos) {
+    switch (pos) {
+      case 0:
+        return first;
+      case 1:
+        return second;
+      case 2:
+        return third;
+      default:
+        return null;
+    }
+  }
+
+  /// Add Hit to throws and return the position.
+  ///
+  /// If no position is given, the next one is chosen.
+  int thrown(Hit hit, {int? pos}) {
+    switch (pos ?? count) {
+      case 0:
+        first = hit;
+        return 0;
+      case 1:
+        second = hit;
+        return 1;
+      case 2:
+        third = hit;
+        return 2;
+      default:
+        return -1;
+    }
+  }
+
+  /// Undo a Hit and return, if anything changed.
+  ///
+  /// If no position is given, the last one is chosen.
+  bool undo({int? pos}) {
+    switch (pos ?? count) {
+      case 0:
+        first = Hit.skipped;
+        return true;
+      case 1:
+        second = Hit.skipped;
+        return true;
+      case 2:
+        third = Hit.skipped;
+        return true;
+    }
+    return false;
+  }
+
+  /// Get the number of hits.
   int get count {
     if (third != Hit.skipped) return 3;
     if (second != Hit.skipped) return 2;
@@ -154,37 +171,17 @@ class Throws {
     return 0;
   }
 
-  int sum() {
-    return first.value + second.value + third.value;
+  /// Get the total sum of throws
+  int sum({int until = 2}) {
+    int sum = 0;
+    if (until >= 0) sum += first.value;
+    if (until >= 1) sum += second.value;
+    if (until >= 2) sum += third.value;
+    return sum;
   }
 
-  void thrown(Hit hit) {
-    switch (count) {
-      case 0:
-        first = hit;
-      case 1:
-        second = hit;
-      case 2:
-        third = hit;
-    }
-  }
-
+  /// Return if all hits are taken.
   bool done() {
     return count == 3;
-  }
-
-  bool undo() {
-    switch (count) {
-      case 1:
-        first = Hit.skipped;
-        return true;
-      case 2:
-        second = Hit.skipped;
-        return true;
-      case 3:
-        third = Hit.skipped;
-        return true;
-    }
-    return false;
   }
 }

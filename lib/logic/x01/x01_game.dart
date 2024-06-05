@@ -1,188 +1,95 @@
+import 'package:dart_dart/logic/common/common.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:dart_dart/logic/x01/x01_commands.dart';
+import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
 
 enum InputType { board, field }
 
-class Player {
-  final String name;
-  int score;
-
-  Player(this.name, this.score);
-
-  bool get done {
-    return score == 0;
-  }
-}
-
-class Round {
-  final Player player;
-  final Throws throws;
-  late final int startPoints;
-
-  Round(this.player, this.throws) {
-    startPoints = player.score;
-  }
-
-  int get subtractedScore {
-    return startPoints - sum;
-  }
-
-  int get sum {
-    return throws.sum();
-  }
-}
-
-class ActiveRound {
+/// Represents a single Game
+class GameController {
   final GameSettings settings;
-  late final Round round;
+  late PlayerData playerData;
+  late GameRound gameRound;
 
-  ActiveRound(this.settings, Player player, {Round? roundData}) {
-    if (roundData == null) {
-      round = Round(player, Throws());
-    } else {
-      round = roundData;
-    }
+  final CommandStack commands = CommandStack();
+
+  GameController(this.settings) {
+    reset();
   }
 
-  Player get player {
-    return round.player;
+  PlayerRound get curRound => gameRound.current;
+
+  bool get isMultiPlayer => playerData.isMultiPlayer;
+
+  Player get curPly => playerData.currentPlayer;
+
+  Player get winner => playerData.finishedPlayer.first;
+
+  bool get hasEnded => playerData.otherPlayer.isEmpty;
+
+  void setCurrentPlayer(Player player, {PlayerRound? round}) {
+    playerData.currentPlayer = player;
+    gameRound.current = round ?? PlayerRound(settings, player.score);
   }
 
-  Throws get throws {
-    return round.throws;
-  }
-
-  int get startPoints {
-    return round.startPoints;
-  }
-
-  bool get isLegal {
-    if (throws.count == 0) {
+  bool isLegal() {
+    if (curRound.count == 0) {
       return true;
     }
-    if (startPoints == settings.points) {
-      return settings.gameIn.fits(throws.first);
+    if (curPly.score == settings.points) {
+      return settings.isValid(curPly.score, curRound.first);
+    } else if (curPly.score == curRound.sum()) {
+      return settings.isValid(curPly.score, curRound.last!);
+    } else if (curRound.sum() < curPly.score) {
+      return true;
     }
-    if (round.subtractedScore == 0) {
-      return settings.gameOut.fits(throws.last);
-    }
-    return round.subtractedScore > 0 && settings.gameOut.possible(round.subtractedScore);
-  }
 
-  int get updatedScore {
-    //In
-    if (player.score == settings.points) {
-      if (!settings.gameIn.fits(throws.first)) {
-        return player.score;
-      }
-    }
-    //Out
-    if (round.subtractedScore < 0) return player.score;
-    if (round.subtractedScore == 0) {
-      if (settings.gameOut.fits(throws.last)) {
-        player.score = 0;
-        return player.score;
-      }
-    }
-    if (!settings.gameOut.possible(round.subtractedScore)) return player.score;
-    return round.subtractedScore;
-  }
-
-  bool get hasEnded {
-    return throws.done() || !isLegal || updatedScore == 0;
-  }
-
-  String get text {
-    return '$updatedScore';
-  }
-
-  bool get playerFinished {
-    return updatedScore == 0;
-  }
-
-  Round apply() {
-    player.score = updatedScore;
-    return round;
-  }
-}
-
-class GameData {
-  final GameSettings settings;
-
-  late ActiveRound currentRound;
-
-  List<Player> otherPlayer = [];
-  List<Player> finishedPlayer = [];
-
-  List<Round> history = [];
-
-  GameData(this.settings) {
-    var currentPlayer = Player('ERROR', -1);
-    if (settings.players.isNotEmpty) {
-      otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
-      currentPlayer = otherPlayer.removeAt(0);
-    }
-    currentRound = ActiveRound(settings, currentPlayer);
-  }
-
-  bool get isSinglePlayer {
-    return otherPlayer.isEmpty && finishedPlayer.isEmpty;
-  }
-
-  bool get isMultiPlayer {
-    return !isSinglePlayer;
+    return false;
   }
 
   bool hasGameFinished() {
-    if (isSinglePlayer) {
-      return currentRound.playerFinished;
+    if (playerData.isSinglePlayer) {
+      return playerData.currentPlayer.score == 0;
     } else {
-      return otherPlayer.isEmpty;
+      return playerData.otherPlayer.isEmpty;
     }
-  }
-
-  Player? get winner {
-    if (finishedPlayer.isEmpty) return null;
-    return finishedPlayer.first;
   }
 
   void reset() {
-    finishedPlayer = [];
-    otherPlayer = settings.players.map((ply) => Player(ply, settings.game.val)).toList();
-    currentRound = ActiveRound(settings, otherPlayer.removeAt(0));
+    playerData = PlayerData(settings.players, settings.points);
+    gameRound = GameRound(settings);
+    commands.clear();
+  }
+
+  void onThrow(Hit hit) {
+    var action = Throw(gameRound.current, hit, curRound.count);
+    commands.execute(action);
   }
 
   void next() {
-    history.add(currentRound.apply());
+    bool isWin = curRound.isWin;
 
-    var next = currentRound.player;
-    if (otherPlayer.isNotEmpty) {
-      next = otherPlayer.removeAt(0);
+    commands.execute(Switch.from(playerData, gameRound));
 
-      if (currentRound.playerFinished) {
-        finishedPlayer.add(currentRound.player);
-      } else {
-        otherPlayer.add(currentRound.player);
-      }
+    if (isWin) {
+      commands.execute(Award(playerData));
     }
-
-    currentRound = ActiveRound(settings, next);
   }
 
   void undo() {
-    if (!currentRound.throws.undo()) {
-      Round undoData = history.removeLast();
-      Player last = currentRound.player;
-      if (isMultiPlayer) {
-        var current = currentRound.player;
-        last = otherPlayer.removeLast();
-        otherPlayer.insert(0, current);
-      }
-      currentRound = ActiveRound(settings, last, roundData: undoData);
-    }
+    commands.undo();
+  }
+
+  void redo() {
+    commands.redo();
   }
 
   bool get canUndo {
-    return currentRound.throws.count > 0 || history.isNotEmpty;
+    return commands.canUndo;
+  }
+
+  bool get canRedo {
+    return commands.canRedo;
   }
 }
