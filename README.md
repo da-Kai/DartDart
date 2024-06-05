@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/da-Kai/DartDart/graph/badge.svg?token=xliIughqt1)](https://codecov.io/gh/da-Kai/DartDart)
+
 # <img src="assets/icons/icon-colored.svg" width=25pt height=25pt></img> DartDart
 
 DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It alows you to keep track of your dart games.
@@ -28,7 +30,3 @@ flutter build web --base-href '/'
 ```bash
 flutter run -d "$BROWER" --web-renderer html
 ```
-
-https://docs.flutter.dev/get-started/install/windows/desktop?tab=download
-
-https://developer.android.com/studio/install

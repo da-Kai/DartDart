@@ -67,4 +67,28 @@ class GameSettings {
     }
     return true;
   }
+
+  /// Determine if the given hit is a potential fishing hit.
+  bool isFinisher(Hit hit) {
+    return gameOut.fits(hit);
+  }
+
+  /// Determine if the given hit is a potential starting hit.
+  bool isStarter(Hit hit) {
+    return gameIn.fits(hit);
+  }
+
+  /// Determine if the hit is valid.
+  bool isValid(int score, Hit hit) {
+    if (hit.number.value == 0) {
+      return true;
+    } else if (score == points) {
+      return isStarter(hit);
+    } else if (score == hit.value) {
+      return isFinisher(hit);
+    } else if (score > hit.value) {
+      return true;
+    }
+    return false;
+  }
 }

@@ -75,7 +75,7 @@ extension ColorSchemes on ColorScheme {
     primaryContainer: ColorConstants.primary,
     onPrimaryContainer: ColorConstants.textDark,
     shadow: ColorConstants.shadow,
-    background: ColorConstants.backgroundBeige,
+    surface: ColorConstants.backgroundBeige,
   );
 
   static const ColorScheme dark = ColorScheme.dark(
@@ -90,7 +90,7 @@ extension ColorSchemes on ColorScheme {
     primaryContainer: ColorConstants.primary,
     onPrimaryContainer: ColorConstants.textLight,
     shadow: ColorConstants.shadow,
-    background: ColorConstants.backgroundDark,
+    surface: ColorConstants.backgroundDark,
     inversePrimary: Colors.yellow,
   );
 }
