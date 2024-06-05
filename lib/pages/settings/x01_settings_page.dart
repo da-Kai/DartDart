@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 typedef Validator = (bool, String?) Function(String);
 
+const playerNameMinLength = 2;
+
 class X01Setting extends StatefulWidget {
   final GameSettings _data = GameSettings();
 
@@ -22,7 +24,7 @@ class _X01PageState extends State<X01Setting> {
   late GameSettings _data;
 
   (bool, String?) validate(String playerName) {
-    if (playerName.length < 3) {
+    if (playerName.length < playerNameMinLength) {
       return (false, 'Name to short');
     } else if (playerName.length > 24) {
       return (false, 'Name to long');
@@ -170,9 +172,11 @@ class _PlayerNameDialog {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
             title: Text(player == null ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
-            content: TextField(
-              controller: textController,
-              decoration: InputDecoration(hintText: 'name', errorText: errorText),
+            content: SingleChildScrollView(
+              child: TextField(
+                controller: textController,
+                decoration: InputDecoration(hintText: 'name', errorText: errorText),
+              ),
             ),
             backgroundColor: colorScheme.backgroundShade,
             actionsAlignment: MainAxisAlignment.center,
