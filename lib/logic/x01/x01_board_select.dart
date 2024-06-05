@@ -2,27 +2,16 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:dart_dart/logic/constant/fields.dart';
-
-class Coordinates {
-  double x;
-  double y;
-
-  Coordinates(this.x, this.y);
-
-  @override
-  String toString() {
-    return 'x($x)\ny($y)';
-  }
-}
+import 'package:dart_dart/logic/common/coordinate.dart';
 
 class GameMath {
   GameMath._();
 
-  static double _getDistance(Coordinates coo) {
+  static double _getDistance(Coordinate coo) {
     return sqrt(pow(coo.x.abs(), 2) + pow(coo.y.abs(), 2));
   }
 
-  static double _getAngle(double dist, Coordinates coo) {
+  static double _getAngle(double dist, Coordinate coo) {
     var radiant = acos(coo.y / dist);
     var degree = radiant * (180 / pi);
     return coo.x > 0 ? 360 - degree : degree;
@@ -30,13 +19,13 @@ class GameMath {
 
   /// Returns Coordinates normalized to 100:-100 with the
   /// center as 0:0 coordinates.
-  static Coordinates norm(Size size, Offset offset) {
+  static Coordinate norm(Size size, Offset offset) {
     var nx = (offset.dx / (size.width / 2)) - 1;
     var ny = (offset.dy / (size.height / 2)) - 1;
-    return Coordinates(nx * 100.0, ny * 100.0);
+    return Coordinate(nx * 100.0, ny * 100.0);
   }
 
-  static (double, double) vectorData(Coordinates coo) {
+  static (double, double) vectorData(Coordinate coo) {
     var distance = _getDistance(coo);
     var angle = _getAngle(distance, coo);
     return (distance, angle);

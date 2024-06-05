@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/common.dart';
+import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_commands.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
@@ -18,7 +18,7 @@ class GameController {
     reset();
   }
 
-  PlayerRound get curRound => gameRound.current;
+  PlayerTurn get curTurn => gameRound.current;
 
   bool get isMultiPlayer => playerData.isMultiPlayer;
 
@@ -28,20 +28,20 @@ class GameController {
 
   bool get hasEnded => playerData.otherPlayer.isEmpty;
 
-  void setCurrentPlayer(Player player, {PlayerRound? round}) {
+  void setCurrentPlayer(Player player, {PlayerTurn? turn}) {
     playerData.currentPlayer = player;
-    gameRound.current = round ?? PlayerRound(settings, player.score);
+    gameRound.current = turn ?? PlayerTurn(settings, player.score);
   }
 
   bool isLegal() {
-    if (curRound.count == 0) {
+    if (curTurn.count == 0) {
       return true;
     }
     if (curPly.score == settings.points) {
-      return settings.isValid(curPly.score, curRound.first);
-    } else if (curPly.score == curRound.sum()) {
-      return settings.isValid(curPly.score, curRound.last!);
-    } else if (curRound.sum() < curPly.score) {
+      return settings.isValid(curPly.score, curTurn.first);
+    } else if (curPly.score == curTurn.sum()) {
+      return settings.isValid(curPly.score, curTurn.last!);
+    } else if (curTurn.sum() < curPly.score) {
       return true;
     }
 
@@ -63,12 +63,12 @@ class GameController {
   }
 
   void onThrow(Hit hit) {
-    var action = Throw(gameRound.current, hit, curRound.count);
+    var action = Throw(gameRound.current, hit, curTurn.count);
     commands.execute(action);
   }
 
   void next() {
-    bool isWin = curRound.isWin;
+    bool isWin = curTurn.isWin;
 
     commands.execute(Switch.from(playerData, gameRound));
 

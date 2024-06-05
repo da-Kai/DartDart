@@ -1,6 +1,6 @@
 /// Every Number fields on a dart board
 enum HitNumber {
-  unthrown('', 0, null),
+  unthrown('', 0, -2),
   miss('MISS', 0, -1),
   one('1', 1, 0),
   two('2', 2, 7),
@@ -32,7 +32,7 @@ enum HitNumber {
   /// Dartboard segment in clockwise order.
   ///
   /// "1":0, "18":1, ... ,"20":19 and "BE":20.
-  final int? segment;
+  final int segment;
 
   /// Get [HitNumber] object by its segment.
   ///
@@ -96,18 +96,21 @@ class Hit {
   String toString() {
     return abbreviation;
   }
+
+  int operator +(covariant other) {
+    if(other is Hit) return value + other.value;
+    if(other is int) return value + other;
+    throw UnimplementedError();
+  }
 }
 
-/// Possibilities for a hits impact.
-enum HitValidity { valid, invalidStart, invalidEnd, overthrow, empty }
-
-/// A Representation of a Players 3 throws per round.
-class Throws {
+/// A Representation of a Players 3 throws per turn.
+class Turn {
   Hit first;
   Hit second;
   Hit third;
 
-  Throws({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
+  Turn({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
   Hit? get last {
     return get(count - 1);
@@ -149,7 +152,7 @@ class Throws {
   ///
   /// If no position is given, the last one is chosen.
   bool undo({int? pos}) {
-    switch (pos ?? count) {
+    switch (pos ?? (count-1)) {
       case 0:
         first = Hit.skipped;
         return true;

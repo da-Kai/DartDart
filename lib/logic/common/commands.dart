@@ -49,6 +49,7 @@ class CommandStack {
   }
 
   Command? peak({position}) {
+    if(position == null) return current;
     Command? cmd = last!;
     for (int i = 0; i <= position; i++) {
       if (cmd == null) {

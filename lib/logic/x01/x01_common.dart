@@ -1,14 +1,14 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
 
-class PlayerRound extends Throws {
+class PlayerTurn extends Turn {
   final GameSettings settings;
   final int startScore;
 
-  PlayerRound(this.settings, this.startScore, {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
+  PlayerTurn(this.settings, this.startScore, {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
 
-  static PlayerRound from(GameSettings settings) {
-    return PlayerRound(settings, settings.points);
+  static PlayerTurn from(GameSettings settings) {
+    return PlayerTurn(settings, settings.points);
   }
 
   @override
@@ -39,12 +39,12 @@ class PlayerRound extends Throws {
 class Player {
   final String name;
   final int startScore;
-  final List<PlayerRound> rounds = [];
+  final List<PlayerTurn> turnHistory = [];
 
   Player(this.name, this.startScore);
 
   int get score {
-    return rounds.isEmpty ? startScore : rounds.last.score;
+    return turnHistory.isEmpty ? startScore : turnHistory.last.score;
   }
 
   bool get done {
@@ -52,21 +52,21 @@ class Player {
   }
 }
 
-///
+/// Container for the active Turn
 class GameRound {
   final GameSettings settings;
-  late PlayerRound current;
+  late PlayerTurn current;
 
   GameRound(this.settings) {
-    current = PlayerRound.from(settings);
+    current = PlayerTurn.from(settings);
   }
 
-  void setRound(PlayerRound round) {
+  void setupTurn(PlayerTurn round) {
     current = round;
   }
 
-  void setRoundFor(Player player) {
-    current = PlayerRound(settings, player.score);
+  void setupTurnFor(Player player) {
+    current = PlayerTurn(settings, player.score);
   }
 }
 

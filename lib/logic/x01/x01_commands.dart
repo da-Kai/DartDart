@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/common.dart';
+import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 
@@ -9,7 +9,7 @@ class Throw implements Command {
   @override
   Command? previous;
 
-  final PlayerRound round;
+  final PlayerTurn round;
   final Hit hit;
   final int pos;
 
@@ -37,7 +37,7 @@ class Switch implements Command {
 
   final Player nextPly;
   final Player curPly;
-  final PlayerRound round;
+  final PlayerTurn round;
 
   final PlayerData data;
   final GameRound game;
@@ -51,11 +51,11 @@ class Switch implements Command {
   @override
   void execute() {
     /// Apply Score if Valid.
-    data.currentPlayer.rounds.add(round);
+    data.currentPlayer.turnHistory.add(round);
     data.pushPlayerBack(curPly);
     data.otherPlayer.remove(nextPly);
     data.setCurrentPlayer(nextPly);
-    game.setRoundFor(nextPly);
+    game.setupTurnFor(nextPly);
   }
 
   @override
@@ -64,8 +64,8 @@ class Switch implements Command {
     data.otherPlayer.remove(curPly);
     data.pushPlayerFront(nextPly);
 
-    curPly.rounds.remove(round);
-    game.setRound(round);
+    curPly.turnHistory.remove(round);
+    game.setupTurn(round);
 
     data.setCurrentPlayer(curPly);
   }

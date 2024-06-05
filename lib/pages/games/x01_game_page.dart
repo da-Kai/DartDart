@@ -301,12 +301,12 @@ class _CurrentPlayer extends StatelessWidget {
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curRound.score == 0
+                game.curTurn.score == 0
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        game.curRound.score.toString(),
+                        game.curTurn.score.toString(),
                         style: titleStyle.copyWith(
                             color: game.isLegal() //
                                 ? colorScheme.onPrimaryContainer //
@@ -322,13 +322,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.first}'),
+                  child: _ThrowBean(text: '${game.curTurn.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.second}'),
+                  child: _ThrowBean(text: '${game.curTurn.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.third}'),
+                  child: _ThrowBean(text: '${game.curTurn.third}'),
                 ),
               ],
             ),
@@ -447,7 +447,7 @@ class _NextButton extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.curRound.done()
+        onPressed: !data.curTurn.done()
             ? null
             : () {
                 update(() {
