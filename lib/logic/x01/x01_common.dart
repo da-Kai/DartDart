@@ -72,12 +72,22 @@ class GameRound {
 
 /// Contains player data.
 class PlayerData {
+  final List<String> players;
+  final int goal;
+
   final List<Player> otherPlayer = [];
   final List<Player> finishedPlayer = [];
 
   Player currentPlayer = Player('ERROR', -1);
 
-  PlayerData(List<String> players, int goal) {
+  PlayerData(this.players, this.goal) {
+    reset();
+  }
+
+  void reset() {
+    otherPlayer.clear();
+    finishedPlayer.clear();
+
     if (players.isNotEmpty) {
       otherPlayer.addAll(players.map((ply) => Player(ply, goal)));
       var ply = popPlayerFront();

@@ -43,21 +43,18 @@ enum Games {
   final int val;
 }
 
-class GameSettings {
+class GameSettingFactory {
+  final List<String> players = [];
+
   Games game = Games.threeOOne;
   InOut gameIn = InOut.straight;
   InOut gameOut = InOut.double;
   int legs = 1;
   int sets = 1;
 
-  int get points {
-    return game.val;
+  GameSettings get() {
+    return GameSettings(game, gameIn, gameOut, sets, legs);
   }
-
-  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-  final List<String> players = [];
 
   bool isNameFree(String name) {
     for (var plyName in players) {
@@ -67,6 +64,23 @@ class GameSettings {
     }
     return true;
   }
+}
+
+class GameSettings {
+  final Games game;
+  final InOut gameIn;
+  final InOut gameOut;
+  final int legs;
+  final int sets;
+
+  GameSettings(this.game, this.gameIn, this.gameOut, this.sets, this.legs);
+
+  int get points {
+    return game.val;
+  }
+
+  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   /// Determine if the given hit is a potential fishing hit.
   bool isFinisher(Hit hit) {

@@ -1,6 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_game.dart';
+import 'package:dart_dart/logic/x01/x01_settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -9,8 +10,8 @@ import 'package:flutter/material.dart';
 class X01Game extends StatefulWidget {
   late final GameController data;
 
-  X01Game({super.key, required settings}) {
-    data = GameController(settings);
+  X01Game({super.key, required List<String> player, required GameSettings settings}) {
+    data = GameController(player, settings);
   }
 
   @override

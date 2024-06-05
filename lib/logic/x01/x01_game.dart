@@ -9,12 +9,13 @@ enum InputType { board, field }
 /// Represents a single Game
 class GameController {
   final GameSettings settings;
-  late PlayerData playerData;
-  late GameRound gameRound;
+  late final PlayerData playerData;
 
+  late GameRound gameRound;
   final CommandStack commands = CommandStack();
 
-  GameController(this.settings) {
+  GameController(List<String> playerNames, this.settings) {
+    playerData = PlayerData(playerNames, settings.points);
     reset();
   }
 
@@ -57,7 +58,7 @@ class GameController {
   }
 
   void reset() {
-    playerData = PlayerData(settings.players, settings.points);
+    playerData.reset();
     gameRound = GameRound(settings);
     commands.clear();
   }
