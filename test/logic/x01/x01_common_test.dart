@@ -20,7 +20,8 @@ void main() {
 
       var playerA = Player('A', 101);
       plyData.pushPlayerFront(playerA);
-      expect(plyData.popPlayerFront(), playerA);
+      expect(plyData.next, playerA);
+      expect(plyData.remove(playerA), true);
 
       expect(plyData.currentPlayer.name, 'B');
       var playerB = plyData.currentPlayer;
@@ -32,6 +33,10 @@ void main() {
       expect(plyData.winner, null);
       plyData.addWinner(front);
       expect(plyData.winner!, front);
+
+      expect(plyData.mapPlayer((p) => p.name), ['C', 'D']);
+      expect(plyData.mapWinner((p) => p.name), ['B']);
+
       plyData.pushPlayerFront(plyData.popWinner()!);
       expect(plyData.winner, null);
 
@@ -44,6 +49,9 @@ void main() {
 
       plyData.addWinner(plyData.currentPlayer);
       expect(plyData.done, true);
+
+      plyData.popWinner();
+      expect(plyData.done, false);
     });
     test('Test X01 PlayerTurn', () {
       var gameFactory = GameSettingFactory();
@@ -70,7 +78,21 @@ void main() {
       expect(turn.done(), true);
       expect(turn.isWin, true);
     });
-    test('Test X01 Commands', () {
+    test('Test X01 GameRound', () {
+      var gameFactory = GameSettingFactory();
+      var set = gameFactory.get();
+      var round = GameRound(set);
+
+      expect(round.current.startScore, set.points);
+
+      round.setupTurn(PlayerTurn(set, 60));
+      expect(round.current.startScore, 60);
+
+      var ply = Player('Test', 101);
+      round.setupTurnFor(ply);
+      expect(round.current.startScore, ply.score);
+    });
+    test('Test X01 PlayerTurn', () {
       var gameFactory = GameSettingFactory();
       var set = gameFactory.get();
 

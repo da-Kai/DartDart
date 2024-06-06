@@ -54,11 +54,11 @@ class Player {
 
 /// Container for the active Turn
 class GameRound {
-  final GameSettings settings;
+  final GameSettings _settings;
   late PlayerTurn current;
 
-  GameRound(this.settings) {
-    current = PlayerTurn.from(settings);
+  GameRound(this._settings) {
+    current = PlayerTurn.from(_settings);
   }
 
   void setupTurn(PlayerTurn round) {
@@ -66,7 +66,7 @@ class GameRound {
   }
 
   void setupTurnFor(Player player) {
-    current = PlayerTurn(settings, player.score);
+    current = PlayerTurn(_settings, player.score);
   }
 }
 
