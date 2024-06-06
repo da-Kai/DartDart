@@ -29,10 +29,36 @@ void main() {
       expect(twenty.value, 20);
       expect(doubleTwenty.value, 40);
       expect(tripleTwenty.value, 60);
+
+      var tripleBullsEye = Hit.get(HitNumber.bullsEye, HitMultiplier.triple);
+      expect(tripleBullsEye.multiplier, HitMultiplier.double);
+    });
+
+    test('Test Hit Names', () {
+      var twenty = Hit.get(HitNumber.twenty, HitMultiplier.single);
+      var doubleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
+      var tripleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.triple);
+      var bullsEye = Hit.bullseye;
+      var skipped = Hit.skipped;
+      var miss = Hit.miss;
+
+      expect(twenty.abbreviation, '20');
+      expect(doubleTwenty.abbreviation, 'D20');
+      expect(tripleTwenty.abbreviation, 'T20');
+      expect(bullsEye.abbreviation, 'BULL');
+      expect(skipped.abbreviation, '');
+      expect(miss.abbreviation, 'MISS');
+
+      expect(miss.toString(), 'MISS');
+
+      expect(() => (miss + ''), throwsA(isA<UnimplementedError>()));
     });
 
     test('Test Throws', () {
       var turn = Turn();
+
+      expect(turn.last, null);
+      expect(turn.thrown(Hit.bullseye, pos: 5), -1);
 
       expect(turn.done(), false);
       expect(turn.count, 0);
@@ -64,6 +90,13 @@ void main() {
       expect(turn.done(), false);
       expect(turn.count, 2);
       expect(turn.sum(), firstHit + secondHit);
+      expect(turn.last, secondHit);
+
+      turn.undo();
+
+      expect(turn.count, 1);
+      expect(turn.sum(), firstHit.value);
+      expect(turn.last, firstHit);
     });
   });
 }
