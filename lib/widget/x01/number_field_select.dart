@@ -122,7 +122,7 @@ class _HitButton extends StatelessWidget {
   final ButtonStyle style;
 
   Hit get hit {
-    return Hit.getFrom(hitNum, hitMult);
+    return Hit.get(hitNum, hitMult);
   }
 
   const _HitButton({required this.style, required this.onPressed, required this.hitMult, required this.hitNum});

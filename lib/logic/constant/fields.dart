@@ -61,19 +61,22 @@ enum HitMultiplier {
 
 /// Represents a single Dart hit.
 class Hit {
-  static const Hit miss = Hit(HitNumber.miss, HitMultiplier.single);
-  static const Hit skipped = Hit(HitNumber.unthrown, HitMultiplier.single);
+  static const Hit miss = Hit._(HitNumber.miss, HitMultiplier.single);
+  static const Hit skipped = Hit._(HitNumber.unthrown, HitMultiplier.single);
+
+  static const Hit bullseye = Hit._(HitNumber.bullsEye, HitMultiplier.single);
+  static const Hit doubleBullseye = Hit._(HitNumber.bullsEye, HitMultiplier.double);
 
   final HitNumber number;
   final HitMultiplier multiplier;
 
-  const Hit(this.number, this.multiplier);
+  const Hit._(this.number, this.multiplier);
 
-  static Hit getFrom(HitNumber number, HitMultiplier multiplier) {
+  static Hit get(HitNumber number, HitMultiplier multiplier) {
     if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
-      return Hit(number, HitMultiplier.double);
+      return Hit._(number, HitMultiplier.double);
     } else {
-      return Hit(number, multiplier);
+      return Hit._(number, multiplier);
     }
   }
 

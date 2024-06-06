@@ -181,7 +181,7 @@ class _PlayersList extends StatelessWidget {
           child: ListView(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
-              children: data.otherPlayer.map<Container>((ply) {
+              children: data.mapPlayer<Container>((ply) {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -211,7 +211,7 @@ class _PlayersList extends StatelessWidget {
                     ],
                   ),
                 );
-              }).followedBy(data.finishedPlayer.map<Container>((ply) {
+              }).followedBy(data.mapWinner<Container>((ply) {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -454,7 +454,7 @@ class _NextButton extends StatelessWidget {
                 update(() {
                   data.next();
                 });
-                if (data.hasGameFinished()) {
+                if (data.hasGameFinished) {
                   var ply = data.winner;
                   _GameEnd(context: context, winner: ply.name)
                       .open() //

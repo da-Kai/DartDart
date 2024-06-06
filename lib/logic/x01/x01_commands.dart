@@ -45,7 +45,7 @@ class Switch implements Command {
   Switch(this.data, this.game, this.round, this.curPly, this.nextPly);
 
   static Switch from(PlayerData data, GameRound round) {
-    return Switch(data, round, round.current, data.currentPlayer, data.otherPlayer.first);
+    return Switch(data, round, round.current, data.currentPlayer, data.next);
   }
 
   @override
@@ -53,7 +53,7 @@ class Switch implements Command {
     /// Apply Score if Valid.
     data.currentPlayer.turnHistory.add(round);
     data.pushPlayerBack(curPly);
-    data.otherPlayer.remove(nextPly);
+    data.remove(nextPly);
     data.setCurrentPlayer(nextPly);
     game.setupTurnFor(nextPly);
   }
@@ -61,7 +61,7 @@ class Switch implements Command {
   @override
   void undo() {
     /// Reset Score.
-    data.otherPlayer.remove(curPly);
+    data.remove(curPly);
     data.pushPlayerFront(nextPly);
 
     curPly.turnHistory.remove(round);
@@ -86,13 +86,13 @@ class Award implements Command {
 
   @override
   void execute() {
-    var ply = data.otherPlayer.removeLast();
-    data.finishedPlayer.add(ply);
+    var ply = data.popPlayerBack()!;
+    data.addWinner(ply);
   }
 
   @override
   void undo() {
-    var win = data.finishedPlayer.removeLast();
-    data.otherPlayer.add(win);
+    var win = data.popWinner()!;
+    data.pushPlayerBack(win);
   }
 }

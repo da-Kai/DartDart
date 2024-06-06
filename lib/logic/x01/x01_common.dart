@@ -13,7 +13,7 @@ class PlayerTurn extends Turn {
 
   @override
   bool done() {
-    return count == 3 || score == 0;
+    return count == 3 || isWin;
   }
 
   bool get valid {
@@ -72,65 +72,80 @@ class GameRound {
 
 /// Contains player data.
 class PlayerData {
-  final List<String> players;
+  final List<String> _players;
   final int goal;
 
-  final List<Player> otherPlayer = [];
-  final List<Player> finishedPlayer = [];
+  final List<Player> _otherPlayer = [];
+  final List<Player> _finishedPlayer = [];
 
   Player currentPlayer = Player('ERROR', -1);
 
-  PlayerData(this.players, this.goal) {
+  PlayerData(this._players, this.goal) {
     reset();
   }
 
   void reset() {
-    otherPlayer.clear();
-    finishedPlayer.clear();
+    _otherPlayer.clear();
+    _finishedPlayer.clear();
 
-    if (players.isNotEmpty) {
-      otherPlayer.addAll(players.map((ply) => Player(ply, goal)));
-      var ply = popPlayerFront();
-      if (ply is Player) {
-        currentPlayer = ply;
-      } else {
-        throw ArgumentError.notNull('currentPlayer');
-      }
+    if (_players.isNotEmpty) {
+      _otherPlayer.addAll(_players.map((ply) => Player(ply, goal)));
+      currentPlayer = popPlayerFront()!;
     }
   }
 
-  bool get isSinglePlayer {
-    return otherPlayer.isEmpty && finishedPlayer.isEmpty;
-  }
+  bool get done => _otherPlayer.isEmpty && _finishedPlayer.isNotEmpty;
 
-  bool get isMultiPlayer {
-    return !isSinglePlayer;
-  }
+  bool get isSinglePlayer => _otherPlayer.isEmpty && _finishedPlayer.isEmpty;
+
+  bool get isMultiPlayer => !isSinglePlayer;
 
   Player? get winner {
-    if (finishedPlayer.isEmpty) return null;
-    return finishedPlayer.first;
+    if (_finishedPlayer.isEmpty) return null;
+    return _finishedPlayer.first;
   }
+
+  bool remove(Player player) {
+    return _otherPlayer.remove(player);
+  }
+
+  Player get next => _otherPlayer.first;
 
   void setCurrentPlayer(Player player) {
     currentPlayer = player;
   }
 
   void pushPlayerBack(Player player) {
-    otherPlayer.add(player);
+    _otherPlayer.add(player);
   }
 
   void pushPlayerFront(Player player) {
-    otherPlayer.insert(0, player);
+    _otherPlayer.insert(0, player);
   }
 
   Player? popPlayerFront() {
-    if (otherPlayer.isEmpty) return null;
-    return otherPlayer.removeAt(0);
+    if (_otherPlayer.isEmpty) return null;
+    return _otherPlayer.removeAt(0);
   }
 
   Player? popPlayerBack() {
-    if (otherPlayer.isEmpty) return null;
-    return otherPlayer.removeAt(otherPlayer.length - 1);
+    if (_otherPlayer.isEmpty) return null;
+    return _otherPlayer.removeAt(_otherPlayer.length - 1);
+  }
+
+  void addWinner(Player player) {
+    _finishedPlayer.add(player);
+  }
+
+  Player? popWinner() {
+    return _finishedPlayer.isEmpty ? null : _finishedPlayer.removeLast();
+  }
+
+  Iterable<T> mapPlayer<T>(T Function(Player) toElement) {
+    return _otherPlayer.map(toElement);
+  }
+
+  Iterable<T> mapWinner<T>(T Function(Player) toElement) {
+    return _finishedPlayer.map(toElement);
   }
 }

@@ -43,10 +43,10 @@ class FieldCalc {
 
     //BullsEye
     if (distance <= 7.1) {
-      return const Hit(HitNumber.bullsEye, HitMultiplier.double);
+      return Hit.doubleBullseye;
     }
     if (distance <= 16.0) {
-      return const Hit(HitNumber.bullsEye, HitMultiplier.single);
+      return Hit.bullseye;
     }
 
     HitMultiplier multiplier = HitMultiplier.single;
@@ -61,6 +61,6 @@ class FieldCalc {
 
     int section = (angle / 18.0).floor();
     HitNumber value = HitNumber.bySegment(section);
-    return Hit(value, multiplier);
+    return Hit.get(value, multiplier);
   }
 }

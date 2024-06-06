@@ -25,9 +25,9 @@ class GameController {
 
   Player get curPly => playerData.currentPlayer;
 
-  Player get winner => playerData.finishedPlayer.first;
+  Player get winner => playerData.winner!;
 
-  bool get hasEnded => playerData.otherPlayer.isEmpty;
+  bool get hasEnded => playerData.done;
 
   void setCurrentPlayer(Player player, {PlayerTurn? turn}) {
     playerData.currentPlayer = player;
@@ -49,13 +49,7 @@ class GameController {
     return false;
   }
 
-  bool hasGameFinished() {
-    if (playerData.isSinglePlayer) {
-      return playerData.currentPlayer.score == 0;
-    } else {
-      return playerData.otherPlayer.isEmpty;
-    }
-  }
+  bool get hasGameFinished => playerData.done;
 
   void reset() {
     playerData.reset();

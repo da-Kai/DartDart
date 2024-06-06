@@ -51,7 +51,7 @@ class CommandStack {
   Command? peak({position}) {
     if(position == null) return current;
     Command? cmd = last!;
-    for (int i = 0; i <= position; i++) {
+    for (int i = 0; i < position; i++) {
       if (cmd == null) {
         return null;
       }
@@ -60,7 +60,7 @@ class CommandStack {
     return cmd;
   }
 
-  bool get canUndo => first != null;
+  bool get canUndo => current != null;
 
   bool get canRedo => last != current;
 }

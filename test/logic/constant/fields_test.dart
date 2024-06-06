@@ -23,9 +23,9 @@ void main() {
     });
 
     test('Test Hit multiplier', () {
-      var twenty = const Hit(HitNumber.twenty, HitMultiplier.single);
-      var doubleTwenty = const Hit(HitNumber.twenty, HitMultiplier.double);
-      var tripleTwenty = const Hit(HitNumber.twenty, HitMultiplier.triple);
+      var twenty = Hit.get(HitNumber.twenty, HitMultiplier.single);
+      var doubleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
+      var tripleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.triple);
 
       expect(twenty.value, 20);
       expect(doubleTwenty.value, 40);
@@ -39,21 +39,21 @@ void main() {
       expect(turn.count, 0);
       expect(turn.sum(), 0);
 
-      var firstHit = const Hit(HitNumber.twenty, HitMultiplier.triple);
+      var firstHit = Hit.get(HitNumber.twenty, HitMultiplier.triple);
       turn.thrown(firstHit);
 
       expect(turn.done(), false);
       expect(turn.count, 1);
       expect(turn.sum(), firstHit.value);
 
-      var secondHit = const Hit(HitNumber.one, HitMultiplier.double);
+      var secondHit = Hit.get(HitNumber.one, HitMultiplier.double);
       turn.thrown(secondHit);
 
       expect(turn.done(), false);
       expect(turn.count, 2);
       expect(turn.sum(), firstHit + secondHit);
 
-      var thirdHit = const Hit(HitNumber.five, HitMultiplier.single);
+      var thirdHit = Hit.get(HitNumber.five, HitMultiplier.single);
       turn.thrown(thirdHit);
 
       expect(turn.done(), true);

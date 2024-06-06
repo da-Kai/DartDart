@@ -49,8 +49,32 @@ void main() {
     expect(stack.canUndo, true);
     expect(stack.canRedo, true);
 
+    stack.undo();
+    expect(cmdOne.executed, false);
+    expect(stack.current, null);
+    expect(stack.canUndo, false);
+    expect(stack.canRedo, true);
+
+    stack.undo();
+    expect(stack.canRedo, true);
+    expect(stack.peak(), null);
+
     stack.redo();
+    expect(cmdOne.executed, true);
+    expect(cmdTwo.executed, false);
+    expect(stack.peak(), cmdOne);
+
+    stack.redo();
+    expect(cmdOne.executed, true);
     expect(cmdTwo.executed, true);
+
     expect(stack.peak(), cmdTwo);
+    expect(stack.peak(position: 1), cmdOne);
+    expect(stack.peak(position: 2), null);
+
+    stack.clear();
+    expect(stack.canRedo, false);
+    expect(stack.canUndo, false);
+    expect(stack.current, null);
   });
 }
