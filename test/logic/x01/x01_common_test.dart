@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
@@ -23,7 +21,7 @@ void main() {
       var playerA = Player('A', 101);
       plyData.pushPlayerFront(playerA);
       expect(plyData.popPlayerFront(), playerA);
-      
+
       expect(plyData.currentPlayer.name, 'B');
       var playerB = plyData.currentPlayer;
       plyData.setCurrentPlayer(playerA);
@@ -38,7 +36,7 @@ void main() {
       expect(plyData.winner, null);
 
       /// Test SinglePlayer
-      plyData = PlayerData( ['nerd'], 101);
+      plyData = PlayerData(['nerd'], 101);
 
       expect(plyData.isSinglePlayer, true);
       expect(plyData.isMultiPlayer, false);
