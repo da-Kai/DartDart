@@ -105,6 +105,14 @@ class Hit {
     if(other is int) return value + other;
     throw UnimplementedError();
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Hit && other.multiplier == multiplier && other.number == number;
+  }
+
+  @override
+  int get hashCode => abbreviation.hashCode;
 }
 
 /// A Representation of a Players 3 throws per turn.
