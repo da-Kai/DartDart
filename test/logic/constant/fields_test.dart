@@ -20,7 +20,6 @@ void main() {
 
       expect(HitNumber.bySegment(null), HitNumber.unthrown);
     });
-
     test('Test Hit multiplier', () {
       var twenty = Hit.get(HitNumber.twenty, HitMultiplier.single);
       var doubleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
@@ -33,7 +32,6 @@ void main() {
       var tripleBullsEye = Hit.get(HitNumber.bullsEye, HitMultiplier.triple);
       expect(tripleBullsEye.multiplier, HitMultiplier.double);
     });
-
     test('Test Hit Names', () {
       var twenty = Hit.get(HitNumber.twenty, HitMultiplier.single);
       var doubleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
@@ -52,6 +50,13 @@ void main() {
       expect(miss.toString(), 'MISS');
 
       expect(() => (miss + ''), throwsA(isA<UnimplementedError>()));
+
+      var miss2 = Hit.get(HitNumber.miss, HitMultiplier.triple);
+      expect(Hit.miss.hashCode != Hit.bullseye.hashCode, true);
+      expect(Hit.miss.hashCode, miss2.hashCode);
+      expect(Hit.miss, miss2);
+      expect(twenty.hashCode != doubleTwenty.hashCode, true);
+      expect(doubleTwenty != tripleTwenty, true);
     });
 
     test('Test Throws', () {

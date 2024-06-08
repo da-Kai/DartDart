@@ -73,11 +73,13 @@ class Hit {
   const Hit._(this.number, this.multiplier);
 
   static Hit get(HitNumber number, HitMultiplier multiplier) {
-    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
-      return Hit._(number, HitMultiplier.double);
-    } else {
-      return Hit._(number, multiplier);
+    if (number == HitNumber.miss) {
+      return Hit.miss;
     }
+    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
+      return Hit.doubleBullseye;
+    }
+    return Hit._(number, multiplier);
   }
 
   int get value {
