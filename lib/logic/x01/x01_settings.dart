@@ -16,7 +16,7 @@ extension InOutExtension on InOut {
       return hit.multiplier == HitMultiplier.double;
     }
     if (this == InOut.master) {
-      return hit.multiplier == HitMultiplier.double && //
+      return hit.multiplier == HitMultiplier.double || //
           hit.multiplier == HitMultiplier.triple;
     }
     return false;
