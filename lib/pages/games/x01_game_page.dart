@@ -309,7 +309,7 @@ class _CurrentPlayer extends StatelessWidget {
                     Text(
                         game.curTurn.score.toString(),
                         style: titleStyle.copyWith(
-                            color: game.isLegal() //
+                            color: game.curTurn.valid //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),

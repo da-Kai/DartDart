@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/common/coordinate.dart';
 
@@ -14,7 +15,11 @@ class GameMath {
   static double _getAngle(double dist, Coordinate coo) {
     var radiant = acos(coo.y / dist);
     var degree = radiant * (180 / pi);
-    return coo.x > 0 ? 360 - degree : degree;
+    return switch(numCheck(coo.x)) {
+      NumCheck.negative => degree,
+      NumCheck.zero => degree,
+      NumCheck.positive => 360 - degree
+    };
   }
 
   /// Returns Coordinates normalized to 100:-100 with the

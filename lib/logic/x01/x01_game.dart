@@ -34,21 +34,6 @@ class GameController {
     gameRound.current = turn ?? PlayerTurn(settings, player.score);
   }
 
-  bool isLegal() {
-    if (curTurn.count == 0) {
-      return true;
-    }
-    if (curPly.score == settings.points) {
-      return settings.isValid(curPly.score, curTurn.first);
-    } else if (curPly.score == curTurn.sum()) {
-      return settings.isValid(curPly.score, curTurn.last!);
-    } else if (curTurn.sum() < curPly.score) {
-      return true;
-    }
-
-    return false;
-  }
-
   bool get hasGameFinished => playerData.done;
 
   void reset() {

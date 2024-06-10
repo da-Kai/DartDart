@@ -45,29 +45,32 @@ class Switch implements Command {
   Switch(this.data, this.game, this.round, this.curPly, this.nextPly);
 
   static Switch from(PlayerData data, GameRound round) {
-    return Switch(data, round, round.current, data.currentPlayer, data.next);
+    var next = data.isMultiPlayer ? data.next : data.currentPlayer;
+    return Switch(data, round, round.current, data.currentPlayer, next);
   }
 
   @override
   void execute() {
     /// Apply Score if Valid.
     data.currentPlayer.turnHistory.add(round);
-    data.pushPlayerBack(curPly);
-    data.remove(nextPly);
-    data.setCurrentPlayer(nextPly);
+    if(data.isMultiPlayer) {
+      data.pushPlayerBack(curPly);
+      data.remove(nextPly);
+      data.setCurrentPlayer(nextPly);
+    }
     game.setupTurnFor(nextPly);
   }
 
   @override
   void undo() {
     /// Reset Score.
-    data.remove(curPly);
-    data.pushPlayerFront(nextPly);
-
     curPly.turnHistory.remove(round);
+    if(data.isMultiPlayer) {
+      data.remove(curPly);
+      data.pushPlayerFront(nextPly);
+      data.setCurrentPlayer(curPly);
+    }
     game.setupTurn(round);
-
-    data.setCurrentPlayer(curPly);
   }
 }
 
@@ -86,13 +89,15 @@ class Award implements Command {
 
   @override
   void execute() {
-    var ply = data.popPlayerBack()!;
+    var ply = data.isMultiPlayer ? data.popPlayerBack()! : data.currentPlayer;
     data.addWinner(ply);
   }
 
   @override
   void undo() {
     var win = data.popWinner()!;
-    data.pushPlayerBack(win);
+    if (data.isMultiPlayer) {
+      data.pushPlayerBack(win);
+    }
   }
 }

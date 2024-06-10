@@ -1,3 +1,4 @@
+import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 
 enum InOut {
@@ -7,6 +8,7 @@ enum InOut {
 }
 
 extension InOutExtension on InOut {
+  /// Check if the hit fits.
   bool fits(Hit? hit) {
     if (hit == null) return false;
     if (this == InOut.straight) return true;
@@ -20,6 +22,7 @@ extension InOutExtension on InOut {
     return false;
   }
 
+  /// Check if a finisher is possible with the remaining score.
   bool possible(int remaining) {
     if (remaining < 0) return false;
     if (this == InOut.straight) return true;
@@ -83,26 +86,33 @@ class GameSettings {
   static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   /// Determine if the given hit is a potential fishing hit.
-  bool isFinisher(Hit hit) {
+  bool isValidFinisher(Hit hit) {
     return gameOut.fits(hit);
   }
 
   /// Determine if the given hit is a potential starting hit.
-  bool isStarter(Hit hit) {
+  bool isValidStarter(Hit hit) {
     return gameIn.fits(hit);
   }
 
-  /// Determine if the hit is valid.
-  bool isValid(int score, Hit hit) {
-    if (hit.number.value == 0) {
-      return true;
-    } else if (score == points) {
-      return isStarter(hit);
-    } else if (score == hit.value) {
-      return isFinisher(hit);
-    } else if (score > hit.value) {
-      return true;
+  /// Determine if the given hit is valid to the currentScore.
+  bool isValid(int curScore, Hit hit) {
+    if(curScore == points) {
+      return isValidStarter(hit);
     }
-    return false;
+    var val = curScore - hit.value;
+    switch(numCheck(val)) {
+      case NumCheck.zero:
+        return isValidFinisher(hit);
+      case NumCheck.positive:
+        return gameOut.possible(val);
+      case NumCheck.negative:
+        return false;
+    }
+  }
+
+  /// Determine if the given hit is NOT valid to the currentScore.
+  bool isInvalid(int curScore, Hit hit) {
+    return !isValid(curScore, hit);
   }
 }

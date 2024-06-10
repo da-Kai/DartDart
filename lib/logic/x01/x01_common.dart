@@ -17,11 +17,13 @@ class PlayerTurn extends Turn {
   }
 
   bool get valid {
+    int val = startScore;
     for (int i = 0; i < count; i++) {
-      int val = startScore - sum(until: i - 1);
-      if (!settings.isValid(val, get(i)!)) {
+      var hit = get(i)!;
+      if (settings.isInvalid(val, hit)) {
         return false;
       }
+      val -= hit.value;
     }
     return true;
   }
