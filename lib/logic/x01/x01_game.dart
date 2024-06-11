@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/common.dart';
+import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_commands.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
@@ -9,66 +9,46 @@ enum InputType { board, field }
 /// Represents a single Game
 class GameController {
   final GameSettings settings;
-  late PlayerData playerData;
-  late GameRound gameRound;
+  late final PlayerData playerData;
 
+  late GameRound gameRound;
   final CommandStack commands = CommandStack();
 
-  GameController(this.settings) {
+  GameController(List<String> playerNames, this.settings) {
+    playerData = PlayerData(playerNames, settings.points);
     reset();
   }
 
-  PlayerRound get curRound => gameRound.current;
+  PlayerTurn get curTurn => gameRound.current;
 
   bool get isMultiPlayer => playerData.isMultiPlayer;
 
   Player get curPly => playerData.currentPlayer;
 
-  Player get winner => playerData.finishedPlayer.first;
+  Player get winner => playerData.winner!;
 
-  bool get hasEnded => playerData.otherPlayer.isEmpty;
+  bool get hasEnded => playerData.done;
 
-  void setCurrentPlayer(Player player, {PlayerRound? round}) {
+  void setCurrentPlayer(Player player, {PlayerTurn? turn}) {
     playerData.currentPlayer = player;
-    gameRound.current = round ?? PlayerRound(settings, player.score);
+    gameRound.current = turn ?? PlayerTurn(settings, player.score);
   }
 
-  bool isLegal() {
-    if (curRound.count == 0) {
-      return true;
-    }
-    if (curPly.score == settings.points) {
-      return settings.isValid(curPly.score, curRound.first);
-    } else if (curPly.score == curRound.sum()) {
-      return settings.isValid(curPly.score, curRound.last!);
-    } else if (curRound.sum() < curPly.score) {
-      return true;
-    }
-
-    return false;
-  }
-
-  bool hasGameFinished() {
-    if (playerData.isSinglePlayer) {
-      return playerData.currentPlayer.score == 0;
-    } else {
-      return playerData.otherPlayer.isEmpty;
-    }
-  }
+  bool get hasGameFinished => playerData.done;
 
   void reset() {
-    playerData = PlayerData(settings.players, settings.points);
+    playerData.reset();
     gameRound = GameRound(settings);
     commands.clear();
   }
 
   void onThrow(Hit hit) {
-    var action = Throw(gameRound.current, hit, curRound.count);
+    var action = Throw(gameRound.current, hit, curTurn.count);
     commands.execute(action);
   }
 
   void next() {
-    bool isWin = curRound.isWin;
+    bool isWin = curTurn.isWin;
 
     commands.execute(Switch.from(playerData, gameRound));
 

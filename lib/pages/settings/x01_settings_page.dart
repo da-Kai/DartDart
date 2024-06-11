@@ -10,7 +10,7 @@ typedef Validator = (bool, String?) Function(String);
 const playerNameMinLength = 2;
 
 class X01Setting extends StatefulWidget {
-  final GameSettings _data = GameSettings();
+  final GameSettingFactory _data = GameSettingFactory();
 
   X01Setting({super.key});
 
@@ -21,7 +21,7 @@ class X01Setting extends StatefulWidget {
 class _X01PageState extends State<X01Setting> {
   final _formKey = GlobalKey<FormState>();
 
-  late GameSettings _data;
+  late GameSettingFactory _data;
 
   (bool, String?) validate(String playerName) {
     if (playerName.length < playerNameMinLength) {
@@ -224,7 +224,7 @@ class _GameSettingContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameSettings settings = state.widget._data;
+    final GameSettingFactory settings = state.widget._data;
 
     final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
       textStyle: FontConstants.text,
@@ -496,7 +496,8 @@ class _StartButton extends StatelessWidget {
                 if (state._formKey.currentState!.validate()) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => X01Game(settings: state._data)),
+                    MaterialPageRoute(builder: (context) => //
+                        X01Game(player: state._data.players, settings: state._data.get())),
                   );
                 }
               },

@@ -1,6 +1,6 @@
 /// Every Number fields on a dart board
 enum HitNumber {
-  unthrown('', 0, null),
+  unthrown('', 0, -2),
   miss('MISS', 0, -1),
   one('1', 1, 0),
   two('2', 2, 7),
@@ -32,7 +32,7 @@ enum HitNumber {
   /// Dartboard segment in clockwise order.
   ///
   /// "1":0, "18":1, ... ,"20":19 and "BE":20.
-  final int? segment;
+  final int segment;
 
   /// Get [HitNumber] object by its segment.
   ///
@@ -61,20 +61,25 @@ enum HitMultiplier {
 
 /// Represents a single Dart hit.
 class Hit {
-  static const Hit miss = Hit(HitNumber.miss, HitMultiplier.single);
-  static const Hit skipped = Hit(HitNumber.unthrown, HitMultiplier.single);
+  static const Hit miss = Hit._(HitNumber.miss, HitMultiplier.single);
+  static const Hit skipped = Hit._(HitNumber.unthrown, HitMultiplier.single);
+
+  static const Hit bullseye = Hit._(HitNumber.bullsEye, HitMultiplier.single);
+  static const Hit doubleBullseye = Hit._(HitNumber.bullsEye, HitMultiplier.double);
 
   final HitNumber number;
   final HitMultiplier multiplier;
 
-  const Hit(this.number, this.multiplier);
+  const Hit._(this.number, this.multiplier);
 
-  static Hit getFrom(HitNumber number, HitMultiplier multiplier) {
-    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
-      return Hit(number, HitMultiplier.double);
-    } else {
-      return Hit(number, multiplier);
+  static Hit get(HitNumber number, HitMultiplier multiplier) {
+    if (number == HitNumber.miss) {
+      return Hit.miss;
     }
+    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
+      return Hit.doubleBullseye;
+    }
+    return Hit._(number, multiplier);
   }
 
   int get value {
@@ -96,18 +101,29 @@ class Hit {
   String toString() {
     return abbreviation;
   }
+
+  int operator +(covariant other) {
+    if(other is Hit) return value + other.value;
+    if(other is int) return value + other;
+    throw UnimplementedError();
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Hit && other.multiplier == multiplier && other.number == number;
+  }
+
+  @override
+  int get hashCode => abbreviation.hashCode;
 }
 
-/// Possibilities for a hits impact.
-enum HitValidity { valid, invalidStart, invalidEnd, overthrow, empty }
-
-/// A Representation of a Players 3 throws per round.
-class Throws {
+/// A Representation of a Players 3 throws per turn.
+class Turn {
   Hit first;
   Hit second;
   Hit third;
 
-  Throws({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
+  Turn({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
   Hit? get last {
     return get(count - 1);
@@ -149,7 +165,7 @@ class Throws {
   ///
   /// If no position is given, the last one is chosen.
   bool undo({int? pos}) {
-    switch (pos ?? count) {
+    switch (pos ?? (count-1)) {
       case 0:
         first = Hit.skipped;
         return true;
