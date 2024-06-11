@@ -101,13 +101,10 @@ class GameSettings {
       return isValidStarter(hit);
     }
     var val = curScore - hit.value;
-    switch(numCheck(val)) {
-      case NumCheck.zero:
-        return isValidFinisher(hit);
-      case NumCheck.positive:
-        return gameOut.possible(val);
-      case NumCheck.negative:
-        return false;
+    return switch(numCheck(val)) {
+      NumCheck.zero => isValidFinisher(hit),
+      NumCheck.positive => gameOut.possible(val),
+      NumCheck.negative => false
     }
   }
 
