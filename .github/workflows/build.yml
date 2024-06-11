@@ -16,7 +16,7 @@ jobs:
       - run: |
           flutter --version
           flutter pub get
-          mkdir -p build/artifact
+          mkdir build/artifact
       - run: |
           flutter build apk --no-pub --release
           mv build/app/outputs/flutter-apk/app-release.apk build/artifact/dart-dart.apk
