@@ -79,7 +79,7 @@ class _FieldSelectState extends State<FieldSelect> {
                 children: hitNumbers
                     .map<Row>((numRow) => Row(
                           children: numRow
-                              .map<Widget>((hitNum) => _HitButton(
+                              .map<Widget>((hitNum) => HitButton(
                                   style: buttonStyle, onPressed: widget.onSelect, hitMult: hitMultiplier, hitNum: hitNum))
                               .toList(),
                         ))
@@ -115,7 +115,7 @@ class _MultiplierButton extends StatelessWidget {
   }
 }
 
-class _HitButton extends StatelessWidget {
+class HitButton extends StatelessWidget {
   final Function(Hit) onPressed;
   final HitNumber hitNum;
   final HitMultiplier hitMult;
@@ -125,7 +125,7 @@ class _HitButton extends StatelessWidget {
     return Hit.get(hitNum, hitMult);
   }
 
-  const _HitButton({required this.style, required this.onPressed, required this.hitMult, required this.hitNum});
+  const HitButton({super.key, required this.style, required this.onPressed, required this.hitMult, required this.hitNum});
 
   @override
   Widget build(BuildContext context) {
