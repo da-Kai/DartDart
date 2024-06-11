@@ -454,7 +454,7 @@ class _NextButton extends StatelessWidget {
                 update(() {
                   data.next();
                 });
-                if (data.hasGameFinished) {
+                if (data.hasGameEnded) {
                   var ply = data.winner;
                   _GameEnd(context: context, winner: ply.name)
                       .open() //

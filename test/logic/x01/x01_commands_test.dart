@@ -21,7 +21,7 @@ void main() {
     });
     test('Test Switch', () {
       var settings = GameSettingFactory().get();
-      var plyData = PlayerData(['A', 'B'], 42);
+      var plyData = PlayerData.get(['A', 'B'], 42);
       var gameRound = GameRound(settings);
       gameRound.current.thrown(Hit.doubleBullseye);
 
@@ -40,7 +40,7 @@ void main() {
       expect(t.curPly.turnHistory.length, 0);
     });
     test('Test Award', () {
-      var plyData = PlayerData(['A', 'B'], 42);
+      var plyData = PlayerData.get(['A', 'B'], 42);
       var curPly = plyData.next;
 
       var a = Award(plyData);
