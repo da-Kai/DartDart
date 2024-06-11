@@ -15,7 +15,7 @@ class GameController {
   final CommandStack commands = CommandStack();
 
   GameController(List<String> playerNames, this.settings) {
-    playerData = PlayerData(playerNames, settings.points);
+    playerData = PlayerData.get(playerNames, settings.points);
     reset();
   }
 
@@ -27,14 +27,12 @@ class GameController {
 
   Player get winner => playerData.winner!;
 
-  bool get hasEnded => playerData.done;
+  bool get hasGameEnded => playerData.playerCount == 0;
 
   void setCurrentPlayer(Player player, {PlayerTurn? turn}) {
-    playerData.currentPlayer = player;
+    playerData.setCurrentPlayer(player);
     gameRound.current = turn ?? PlayerTurn(settings, player.score);
   }
-
-  bool get hasGameFinished => playerData.done;
 
   void reset() {
     playerData.reset();

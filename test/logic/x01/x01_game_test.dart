@@ -24,7 +24,7 @@ void main() {
     expect(game.canRedo, false);
     expect(game.curTurn.first, Hit.bullseye);
 
-    expect(game.hasEnded, false);
+    expect(game.hasGameEnded, false);
     
     game.onThrow(Hit.miss);
     game.onThrow(Hit.miss);

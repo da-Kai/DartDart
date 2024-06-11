@@ -53,11 +53,9 @@ class Switch implements Command {
   void execute() {
     /// Apply Score if Valid.
     data.currentPlayer.turnHistory.add(round);
-    if(data.isMultiPlayer) {
-      data.pushPlayerBack(curPly);
-      data.remove(nextPly);
-      data.setCurrentPlayer(nextPly);
-    }
+    data.pushPlayerBack(curPly);
+    data.popPlayerFront();
+    data.setCurrentPlayer(nextPly);
     game.setupTurnFor(nextPly);
   }
 
@@ -65,11 +63,9 @@ class Switch implements Command {
   void undo() {
     /// Reset Score.
     curPly.turnHistory.remove(round);
-    if(data.isMultiPlayer) {
-      data.remove(curPly);
-      data.pushPlayerFront(nextPly);
-      data.setCurrentPlayer(curPly);
-    }
+    data.popPlayerBack();
+    data.pushPlayerFront(nextPly);
+    data.setCurrentPlayer(curPly);
     game.setupTurn(round);
   }
 }

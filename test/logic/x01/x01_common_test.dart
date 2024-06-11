@@ -9,7 +9,7 @@ void main() {
       /// Test Multiplayer
       var player = ['B', 'C', 'D'];
 
-      var plyData = PlayerData(player, 101);
+      var plyData = PlayerData.get(player, 101);
 
       expect(plyData.isSinglePlayer, false);
       expect(plyData.isMultiPlayer, true);
@@ -21,7 +21,7 @@ void main() {
       var playerA = Player('A', 101);
       plyData.pushPlayerFront(playerA);
       expect(plyData.next, playerA);
-      expect(plyData.remove(playerA), true);
+      expect(plyData.popPlayerFront(), playerA);
 
       expect(plyData.currentPlayer.name, 'B');
       var playerB = plyData.currentPlayer;
@@ -41,17 +41,17 @@ void main() {
       expect(plyData.winner, null);
 
       /// Test SinglePlayer
-      plyData = PlayerData(['nerd'], 101);
+      plyData = PlayerData.get(['nerd'], 101);
 
       expect(plyData.isSinglePlayer, true);
       expect(plyData.isMultiPlayer, false);
-      expect(plyData.done, false);
+      expect(plyData.playerCount, 1);
 
       plyData.addWinner(plyData.currentPlayer);
-      expect(plyData.done, true);
+      expect(plyData.playerCount, 0);
 
       plyData.popWinner();
-      expect(plyData.done, false);
+      expect(plyData.playerCount, 1);
     });
     test('Test X01 PlayerTurn', () {
       var gameFactory = GameSettingFactory();
