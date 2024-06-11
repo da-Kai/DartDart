@@ -1,6 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_game.dart';
+import 'package:dart_dart/logic/x01/x01_settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -9,8 +10,8 @@ import 'package:flutter/material.dart';
 class X01Game extends StatefulWidget {
   late final GameController data;
 
-  X01Game({super.key, required settings}) {
-    data = GameController(settings);
+  X01Game({super.key, required List<String> player, required GameSettings settings}) {
+    data = GameController(player, settings);
   }
 
   @override
@@ -180,7 +181,7 @@ class _PlayersList extends StatelessWidget {
           child: ListView(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
-              children: data.otherPlayer.map<Container>((ply) {
+              children: data.mapPlayer<Container>((ply) {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -210,7 +211,7 @@ class _PlayersList extends StatelessWidget {
                     ],
                   ),
                 );
-              }).followedBy(data.finishedPlayer.map<Container>((ply) {
+              }).followedBy(data.mapWinner<Container>((ply) {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -301,14 +302,14 @@ class _CurrentPlayer extends StatelessWidget {
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curRound.score == 0
+                game.curTurn.score == 0
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        game.curRound.score.toString(),
+                        game.curTurn.score.toString(),
                         style: titleStyle.copyWith(
-                            color: game.isLegal() //
+                            color: game.curTurn.valid //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),
@@ -322,13 +323,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.first}'),
+                  child: _ThrowBean(text: '${game.curTurn.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.second}'),
+                  child: _ThrowBean(text: '${game.curTurn.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curRound.third}'),
+                  child: _ThrowBean(text: '${game.curTurn.third}'),
                 ),
               ],
             ),
@@ -447,13 +448,13 @@ class _NextButton extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.curRound.done()
+        onPressed: !data.curTurn.done()
             ? null
             : () {
                 update(() {
                   data.next();
                 });
-                if (data.hasGameFinished()) {
+                if (data.hasGameFinished) {
                   var ply = data.winner;
                   _GameEnd(context: context, winner: ply.name)
                       .open() //

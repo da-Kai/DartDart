@@ -1,3 +1,4 @@
+import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 
 enum InOut {
@@ -7,6 +8,7 @@ enum InOut {
 }
 
 extension InOutExtension on InOut {
+  /// Check if the hit fits.
   bool fits(Hit? hit) {
     if (hit == null) return false;
     if (this == InOut.straight) return true;
@@ -14,12 +16,13 @@ extension InOutExtension on InOut {
       return hit.multiplier == HitMultiplier.double;
     }
     if (this == InOut.master) {
-      return hit.multiplier == HitMultiplier.double && //
+      return hit.multiplier == HitMultiplier.double || //
           hit.multiplier == HitMultiplier.triple;
     }
     return false;
   }
 
+  /// Check if a finisher is possible with the remaining score.
   bool possible(int remaining) {
     if (remaining < 0) return false;
     if (this == InOut.straight) return true;
@@ -43,21 +46,18 @@ enum Games {
   final int val;
 }
 
-class GameSettings {
+class GameSettingFactory {
+  final List<String> players = [];
+
   Games game = Games.threeOOne;
   InOut gameIn = InOut.straight;
   InOut gameOut = InOut.double;
   int legs = 1;
   int sets = 1;
 
-  int get points {
-    return game.val;
+  GameSettings get() {
+    return GameSettings(game, gameIn, gameOut, sets, legs);
   }
-
-  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-  final List<String> players = [];
 
   bool isNameFree(String name) {
     for (var plyName in players) {
@@ -67,28 +67,49 @@ class GameSettings {
     }
     return true;
   }
+}
+
+class GameSettings {
+  final Games game;
+  final InOut gameIn;
+  final InOut gameOut;
+  final int legs;
+  final int sets;
+
+  GameSettings(this.game, this.gameIn, this.gameOut, this.sets, this.legs);
+
+  int get points {
+    return game.val;
+  }
+
+  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   /// Determine if the given hit is a potential fishing hit.
-  bool isFinisher(Hit hit) {
+  bool isValidFinisher(Hit hit) {
     return gameOut.fits(hit);
   }
 
   /// Determine if the given hit is a potential starting hit.
-  bool isStarter(Hit hit) {
+  bool isValidStarter(Hit hit) {
     return gameIn.fits(hit);
   }
 
-  /// Determine if the hit is valid.
-  bool isValid(int score, Hit hit) {
-    if (hit.number.value == 0) {
-      return true;
-    } else if (score == points) {
-      return isStarter(hit);
-    } else if (score == hit.value) {
-      return isFinisher(hit);
-    } else if (score > hit.value) {
-      return true;
+  /// Determine if the given hit is valid to the currentScore.
+  bool isValid(int curScore, Hit hit) {
+    if(curScore == points) {
+      return isValidStarter(hit);
     }
-    return false;
+    var val = curScore - hit.value;
+    return switch(numCheck(val)) {
+      NumCheck.zero => isValidFinisher(hit),
+      NumCheck.positive => gameOut.possible(val),
+      NumCheck.negative => false
+    };
+  }
+
+  /// Determine if the given hit is NOT valid to the currentScore.
+  bool isInvalid(int curScore, Hit hit) {
+    return !isValid(curScore, hit);
   }
 }

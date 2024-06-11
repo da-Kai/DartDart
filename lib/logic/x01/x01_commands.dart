@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/common.dart';
+import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 
@@ -9,7 +9,7 @@ class Throw implements Command {
   @override
   Command? previous;
 
-  final PlayerRound round;
+  final PlayerTurn round;
   final Hit hit;
   final int pos;
 
@@ -37,7 +37,7 @@ class Switch implements Command {
 
   final Player nextPly;
   final Player curPly;
-  final PlayerRound round;
+  final PlayerTurn round;
 
   final PlayerData data;
   final GameRound game;
@@ -45,29 +45,32 @@ class Switch implements Command {
   Switch(this.data, this.game, this.round, this.curPly, this.nextPly);
 
   static Switch from(PlayerData data, GameRound round) {
-    return Switch(data, round, round.current, data.currentPlayer, data.otherPlayer.first);
+    var next = data.isMultiPlayer ? data.next : data.currentPlayer;
+    return Switch(data, round, round.current, data.currentPlayer, next);
   }
 
   @override
   void execute() {
     /// Apply Score if Valid.
-    data.currentPlayer.rounds.add(round);
-    data.pushPlayerBack(curPly);
-    data.otherPlayer.remove(nextPly);
-    data.setCurrentPlayer(nextPly);
-    game.setRoundFor(nextPly);
+    data.currentPlayer.turnHistory.add(round);
+    if(data.isMultiPlayer) {
+      data.pushPlayerBack(curPly);
+      data.remove(nextPly);
+      data.setCurrentPlayer(nextPly);
+    }
+    game.setupTurnFor(nextPly);
   }
 
   @override
   void undo() {
     /// Reset Score.
-    data.otherPlayer.remove(curPly);
-    data.pushPlayerFront(nextPly);
-
-    curPly.rounds.remove(round);
-    game.setRound(round);
-
-    data.setCurrentPlayer(curPly);
+    curPly.turnHistory.remove(round);
+    if(data.isMultiPlayer) {
+      data.remove(curPly);
+      data.pushPlayerFront(nextPly);
+      data.setCurrentPlayer(curPly);
+    }
+    game.setupTurn(round);
   }
 }
 
@@ -86,13 +89,15 @@ class Award implements Command {
 
   @override
   void execute() {
-    var ply = data.otherPlayer.removeLast();
-    data.finishedPlayer.add(ply);
+    var ply = data.isMultiPlayer ? data.popPlayerBack()! : data.currentPlayer;
+    data.addWinner(ply);
   }
 
   @override
   void undo() {
-    var win = data.finishedPlayer.removeLast();
-    data.otherPlayer.add(win);
+    var win = data.popWinner()!;
+    if (data.isMultiPlayer) {
+      data.pushPlayerBack(win);
+    }
   }
 }

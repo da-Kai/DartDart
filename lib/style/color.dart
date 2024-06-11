@@ -38,12 +38,10 @@ class ColorConstants {
 
 extension ColorSchemes on ColorScheme {
   Color get success {
-    switch (brightness) {
-      case Brightness.light:
-        return ColorConstants.success;
-      case Brightness.dark:
-        return ColorConstants.success;
-    }
+    return switch(brightness) {
+      Brightness.light => ColorConstants.success,
+      Brightness.dark => ColorConstants.success
+    };
   }
 
   TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow}) {
@@ -55,12 +53,10 @@ extension ColorSchemes on ColorScheme {
   }
 
   Color get backgroundShade {
-    switch (brightness) {
-      case Brightness.light:
-        return ColorConstants.primaryContainerLight;
-      case Brightness.dark:
-        return ColorConstants.primaryContainer;
-    }
+    return switch(brightness) {
+      Brightness.light => ColorConstants.primaryContainerLight,
+      Brightness.dark => ColorConstants.primaryContainer
+    };
   }
 
   static const ColorScheme light = ColorScheme.light(
