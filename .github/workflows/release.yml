@@ -1,0 +1,30 @@
+name: Prepare Release
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build App
+        run: |
+          flutter pub get
+          flutter build apk --no-pub --release
+          mkdir -p build/artifact
+          mv build/app/outputs/flutter-apk/app-release.apk build/artifact/dart-dart.apk
+
+      - name: Create draft Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            build/artifact/dart-dart.apk
