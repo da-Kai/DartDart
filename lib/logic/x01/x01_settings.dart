@@ -105,7 +105,7 @@ class GameSettings {
       NumCheck.zero => isValidFinisher(hit),
       NumCheck.positive => gameOut.possible(val),
       NumCheck.negative => false
-    }
+    };
   }
 
   /// Determine if the given hit is NOT valid to the currentScore.
