@@ -31,22 +31,15 @@ class PlayerTurn extends Turn {
     return true;
   }
 
-  int get _score => startScore - sum();
-
   int get score {
-    if(!valid) {
-      return startScore;
-    } else {
-      if(isWin) {
-        return 0;
-      } else {
-        return _score;
-      }
-    }
+    final updated = startScore - sum();
+    return valid //
+        ? updated <= 0 ? 0 : updated //
+        : startScore;
   }
 
   bool get isWin {
-    return _score <= 0 && valid;
+    return score == 0 && valid;
   }
 }
 
