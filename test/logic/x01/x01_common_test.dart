@@ -70,13 +70,13 @@ void main() {
       turn.thrown(hitOne);
       turn.thrown(hitOne);
       expect(turn.done(), true);
-      expect(turn.isWin, false);
+      expect(turn.isCheckout, false);
 
       turn = PlayerTurn(set, 40);
       expect(turn.done(), false);
       turn.thrown(hitDTwenty);
       expect(turn.done(), true);
-      expect(turn.isWin, true);
+      expect(turn.isCheckout, true);
     });
     test('Test X01 GameRound', () {
       var gameFactory = GameSettingFactory();

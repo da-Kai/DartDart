@@ -44,6 +44,10 @@ enum HitNumber {
       return HitNumber.values.firstWhere((hitNum) => hitNum.segment == segment, orElse: () => HitNumber.miss);
     }
   }
+
+  static HitNumber byAbbreviation(String abbr) {
+    return HitNumber.values.firstWhere((hitNum) => hitNum.abbr == abbr);
+  }
 }
 
 /// Three possible Multipliers on a Dart board
@@ -80,6 +84,19 @@ class Hit {
       return Hit.doubleBullseye;
     }
     return Hit._(number, multiplier);
+  }
+
+  static Hit getByAbbreviation(String abbr) {
+    var mult = HitMultiplier.single;
+    if (abbr.startsWith('D')) {
+      mult = HitMultiplier.double;
+      abbr = abbr.substring(1);
+    } else if(abbr.startsWith('T')) {
+      mult = HitMultiplier.triple;
+      abbr = abbr.substring(1);
+    }
+    var num = HitNumber.byAbbreviation(abbr);
+    return Hit.get(num, mult);
   }
 
   int get value {

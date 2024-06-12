@@ -48,6 +48,8 @@ flutter_launcher_icons:
 flutter:
   assets:
     - 'assets/images/dart_board-1024.png'
+    - 'assets/data/checkout-double.csv'
+    - 'assets/data/checkout-master.csv'
   uses-material-design: true
   fonts:
     - family: dartdart

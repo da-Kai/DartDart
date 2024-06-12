@@ -238,12 +238,25 @@ class _PlayersList extends StatelessWidget {
 
 class _ThrowBean extends StatelessWidget {
   final String text;
+  final String tooltip;
 
-  const _ThrowBean({required this.text});
+  const _ThrowBean({required this.text, required this.tooltip});
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final _tooltipStyle = TextStyle(
+      fontSize: 20,
+      color: colorScheme.shadow,
+    );
+
+    final _textStyle = TextStyle(
+      fontSize: 20,
+      color: colorScheme.onPrimary,
+    );
+
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -253,12 +266,9 @@ class _ThrowBean extends StatelessWidget {
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
       child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 20,
-          color: colorScheme.onPrimary,
+          text.isNotEmpty ? text : tooltip,
+          style: text.isNotEmpty ? _textStyle : _tooltipStyle,
         ),
-      ),
     );
   }
 }
@@ -323,13 +333,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.first}'),
+                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: '${game.checkout.first}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.second}'),
+                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: '${game.checkout.second}'),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.third}'),
+                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: '${game.checkout.third}'),
                 ),
               ],
             ),

@@ -30,6 +30,22 @@ extension InOutExtension on InOut {
     if (this == InOut.master) return remaining >= 2;
     return false;
   }
+
+  int highestCheckout() {
+    return switch(this) {
+      InOut.double => 170,
+      InOut.master => 180,
+      InOut.straight => 180,
+    };
+  }
+
+  int lowestCheckout() {
+    return switch(this) {
+      InOut.double => 2,
+      InOut.master => 2,
+      InOut.straight => 1,
+    };
+  }
 }
 
 enum Games {

@@ -13,7 +13,7 @@ class PlayerTurn extends Turn {
 
   @override
   bool done() {
-    return count == 3 || isWin;
+    return count == 3 || isCheckout;
   }
 
   bool get valid {
@@ -32,7 +32,7 @@ class PlayerTurn extends Turn {
     return valid ? startScore - sum() : startScore;
   }
 
-  bool get isWin {
+  bool get isCheckout {
     return score == 0;
   }
 }

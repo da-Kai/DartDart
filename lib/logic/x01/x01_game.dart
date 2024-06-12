@@ -1,5 +1,6 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:dart_dart/logic/x01/x01_checkout.dart';
 import 'package:dart_dart/logic/x01/x01_commands.dart';
 import 'package:dart_dart/logic/x01/x01_common.dart';
 import 'package:dart_dart/logic/x01/x01_settings.dart';
@@ -18,6 +19,8 @@ class GameController {
     playerData = PlayerData.get(playerNames, settings.points);
     reset();
   }
+
+  Checkout get checkout => calcCheckout(settings.gameOut, gameRound.current.score);
 
   PlayerTurn get curTurn => gameRound.current;
 
@@ -46,7 +49,7 @@ class GameController {
   }
 
   void next() {
-    bool isWin = curTurn.isWin;
+    bool isWin = curTurn.isCheckout;
 
     commands.execute(Switch.from(playerData, gameRound));
 
