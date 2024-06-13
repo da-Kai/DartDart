@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/pages/games/x01_game_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';

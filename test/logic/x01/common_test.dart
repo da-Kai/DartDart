@@ -1,6 +1,6 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_common.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

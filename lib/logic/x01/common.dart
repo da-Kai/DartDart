@@ -1,5 +1,5 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 
 class PlayerTurn extends Turn {
   final GameSettings settings;
@@ -225,6 +225,7 @@ class _SinglePlayerData implements PlayerData {
   @override
   void reset() {
     currentPlayer = Player(_playerName, goal);
+    done = false;
   }
 
   @override

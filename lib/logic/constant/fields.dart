@@ -91,7 +91,7 @@ class Hit {
     if (abbr.startsWith('D')) {
       mult = HitMultiplier.double;
       abbr = abbr.substring(1);
-    } else if(abbr.startsWith('T')) {
+    } else if (abbr.startsWith('T')) {
       mult = HitMultiplier.triple;
       abbr = abbr.substring(1);
     }
@@ -120,8 +120,8 @@ class Hit {
   }
 
   int operator +(covariant other) {
-    if(other is Hit) return value + other.value;
-    if(other is int) return value + other;
+    if (other is Hit) return value + other.value;
+    if (other is int) return value + other;
     throw UnimplementedError();
   }
 
@@ -182,7 +182,7 @@ class Turn {
   ///
   /// If no position is given, the last one is chosen.
   bool undo({int? pos}) {
-    switch (pos ?? (count-1)) {
+    switch (pos ?? (count - 1)) {
       case 0:
         first = Hit.skipped;
         return true;
@@ -202,6 +202,11 @@ class Turn {
     if (second != Hit.skipped) return 2;
     if (first != Hit.skipped) return 1;
     return 0;
+  }
+
+  /// Get the number of hits remaining.
+  int get remain {
+    return 3 - count;
   }
 
   /// Get the total sum of throws

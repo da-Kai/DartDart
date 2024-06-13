@@ -1,7 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_common.dart';
-import 'package:dart_dart/logic/x01/x01_game.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/game.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -246,16 +246,16 @@ class _ThrowBean extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final _tooltipStyle = TextStyle(
+    final tooltipStyle = colorScheme.getTextStyle(
       fontSize: 20,
-      color: colorScheme.shadow,
+      color: colorScheme.onPrimary.withOpacity(0.4),
+      fontStyle: FontStyle.italic,
     );
 
-    final _textStyle = TextStyle(
-      fontSize: 20,
+    final textStyle = colorScheme.getTextStyle(
       color: colorScheme.onPrimary,
+      fontSize: 20
     );
-
 
     return Container(
       decoration: BoxDecoration(
@@ -267,7 +267,7 @@ class _ThrowBean extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
           text.isNotEmpty ? text : tooltip,
-          style: text.isNotEmpty ? _textStyle : _tooltipStyle,
+          style: text.isNotEmpty ? textStyle : tooltipStyle,
         ),
     );
   }
@@ -333,13 +333,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: '${game.checkout.first}'),
+                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: game.checkout.first),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: '${game.checkout.second}'),
+                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: game.checkout.second),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: '${game.checkout.third}'),
+                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: game.checkout.third),
                 ),
               ],
             ),

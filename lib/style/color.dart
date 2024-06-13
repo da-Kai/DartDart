@@ -44,12 +44,14 @@ extension ColorSchemes on ColorScheme {
     };
   }
 
-  TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow}) {
+  TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow, FontStyle? fontStyle}) {
     return FontConstants.text.copyWith(
         color: color ?? onPrimaryContainer, //
         fontSize: fontSize, //
         fontWeight: fontWeight, //
-        overflow: overflow);
+        overflow: overflow, //
+        fontStyle: fontStyle ?? FontStyle.normal,
+    );
   }
 
   Color get backgroundShade {

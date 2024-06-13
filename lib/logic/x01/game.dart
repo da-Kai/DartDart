@@ -1,9 +1,9 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_checkout.dart';
-import 'package:dart_dart/logic/x01/x01_commands.dart';
-import 'package:dart_dart/logic/x01/x01_common.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/checkout.dart';
+import 'package:dart_dart/logic/x01/commands.dart';
+import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 
 enum InputType { board, field }
 
@@ -20,7 +20,12 @@ class GameController {
     reset();
   }
 
-  Checkout get checkout => calcCheckout(settings.gameOut, gameRound.current.score);
+  Checkout get checkout {
+    final out = settings.gameOut;
+    final score = gameRound.current.score;
+    final remain = gameRound.current.remain;
+    return calcCheckout(out, remain, score);
+  }
 
   PlayerTurn get curTurn => gameRound.current;
 
