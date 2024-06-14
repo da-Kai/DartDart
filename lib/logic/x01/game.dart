@@ -24,7 +24,7 @@ class GameController {
     final out = settings.gameOut;
     final score = gameRound.current.score;
     final remain = gameRound.current.remain;
-    return calcCheckout(out, remain, score);
+    return calcCheckout(out, score, dartsRemain: remain);
   }
 
   PlayerTurn get curTurn => gameRound.current;

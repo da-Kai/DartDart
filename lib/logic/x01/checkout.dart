@@ -9,7 +9,8 @@ class Checkout {
 
   Checkout({this.first = '', this.second = '', this.third = ''});
 
-  static Checkout from(String str, {int shift = 0}) {
+  static Checkout from(String str, {int dartsRemain = 0}) {
+    final shift = 3 - dartsRemain;
     final prefix = ''.padLeft(shift, ';');
     final List<String> throws = '$prefix$str'.split(';');
     if (throws.length >= 3) {
@@ -24,7 +25,7 @@ class Checkout {
   }
 }
 
-Checkout calcCheckout(InOut setting, int dartsRemain, int score) {
+Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
   final done = dartsRemain == 0 || score == 0;
   if (done || setting.highestCheckout() < score || setting == InOut.straight) {
     return Checkout();
@@ -33,26 +34,10 @@ Checkout calcCheckout(InOut setting, int dartsRemain, int score) {
   for (var checkout in checkouts) {
     var line = checkout[score];
     if (line != null) {
-      return _convert(line, dartsRemain);
+      return Checkout.from(line, dartsRemain: dartsRemain);
     }
   }
   return Checkout();
-}
-
-Checkout _convert(String test, int remain) {
-  final List<String> throws = test.split(';');
-  for (int i = 3; i > remain; i--) {
-    throws.insert(0, '');
-  }
-  if (throws.length >= 3) {
-    return Checkout(first: throws[0], second: throws[1], third: throws[2]);
-  } else if (throws.length == 2) {
-    return Checkout(first: throws[0], second: throws[1]);
-  } else if (throws.length == 1) {
-    return Checkout(first: throws[0]);
-  } else {
-    return Checkout();
-  }
 }
 
 List<Map<int, String>> _listOfCheckouts(InOut setting, int dartsRemain) {

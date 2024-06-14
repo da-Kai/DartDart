@@ -1,5 +1,6 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/checkout.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -18,6 +19,14 @@ void main() {
         expect(score, 0, reason: '${entry.key} != ${entry.value}');
       }
     }
+
+    expect(InOut.straight.highestCheckout(), 180);
+    expect(InOut.master.highestCheckout(), 180);
+    expect(InOut.double.highestCheckout(), 170);
+
+    expect(InOut.straight.lowestCheckout(), 1);
+    expect(InOut.master.lowestCheckout(), 2);
+    expect(InOut.double.lowestCheckout(), 2);
   });
   test('Test Double Checkouts Fit', () {
     for(var entry in doubleCheckoutTriple.entries) {
