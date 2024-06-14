@@ -75,5 +75,6 @@ bin/
 /android/app/release
 
 # Testing
+coverage/
 lcov.info
 flutter_*.log
