@@ -38,24 +38,25 @@ class ColorConstants {
 
 extension ColorSchemes on ColorScheme {
   Color get success {
-    return switch(brightness) {
+    return switch (brightness) {
       Brightness.light => ColorConstants.success,
-      Brightness.dark => ColorConstants.success
+      Brightness.dark => ColorConstants.success,
     };
   }
 
-  TextStyle getTextStyle({Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow, FontStyle? fontStyle}) {
+  TextStyle getTextStyle(
+      {Color? color, double? fontSize, FontWeight? fontWeight, TextOverflow? overflow, FontStyle? fontStyle}) {
     return FontConstants.text.copyWith(
-        color: color ?? onPrimaryContainer, //
-        fontSize: fontSize, //
-        fontWeight: fontWeight, //
-        overflow: overflow, //
-        fontStyle: fontStyle ?? FontStyle.normal,
+      color: color ?? onPrimaryContainer,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      overflow: overflow,
+      fontStyle: fontStyle ?? FontStyle.normal,
     );
   }
 
   Color get backgroundShade {
-    return switch(brightness) {
+    return switch (brightness) {
       Brightness.light => ColorConstants.primaryContainerLight,
       Brightness.dark => ColorConstants.primaryContainer
     };

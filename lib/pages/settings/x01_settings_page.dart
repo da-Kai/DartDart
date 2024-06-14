@@ -496,8 +496,9 @@ class _StartButton extends StatelessWidget {
                 if (state._formKey.currentState!.validate()) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => //
-                        X01Game(player: state._data.players, settings: state._data.get())),
+                    MaterialPageRoute(
+                        builder: (context) => //
+                            X01Game(player: state._data.players, settings: state._data.get())),
                   );
                 }
               },

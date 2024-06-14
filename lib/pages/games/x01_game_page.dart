@@ -252,10 +252,7 @@ class _ThrowBean extends StatelessWidget {
       fontStyle: FontStyle.italic,
     );
 
-    final textStyle = colorScheme.getTextStyle(
-      color: colorScheme.onPrimary,
-      fontSize: 20
-    );
+    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: 20);
 
     return Container(
       decoration: BoxDecoration(
@@ -266,9 +263,9 @@ class _ThrowBean extends StatelessWidget {
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
       child: Text(
-          text.isNotEmpty ? text : tooltip,
-          style: text.isNotEmpty ? textStyle : tooltipStyle,
-        ),
+        text.isNotEmpty ? text : tooltip,
+        style: text.isNotEmpty ? textStyle : tooltipStyle,
+      ),
     );
   }
 }

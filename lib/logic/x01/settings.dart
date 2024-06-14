@@ -32,7 +32,7 @@ extension InOutExtension on InOut {
   }
 
   int highestCheckout() {
-    return switch(this) {
+    return switch (this) {
       InOut.double => 170,
       InOut.master => 180,
       InOut.straight => 180,
@@ -40,7 +40,7 @@ extension InOutExtension on InOut {
   }
 
   int lowestCheckout() {
-    return switch(this) {
+    return switch (this) {
       InOut.double => 2,
       InOut.master => 2,
       InOut.straight => 1,
@@ -113,11 +113,11 @@ class GameSettings {
 
   /// Determine if the given hit is valid to the currentScore.
   bool isValid(int curScore, Hit hit) {
-    if(curScore == points) {
+    if (curScore == points) {
       return isValidStarter(hit);
     }
     var val = curScore - hit.value;
-    return switch(numCheck(val)) {
+    return switch (numCheck(val)) {
       NumCheck.zero => isValidFinisher(hit),
       NumCheck.positive => gameOut.possible(val),
       NumCheck.negative => false

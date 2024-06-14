@@ -7,8 +7,8 @@ class PlayerTurn extends Turn {
 
   PlayerTurn(this.settings, this.startScore,
       {super.first = Hit.skipped,
-      super.second = Hit.skipped,
-      super.third = Hit.skipped});
+        super.second = Hit.skipped,
+        super.third = Hit.skipped});
 
   static PlayerTurn from(GameSettings settings) {
     return PlayerTurn(settings, settings.points);
@@ -38,8 +38,8 @@ class PlayerTurn extends Turn {
     final updated = startScore - sum();
     return valid //
         ? updated <= 0
-            ? 0
-            : updated //
+        ? 0
+        : updated //
         : startScore;
   }
 
@@ -91,11 +91,13 @@ abstract class PlayerData {
 
   /// count of players still in the game (excluding current Player)
   int get playerCount;
+
   Player? get winner;
 
   void reset();
 
   bool get isSinglePlayer;
+
   bool get isMultiPlayer;
 
   /// get next Player in line
@@ -123,6 +125,7 @@ abstract class PlayerData {
   Player? popWinner();
 
   Iterable<T> mapPlayer<T>(T Function(Player) toElement);
+
   Iterable<T> mapWinner<T>(T Function(Player) toElement);
 
   static PlayerData get(List<String> player, int goal) {
@@ -163,6 +166,7 @@ class _MultiPlayerData implements PlayerData {
 
   @override
   bool get isSinglePlayer => false;
+
   @override
   bool get isMultiPlayer => true;
 
@@ -250,6 +254,7 @@ class _SinglePlayerData implements PlayerData {
 
   @override
   bool get isSinglePlayer => true;
+
   @override
   bool get isMultiPlayer => false;
 
