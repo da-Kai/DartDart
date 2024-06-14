@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('Test Checkout Values', () {
-    var checkouts = [doubleCheckoutSingle, doubleCheckoutTwo, doubleCheckoutThree, masterCheckoutThree];
+    var checkouts = [doubleCheckoutSingle, doubleCheckoutDouble, doubleCheckoutTriple, masterCheckoutTriple];
 
     for(var checkout in checkouts) {
       for(var entry in checkout.entries) {
@@ -20,14 +20,14 @@ void main() {
     }
   });
   test('Test Double Checkouts Fit', () {
-    for(var entry in doubleCheckoutThree.entries) {
+    for(var entry in doubleCheckoutTriple.entries) {
       var score = entry.key;
       var three = entry.value.split(';');
       
       var firstHit = Hit.getByAbbreviation(three[0]);
       score -= firstHit.value;
 
-      var twoEntry = doubleCheckoutTwo[score];
+      var twoEntry = doubleCheckoutDouble[score];
 
       expect(twoEntry != null, true, reason: 'no $score value for doubleOut');
       var two = twoEntry!.split(';');
@@ -49,14 +49,14 @@ void main() {
     }
   });
   test('Test Master Checkouts Fit', () {
-    for(var entry in masterCheckoutThree.entries) {
+    for(var entry in masterCheckoutTriple.entries) {
       var score = entry.key;
       var three = entry.value.split(';');
 
       var firstHit = Hit.getByAbbreviation(three[0]);
       score -= firstHit.value;
 
-      var twoEntry = doubleCheckoutTwo[score] ??  masterCheckoutTwo[score];
+      var twoEntry = doubleCheckoutDouble[score] ??  masterCheckoutDouble[score];
       expect(twoEntry != null, true, reason: 'no $score value for doubleOut');
       var two = twoEntry!.split(';');
       expect(three[1], two[0], reason: '${entry.key}: ${entry.value} != $twoEntry');
@@ -65,7 +65,7 @@ void main() {
       var secondHit = Hit.getByAbbreviation(two[0]);
       score -= secondHit.value;
 
-      var oneEntry = doubleCheckoutSingle[score] ?? masterCheckoutOne[score];
+      var oneEntry = doubleCheckoutSingle[score] ?? masterCheckoutSingle[score];
       expect(oneEntry != null, true, reason: 'no $score value for singleOut');
       var one = oneEntry!.split(';');
       expect(one[0], two[1], reason: '${entry.key}: ${entry.value} != $twoEntry != $one');

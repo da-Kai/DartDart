@@ -58,21 +58,27 @@ Checkout _convert(String test, int remain) {
 List<Map<int, String>> _listOfCheckouts(InOut setting, int dartsRemain) {
   final List<Map<int, String>> checkouts = [];
   if (dartsRemain >= 3) {
+    checkouts.add(doubleCheckoutTriple);
     if (setting == InOut.master) {
-      checkouts.add(masterCheckoutThree);
+      checkouts.add(masterCheckoutTriple);
     }
-    checkouts.add(doubleCheckoutThree);
   }
   if (dartsRemain >= 2) {
-    checkouts.add(doubleCheckoutTwo);
+    checkouts.add(doubleCheckoutDouble);
+    if (setting == InOut.master) {
+      checkouts.add(masterCheckoutDouble);
+    }
   }
   if (dartsRemain >= 1) {
     checkouts.add(doubleCheckoutSingle);
+    if (setting == InOut.master) {
+      checkouts.add(masterCheckoutSingle);
+    }
   }
   return checkouts;
 }
 
-final Map<int, String> masterCheckoutThree = Map.unmodifiable(HashMap.from({
+final Map<int, String> masterCheckoutTriple = Map.unmodifiable(HashMap.from({
   180: 'T20;T20;T20',
   177: 'T19;T20;T20',
   174: 'T20;T20;T18',
@@ -83,7 +89,7 @@ final Map<int, String> masterCheckoutThree = Map.unmodifiable(HashMap.from({
   159: 'T20;T20;T13',
 }));
 
-final Map<int, String> masterCheckoutTwo = Map.unmodifiable(HashMap.from({
+final Map<int, String> masterCheckoutDouble = Map.unmodifiable(HashMap.from({
   120: 'T20;T20',
   117: 'T20;T19',
   114: 'T20;T18',
@@ -94,7 +100,7 @@ final Map<int, String> masterCheckoutTwo = Map.unmodifiable(HashMap.from({
   99: 'T20;T13',
 }));
 
-final Map<int, String> masterCheckoutOne = Map.unmodifiable(HashMap.from({
+final Map<int, String> masterCheckoutSingle = Map.unmodifiable(HashMap.from({
   60: 'T20',
   57: 'T19',
   54: 'T18',
@@ -111,7 +117,7 @@ final Map<int, String> masterCheckoutOne = Map.unmodifiable(HashMap.from({
   3: 'T1',
 }));
 
-final Map<int, String> doubleCheckoutThree = Map.unmodifiable(HashMap.from({
+final Map<int, String> doubleCheckoutTriple = Map.unmodifiable(HashMap.from({
   170: 'T20;T20;DBULL',
   167: 'T20;T19;DBULL',
   164: 'T20;T18;DBULL',
@@ -177,7 +183,7 @@ final Map<int, String> doubleCheckoutThree = Map.unmodifiable(HashMap.from({
   101: 'T17;10;D20',
 }));
 
-final Map<int, String> doubleCheckoutTwo = Map.unmodifiable(HashMap.from({
+final Map<int, String> doubleCheckoutDouble = Map.unmodifiable(HashMap.from({
   110: 'T20;DBULL',
   107: 'T19;DBULL',
   104: 'T18;DBULL',
