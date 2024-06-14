@@ -24,16 +24,22 @@ class PlayerTurn extends Turn {
         return false;
       }
       val -= hit.value;
+      if (val == 0 && settings.isValidFinisher(hit)) {
+        return true;
+      }
     }
     return true;
   }
 
   int get score {
-    return valid ? startScore - sum() : startScore;
+    final updated = startScore - sum();
+    return valid //
+        ? updated <= 0 ? 0 : updated //
+        : startScore;
   }
 
   bool get isWin {
-    return score == 0;
+    return score == 0 && valid;
   }
 }
 
