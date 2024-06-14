@@ -1,8 +1,7 @@
 name: Build DartDart
 on:
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
 
 jobs:
   build-dart:
@@ -17,6 +16,7 @@ jobs:
           flutter --version
           flutter pub get
           mkdir -p build/artifact
+          dart run flutter_launcher_icons
       - run: |
           flutter build apk --no-pub --release
           mv build/app/outputs/flutter-apk/app-release.apk build/artifact/dart-dart.apk

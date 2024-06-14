@@ -71,4 +71,5 @@ bin/
 
 # Testing
 coverage/
+lcov.info
 flutter_*.log
