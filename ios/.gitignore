@@ -33,4 +33,4 @@ Runner/GeneratedPluginRegistrant.*
 !default.pbxuser
 !default.perspectivev3
 
-Runner/Assets.xcassets/
+Runner/Assets.xcassets/**/*.png

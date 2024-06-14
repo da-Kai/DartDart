@@ -12,5 +12,6 @@ key.properties
 **/*.keystore
 **/*.jks
 
-/app/src/main/res/drawable*/
-/app/src/main/res/mipmap*/
+# Exclude Generated ImageFiles
+app/src/**/res/drawable*/
+app/src/**/res/mipmap*/
