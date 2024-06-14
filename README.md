@@ -4,15 +4,26 @@
 
 DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It allows you to keep track of your dart games.
 
-## Game modes
+### X01
 
-- X01
-- Cricked (Planned)
-- Round the Clock (Planned)
+Play a classic game of 301, 501 or 701.
+
+The App helps with tracking the Scores and gives suggestions for Checkouts.
+
+### *Cricked (Planned)*
+### *Round the Clock (Planned)*
 
 ## Build
 
-Update Icons with `flutter pub run flutter_launcher_icons`
+1. Get Dependencies
+    ```shell
+    flutter pub get
+    ```
+
+2. Update Icons
+    ```
+    dart run flutter_launcher_icons
+    ```
 
 ### Android
 ```bash

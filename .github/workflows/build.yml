@@ -1,8 +1,7 @@
 name: Build DartDart
 on:
   push:
-    branches:
-      - main
+    branches: [main, develop]
 
 jobs:
   build-dart:
