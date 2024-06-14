@@ -13,15 +13,7 @@ class Checkout {
     final shift = 3 - dartsRemain;
     final prefix = ''.padLeft(shift, ';');
     final List<String> throws = '$prefix$str'.split(';');
-    if (throws.length >= 3) {
-      return Checkout(first: throws[0], second: throws[1], third: throws[2]);
-    } else if (throws.length == 2) {
-      return Checkout(first: throws[0], second: throws[1]);
-    } else if (throws.length == 1) {
-      return Checkout(first: throws[0]);
-    } else {
-      return Checkout();
-    }
+    return Checkout(first: throws[0], second: throws[1], third: throws[2]);
   }
 }
 
