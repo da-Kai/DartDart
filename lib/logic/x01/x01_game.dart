@@ -41,7 +41,7 @@ class GameController {
   }
 
   void onThrow(Hit hit) {
-    var action = Throw(gameRound.current, hit, curTurn.count);
+    var action = Throw(gameRound, hit, curTurn.count);
     commands.execute(action);
   }
 

@@ -9,7 +9,7 @@ class Throw implements Command {
   @override
   Command? previous;
 
-  final PlayerTurn round;
+  final GameRound round;
   final Hit hit;
   final int pos;
 
@@ -17,12 +17,12 @@ class Throw implements Command {
 
   @override
   void execute() {
-    round.thrown(hit, pos: pos);
+    round.current.thrown(hit, pos: pos);
   }
 
   @override
   void undo() {
-    round.undo(pos: pos);
+    round.current.undo(pos: pos);
   }
 }
 
