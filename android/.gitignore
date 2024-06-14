@@ -11,3 +11,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+/app/src/main/res/drawable*/
+/app/src/main/res/mipmap*/
