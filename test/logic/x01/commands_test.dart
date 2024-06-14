@@ -8,16 +8,16 @@ void main() {
   group('Test X01 Commands', () {
     test('Test Throw', () {
       var settings = GameSettingFactory().get();
-      var round = PlayerTurn(settings, settings.points);
+      var round = GameRound(settings);
       var hit = Hit.bullseye;
 
       var t = Throw(round, hit, 0);
 
-      expect(round.first, Hit.skipped);
+      expect(round.current.first, Hit.skipped);
       t.execute();
-      expect(round.first, hit);
+      expect(round.current.first, hit);
       t.undo();
-      expect(round.first, Hit.skipped);
+      expect(round.current.first, Hit.skipped);
     });
     test('Test Switch', () {
       var settings = GameSettingFactory().get();

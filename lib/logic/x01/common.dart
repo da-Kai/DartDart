@@ -5,7 +5,10 @@ class PlayerTurn extends Turn {
   final GameSettings settings;
   final int startScore;
 
-  PlayerTurn(this.settings, this.startScore, {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
+  PlayerTurn(this.settings, this.startScore,
+      {super.first = Hit.skipped,
+      super.second = Hit.skipped,
+      super.third = Hit.skipped});
 
   static PlayerTurn from(GameSettings settings) {
     return PlayerTurn(settings, settings.points);
@@ -24,12 +27,20 @@ class PlayerTurn extends Turn {
         return false;
       }
       val -= hit.value;
+      if (val == 0 && settings.isValidFinisher(hit)) {
+        return true;
+      }
     }
     return true;
   }
 
   int get score {
-    return valid ? startScore - sum() : startScore;
+    final updated = startScore - sum();
+    return valid //
+        ? updated <= 0
+            ? 0
+            : updated //
+        : startScore;
   }
 
   bool get isCheckout {
@@ -77,6 +88,7 @@ abstract class PlayerData {
   PlayerData._();
 
   Player get currentPlayer;
+
   /// count of players still in the game (excluding current Player)
   int get playerCount;
   Player? get winner;
@@ -85,20 +97,28 @@ abstract class PlayerData {
 
   bool get isSinglePlayer;
   bool get isMultiPlayer;
+
   /// get next Player in line
   Player get next;
+
   /// set current player
   void setCurrentPlayer(Player player);
+
   /// add player to the back of the line
   void pushPlayerBack(Player player);
+
   /// add player to the front of the line
   void pushPlayerFront(Player player);
+
   /// remove player from the front of the line
   Player? popPlayerFront();
+
   /// remove player from the back of the line
   Player? popPlayerBack();
+
   /// award player to winner
   void addWinner(Player player);
+
   /// remove last winner from list
   Player? popWinner();
 
@@ -106,7 +126,7 @@ abstract class PlayerData {
   Iterable<T> mapWinner<T>(T Function(Player) toElement);
 
   static PlayerData get(List<String> player, int goal) {
-    if(player.length == 1) {
+    if (player.length == 1) {
       return _SinglePlayerData(player.first, goal);
     } else {
       return _MultiPlayerData(player, goal);
