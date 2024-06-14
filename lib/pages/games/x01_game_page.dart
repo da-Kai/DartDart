@@ -312,7 +312,7 @@ class _CurrentPlayer extends StatelessWidget {
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curTurn.isWin
+                game.curTurn.isCheckout
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
