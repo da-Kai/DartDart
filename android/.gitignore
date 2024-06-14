@@ -12,6 +12,11 @@ key.properties
 **/*.keystore
 **/*.jks
 
+# Android Studio will place build artifacts here
+/app/debug
+/app/profile
+/app/release
+
 # Exclude Generated ImageFiles
 app/src/**/res/drawable*/
 app/src/**/res/mipmap*/

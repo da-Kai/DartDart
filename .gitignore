@@ -69,11 +69,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
 # Testing
-lcov.info
+coverage/
 flutter_*.log
