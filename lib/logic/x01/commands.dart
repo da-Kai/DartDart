@@ -1,6 +1,6 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_common.dart';
+import 'package:dart_dart/logic/x01/common.dart';
 
 /// Single Throw by a player.
 class Throw implements Command {

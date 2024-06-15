@@ -1,5 +1,5 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_game.dart';
+import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/widget/x01/board_select.dart';
 import 'package:dart_dart/widget/x01/number_field_select.dart';

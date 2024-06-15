@@ -1,11 +1,14 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 
 class PlayerTurn extends Turn {
   final GameSettings settings;
   final int startScore;
 
-  PlayerTurn(this.settings, this.startScore, {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
+  PlayerTurn(this.settings, this.startScore,
+      {super.first = Hit.skipped,
+        super.second = Hit.skipped,
+        super.third = Hit.skipped});
 
   static PlayerTurn from(GameSettings settings) {
     return PlayerTurn(settings, settings.points);
@@ -13,7 +16,7 @@ class PlayerTurn extends Turn {
 
   @override
   bool done() {
-    return count == 3 || isWin;
+    return count == 3 || isCheckout;
   }
 
   bool get valid {
@@ -33,13 +36,15 @@ class PlayerTurn extends Turn {
 
   int get score {
     final updated = startScore - sum();
-    return valid //
-        ? updated <= 0 ? 0 : updated //
-        : startScore;
+    if (valid) {
+      return updated <= 0 ? 0 : updated;
+    } else {
+      return startScore;
+    }
   }
 
-  bool get isWin {
-    return score == 0 && valid;
+  bool get isCheckout {
+    return score == 0;
   }
 }
 
@@ -83,36 +88,48 @@ abstract class PlayerData {
   PlayerData._();
 
   Player get currentPlayer;
+
   /// count of players still in the game (excluding current Player)
   int get playerCount;
+
   Player? get winner;
 
   void reset();
 
   bool get isSinglePlayer;
+
   bool get isMultiPlayer;
+
   /// get next Player in line
   Player get next;
+
   /// set current player
   void setCurrentPlayer(Player player);
+
   /// add player to the back of the line
   void pushPlayerBack(Player player);
+
   /// add player to the front of the line
   void pushPlayerFront(Player player);
+
   /// remove player from the front of the line
   Player? popPlayerFront();
+
   /// remove player from the back of the line
   Player? popPlayerBack();
+
   /// award player to winner
   void addWinner(Player player);
+
   /// remove last winner from list
   Player? popWinner();
 
   Iterable<T> mapPlayer<T>(T Function(Player) toElement);
+
   Iterable<T> mapWinner<T>(T Function(Player) toElement);
 
   static PlayerData get(List<String> player, int goal) {
-    if(player.length == 1) {
+    if (player.length == 1) {
       return _SinglePlayerData(player.first, goal);
     } else {
       return _MultiPlayerData(player, goal);
@@ -149,6 +166,7 @@ class _MultiPlayerData implements PlayerData {
 
   @override
   bool get isSinglePlayer => false;
+
   @override
   bool get isMultiPlayer => true;
 
@@ -231,10 +249,12 @@ class _SinglePlayerData implements PlayerData {
   @override
   void reset() {
     currentPlayer = Player(_playerName, goal);
+    done = false;
   }
 
   @override
   bool get isSinglePlayer => true;
+
   @override
   bool get isMultiPlayer => false;
 

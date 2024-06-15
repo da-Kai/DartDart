@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:dart_dart/logic/common/coordinate.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_board_select.dart';
+import 'package:dart_dart/logic/x01/board_select.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
