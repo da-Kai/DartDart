@@ -34,24 +34,14 @@ Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
 
 List<Map<int, String>> _listOfCheckouts(InOut setting, int dartsRemain) {
   final List<Map<int, String>> checkouts = [];
-  if (dartsRemain >= 3) {
-    checkouts.add(doubleCheckoutTriple);
-    if (setting == InOut.master) {
-      checkouts.add(masterCheckoutTriple);
-    }
+  if (setting == InOut.master) {
+    if (dartsRemain >= 3) checkouts.add(masterCheckoutTriple);
+    if (dartsRemain >= 2) checkouts.add(masterCheckoutDouble);
+    if (dartsRemain >= 1) checkouts.add(masterCheckoutSingle);
   }
-  if (dartsRemain >= 2) {
-    checkouts.add(doubleCheckoutDouble);
-    if (setting == InOut.master) {
-      checkouts.add(masterCheckoutDouble);
-    }
-  }
-  if (dartsRemain >= 1) {
-    checkouts.add(doubleCheckoutSingle);
-    if (setting == InOut.master) {
-      checkouts.add(masterCheckoutSingle);
-    }
-  }
+  if (dartsRemain >= 3) checkouts.add(doubleCheckoutTriple);
+  if (dartsRemain >= 2) checkouts.add(doubleCheckoutDouble);
+  if (dartsRemain >= 1) checkouts.add(doubleCheckoutSingle);
   return checkouts;
 }
 
