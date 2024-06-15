@@ -36,11 +36,11 @@ class PlayerTurn extends Turn {
 
   int get score {
     final updated = startScore - sum();
-    return valid //
-        ? updated <= 0
-        ? 0
-        : updated //
-        : startScore;
+    if (valid) {
+      return updated <= 0 ? 0 : updated;
+    } else {
+      return startScore;
+    }
   }
 
   bool get isCheckout {

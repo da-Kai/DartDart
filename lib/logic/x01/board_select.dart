@@ -15,7 +15,11 @@ class GameMath {
   static double _getAngle(double dist, Coordinate coo) {
     var radiant = acos(coo.y / dist);
     var degree = radiant * (180 / pi);
-    return switch (numCheck(coo.x)) { NumCheck.negative => degree, NumCheck.zero => degree, NumCheck.positive => 360 - degree };
+    return switch (numCheck(coo.x)) {
+      NumCheck.negative => degree,
+      NumCheck.zero => degree,
+      NumCheck.positive => 360 - degree,
+    };
   }
 
   /// Returns Coordinates normalized to 100:-100 with the
