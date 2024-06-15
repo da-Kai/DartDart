@@ -1,7 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/x01_common.dart';
-import 'package:dart_dart/logic/x01/x01_game.dart';
-import 'package:dart_dart/logic/x01/x01_settings.dart';
+import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/game.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -238,12 +238,22 @@ class _PlayersList extends StatelessWidget {
 
 class _ThrowBean extends StatelessWidget {
   final String text;
+  final String tooltip;
 
-  const _ThrowBean({required this.text});
+  const _ThrowBean({required this.text, required this.tooltip});
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final tooltipStyle = colorScheme.getTextStyle(
+      fontSize: 20,
+      color: colorScheme.onPrimary.withOpacity(0.4),
+      fontStyle: FontStyle.italic,
+    );
+
+    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: 20);
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -253,11 +263,8 @@ class _ThrowBean extends StatelessWidget {
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
       child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 20,
-          color: colorScheme.onPrimary,
-        ),
+        text.isNotEmpty ? text : tooltip,
+        style: text.isNotEmpty ? textStyle : tooltipStyle,
       ),
     );
   }
@@ -302,7 +309,7 @@ class _CurrentPlayer extends StatelessWidget {
                   style: titleStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curTurn.isWin
+                game.curTurn.isCheckout
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
@@ -323,13 +330,13 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.first}'),
+                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: game.checkout.first),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.second}'),
+                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: game.checkout.second),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.third}'),
+                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: game.checkout.third),
                 ),
               ],
             ),
