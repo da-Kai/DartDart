@@ -21,10 +21,14 @@ class GameController {
   }
 
   Checkout get checkout {
-    final out = settings.gameOut;
-    final score = gameRound.current.score;
-    final remain = gameRound.current.remain;
-    return calcCheckout(out, score, dartsRemain: remain);
+    if(curTurn.valid) {
+      final out = settings.gameOut;
+      final score = gameRound.current.score;
+      final remain = gameRound.current.remain;
+      return calcCheckout(out, score, dartsRemain: remain);
+    } else {
+      return Checkout();
+    }
   }
 
   PlayerTurn get curTurn => gameRound.current;

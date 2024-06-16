@@ -1,49 +1,25 @@
 import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 
-enum InOut {
-  straight,
-  double,
-  master,
-}
+typedef Check<T> = bool Function(T a);
 
-extension InOutExtension on InOut {
+enum InOut {
+  straight(180, 1),
+  double(170, 2),
+  master(180, 2);
+
+  final int highestCheckout;
+  final int lowestCheckout;
+
+  const InOut(this.highestCheckout, this.lowestCheckout);
+
   /// Check if the hit fits.
   bool fits(Hit? hit) {
     if (hit == null) return false;
-    if (this == InOut.straight) return true;
-    if (this == InOut.double) {
-      return hit.multiplier == HitMultiplier.double;
-    }
-    if (this == InOut.master) {
-      return hit.multiplier == HitMultiplier.double || //
-          hit.multiplier == HitMultiplier.triple;
-    }
-    return false;
-  }
-
-  /// Check if a finisher is possible with the remaining score.
-  bool possible(int remaining) {
-    if (remaining < 0) return false;
-    if (this == InOut.straight) return true;
-    if (this == InOut.double) return remaining >= 2;
-    if (this == InOut.master) return remaining >= 2;
-    return false;
-  }
-
-  int highestCheckout() {
-    return switch (this) {
-      InOut.double => 170,
-      InOut.master => 180,
-      InOut.straight => 180,
-    };
-  }
-
-  int lowestCheckout() {
-    return switch (this) {
-      InOut.double => 2,
-      InOut.master => 2,
-      InOut.straight => 1,
+    return switch(this) {
+      InOut.straight => true,
+      InOut.double => hit.multiplier.isDouble,
+      InOut.master => hit.multiplier.isDouble || hit.multiplier.isTriple,
     };
   }
 }
@@ -119,7 +95,7 @@ class GameSettings {
     var val = curScore - hit.value;
     return switch (numCheck(val)) {
       NumCheck.zero => isValidFinisher(hit),
-      NumCheck.positive => gameOut.possible(val),
+      NumCheck.positive => val >= gameOut.lowestCheckout,
       NumCheck.negative => false
     };
   }

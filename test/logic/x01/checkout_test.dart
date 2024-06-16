@@ -20,13 +20,13 @@ void main() {
       }
     }
 
-    expect(InOut.straight.highestCheckout(), 180);
-    expect(InOut.master.highestCheckout(), 180);
-    expect(InOut.double.highestCheckout(), 170);
+    expect(InOut.straight.highestCheckout, 180);
+    expect(InOut.master.highestCheckout, 180);
+    expect(InOut.double.highestCheckout, 170);
 
-    expect(InOut.straight.lowestCheckout(), 1);
-    expect(InOut.master.lowestCheckout(), 2);
-    expect(InOut.double.lowestCheckout(), 2);
+    expect(InOut.straight.lowestCheckout, 1);
+    expect(InOut.master.lowestCheckout, 2);
+    expect(InOut.double.lowestCheckout, 2);
   });
   test('Test Double Checkouts Fit', () {
     for(var entry in doubleCheckoutTriple.entries) {

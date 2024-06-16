@@ -16,8 +16,10 @@ class PlayerTurn extends Turn {
 
   @override
   bool done() {
-    return count == 3 || isCheckout;
+    return count == 3 || isCheckout || overthrown;
   }
+
+  bool get overthrown => startScore < sum();
 
   bool get valid {
     int val = startScore;
@@ -47,7 +49,6 @@ class PlayerTurn extends Turn {
     return score == 0;
   }
 }
-
 /// Simple Player
 class Player {
   final String name;
