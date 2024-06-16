@@ -2,8 +2,8 @@ name: Prepare Release
 
 on:
   push:
-    tags:
-      - "*.*.*"
+    branches:
+      - main
 
 jobs:
   release:
@@ -11,13 +11,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install js-yaml
+        run: npm install js-yaml
+
+      - name: Get version
+        id: read-yaml
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const yaml = require('js-yaml');
+            const fs   = require('fs');
+            const file = fs.readFileSync("${{ github.workspace }}/pubspec.yaml", 'utf8');
+            const data = yaml.load(file);
+            core.setOutput('version', data.version);
+            core.setOutput('alias', data.version_alias);
+
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
+      - name: Prepare Flutter
+        run: |
+          flutter config --no-cli-animations
+          flutter config --no-analytics
+          flutter pub get
+
       - name: Build App
         run: |
-          flutter pub get
           flutter build apk --no-pub --release
           mkdir -p build/artifact
           mv build/app/outputs/flutter-apk/app-release.apk build/artifact/dart-dart.apk
@@ -25,6 +50,9 @@ jobs:
       - name: Create draft Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: "v${{steps.read-yaml.outputs.version}}"
+          name: "v${{steps.read-yaml.outputs.version}} \"${{steps.read-yaml.outputs.alias}}\""
           draft: true
+          token: "${{secrets.RELEASE_TOKEN}}"
           files: |
             build/artifact/dart-dart.apk

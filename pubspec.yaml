@@ -4,7 +4,8 @@ homepage: "https://da-kai.github.io/DartDart/"
 repository: "https://github.com/da-Kai/DartDart"
 publish_to: 'none'
 
-version: 0.1.0
+version: 0.4.0
+version_alias: prototype
 
 environment:
   sdk: '>=3.2.2 <4.0.0'

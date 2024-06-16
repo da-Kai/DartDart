@@ -14,9 +14,11 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: flutter --version
-
-      - run: flutter pub get
+      - run: |
+          flutter --version
+          flutter config --no-cli-animations
+          flutter config --no-analytics
+          flutter pub get
 
       - run: flutter test --coverage --coverage-path=lcov.info
       
