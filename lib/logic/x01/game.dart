@@ -11,12 +11,14 @@ enum InputType { board, field }
 class GameController {
   final GameSettings settings;
   late final PlayerData playerData;
+  late final LegAndSetData legAndSetData;
 
   late GameRound gameRound;
   final CommandStack commands = CommandStack();
 
   GameController(List<String> playerNames, this.settings) {
     playerData = PlayerData.get(playerNames, settings.points);
+    legAndSetData = LegAndSetData(playerNames);
     reset();
   }
 
@@ -37,7 +39,10 @@ class GameController {
 
   Player get curPly => playerData.currentPlayer;
 
-  Player get winner => playerData.winner!;
+  Player? get winner {
+    var leader = legAndSetData.getLeader();
+    return legAndSetData.getSets(leader) == settings.sets ? playerData.find(leader) : null;
+  }
 
   bool get hasGameEnded => playerData.playerCount == 0;
 
@@ -63,7 +68,7 @@ class GameController {
     commands.execute(Switch.from(playerData, gameRound));
 
     if (isWin) {
-      commands.execute(Award(playerData));
+      commands.execute(EndLeg(legAndSetData, playerData));
     }
   }
 

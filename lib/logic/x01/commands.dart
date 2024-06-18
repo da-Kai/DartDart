@@ -53,9 +53,7 @@ class Switch implements Command {
   void execute() {
     /// Apply Score if Valid.
     data.currentPlayer.turnHistory.add(round);
-    data.pushPlayerBack(curPly);
-    data.popPlayerFront();
-    data.setCurrentPlayer(nextPly);
+    data.rotateForward();
     game.setupTurnFor(nextPly);
   }
 
@@ -63,9 +61,7 @@ class Switch implements Command {
   void undo() {
     /// Reset Score.
     curPly.turnHistory.remove(round);
-    data.popPlayerBack();
-    data.pushPlayerFront(nextPly);
-    data.setCurrentPlayer(curPly);
+    data.rotateBackwards();
     game.setupTurn(round);
   }
 }
@@ -73,27 +69,53 @@ class Switch implements Command {
 /// Set the last Player as a winner, and move to winners List.
 ///
 /// Should be executed after a [Switch] command.
-class Award implements Command {
+class EndLeg implements Command {
   @override
   Command? next;
   @override
   Command? previous;
 
-  PlayerData data;
+  final PlayerData player;
+  final LegAndSetData data;
+  late final Player legWinner;
 
-  Award(this.data);
+  late Map<String, int> _leg;
+  late List<String> _player;
+
+  EndLeg(this.data, this.player) {
+    legWinner = player.currentPlayer;
+  }
 
   @override
   void execute() {
-    var ply = data.isMultiPlayer ? data.popPlayerBack()! : data.currentPlayer;
-    data.addWinner(ply);
+    data.addLeg(legWinner.name);
+    _leg = data.resetLegs();
+    _player = player.reset();
   }
 
   @override
   void undo() {
-    var win = data.popWinner()!;
-    if (data.isMultiPlayer) {
-      data.pushPlayerBack(win);
-    }
+    data.removeLeg(legWinner.name);
+    data.setLegs(_leg);
+    player.organize(_player);
+  }
+}
+
+class EndSet implements Command {
+  @override
+  Command? next;
+  @override
+  Command? previous;
+
+  EndSet();
+
+  @override
+  void execute() {
+
+  }
+
+  @override
+  void undo() {
+
   }
 }

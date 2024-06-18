@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 
@@ -84,6 +86,56 @@ class GameRound {
   }
 }
 
+class LegAndSetData {
+
+  late final List<String> _setHistory;
+
+  late final Map<String, int> _playerLegs;
+  late final Map<String, int> _playerSets;
+
+  LegAndSetData(List<String> player) {
+    _playerLegs = HashMap.fromIterable(player, key: (p) => p, value: (p) => 0);
+    _playerSets = HashMap.fromIterable(player, key: (p) => p, value: (p) => 0);
+  }
+
+  int _calcLeg(String player, int add, int other) {
+      return _playerLegs.update(player, (i) => i+add, ifAbsent: () => other);
+  }
+
+  /// Add one to the given players legs and return its current Legs.
+  int addLeg(String player) {
+    return _calcLeg(player, 1, 1);
+  }
+
+  int removeLeg(String player) {
+    return _calcLeg(player, -1, 0);
+  }
+
+  int addSet(String player) {
+    return _playerSets.update(player, (i) => i++, ifAbsent: () => 1);
+  }
+
+  Map<String, int> resetLegs() {
+    var curLegs = Map<String, int>.from(_playerLegs);
+    _playerLegs.clear();
+    return curLegs;
+  }
+
+  void setLegs(Map<String, int> legs) {
+    _playerLegs.updateAll((key, _) => legs[key] ?? 0);
+  }
+
+  int getSets(String player) {
+    return _playerSets[player] ?? 0;
+  }
+
+  String getLeader() {
+    List<int> values = _playerSets.values.toList()..sort((a, b) => a - b);
+    return _playerSets.entries.where((e) => e.value == values.first).first.key;
+  }
+
+}
+
 /// Contains player data.
 abstract class PlayerData {
   PlayerData._();
@@ -93,9 +145,8 @@ abstract class PlayerData {
   /// count of players still in the game (excluding current Player)
   int get playerCount;
 
-  Player? get winner;
-
-  void reset();
+  /// Reset the players and return their current order
+  List<String> reset();
 
   bool get isSinglePlayer;
 
@@ -107,27 +158,17 @@ abstract class PlayerData {
   /// set current player
   void setCurrentPlayer(Player player);
 
-  /// add player to the back of the line
-  void pushPlayerBack(Player player);
+  void rotateForward();
 
-  /// add player to the front of the line
-  void pushPlayerFront(Player player);
+  void rotateBackwards();
 
-  /// remove player from the front of the line
-  Player? popPlayerFront();
+  /// get player from the front of the line
+  Player peekPlayerFront();
 
-  /// remove player from the back of the line
-  Player? popPlayerBack();
-
-  /// award player to winner
-  void addWinner(Player player);
-
-  /// remove last winner from list
-  Player? popWinner();
+  /// get player from the back of the line
+  Player peekPlayerBack();
 
   Iterable<T> mapPlayer<T>(T Function(Player) toElement);
-
-  Iterable<T> mapWinner<T>(T Function(Player) toElement);
 
   static PlayerData get(List<String> player, int goal) {
     if (player.length == 1) {
@@ -136,34 +177,37 @@ abstract class PlayerData {
       return _MultiPlayerData(player, goal);
     }
   }
+
+  Player find(String name);
+
+  void organize(List<String> player);
 }
 
 class _MultiPlayerData implements PlayerData {
   final List<String> _players;
   final int goal;
 
-  final List<Player> _otherPlayer = [];
-  final List<Player> _finishedPlayer = [];
-
-  @override
-  Player currentPlayer = Player('ERROR', -1);
+  final List<Player> _playerList = [];
 
   _MultiPlayerData(this._players, this.goal) {
     reset();
   }
 
   @override
-  void reset() {
-    _otherPlayer.clear();
-    _finishedPlayer.clear();
+  List<String> reset() {
+    var cur = _playerList.map((p) => p.name).toList();
+    cur.insert(0, currentPlayer.name);
 
+    _playerList.clear();
     if (_players.isNotEmpty) {
-      _otherPlayer.addAll(_players.map((ply) => Player(ply, goal)));
-      currentPlayer = popPlayerFront()!;
+      _playerList.addAll(_players.map((ply) => Player(ply, goal)));
     }
+
+    return cur;
   }
 
-  bool get done => _otherPlayer.isEmpty && _finishedPlayer.isNotEmpty;
+  @override
+  Player get currentPlayer => peekPlayerFront();
 
   @override
   bool get isSinglePlayer => false;
@@ -172,66 +216,67 @@ class _MultiPlayerData implements PlayerData {
   bool get isMultiPlayer => true;
 
   @override
-  Player? get winner {
-    if (_finishedPlayer.isEmpty) return null;
-    return _finishedPlayer.first;
-  }
-
-  @override
-  int get playerCount => _otherPlayer.length;
+  int get playerCount => _playerList.length;
 
   bool remove(Player player) {
-    return _otherPlayer.remove(player);
+    return _playerList.remove(player);
   }
 
   @override
-  Player get next => _otherPlayer.first;
+  Player get next => _playerList.first;
 
   @override
   void setCurrentPlayer(Player player) {
-    currentPlayer = player;
+    if(!_playerList.contains(player)) {
+      throw Exception('Player "${player.name}" is not part of the Game!');
+    }
+    while(currentPlayer != player) {
+      rotateForward();
+    }
   }
 
   @override
-  void pushPlayerBack(Player player) {
-    _otherPlayer.add(player);
+  void rotateForward() {
+    var ply = _playerList.removeAt(0);
+    _playerList.add(ply);
   }
 
   @override
-  void pushPlayerFront(Player player) {
-    _otherPlayer.insert(0, player);
+  void rotateBackwards() {
+    var ply = _playerList.removeLast();
+    _playerList.insert(0, ply);
   }
 
   @override
-  Player? popPlayerFront() {
-    if (_otherPlayer.isEmpty) return null;
-    return _otherPlayer.removeAt(0);
+  Player peekPlayerFront() {
+    return _playerList.first;
   }
 
   @override
-  Player? popPlayerBack() {
-    if (_otherPlayer.isEmpty) return null;
-    return _otherPlayer.removeAt(_otherPlayer.length - 1);
-  }
-
-  @override
-  void addWinner(Player player) {
-    _finishedPlayer.add(player);
-  }
-
-  @override
-  Player? popWinner() {
-    return _finishedPlayer.isEmpty ? null : _finishedPlayer.removeLast();
+  Player peekPlayerBack() {
+    return _playerList.last;
   }
 
   @override
   Iterable<T> mapPlayer<T>(T Function(Player) toElement) {
-    return _otherPlayer.map(toElement);
+    return _playerList.map(toElement);
   }
 
   @override
-  Iterable<T> mapWinner<T>(T Function(Player) toElement) {
-    return _finishedPlayer.map(toElement);
+  void organize(List<String> player) {
+    if(player.length != _playerList.length) {
+      throw Exception("Player list is not of same Length! can't organize.");
+    }
+    for(var name in player) {
+      var ply = find(name);
+      _playerList.remove(ply);
+      _playerList.add(ply);
+    }
+  }
+
+  @override
+  Player find(String name) {
+    return _playerList.firstWhere((p) => p.name == name);
   }
 }
 
@@ -241,16 +286,15 @@ class _SinglePlayerData implements PlayerData {
 
   @override
   late Player currentPlayer;
-  bool done = false;
 
   _SinglePlayerData(this._playerName, this.goal) {
     reset();
   }
 
   @override
-  void reset() {
+  List<String> reset() {
     currentPlayer = Player(_playerName, goal);
-    done = false;
+    return [_playerName];
   }
 
   @override
@@ -260,12 +304,7 @@ class _SinglePlayerData implements PlayerData {
   bool get isMultiPlayer => false;
 
   @override
-  Player? get winner {
-    return done ? currentPlayer : null;
-  }
-
-  @override
-  int get playerCount => done ? 0 : 1;
+  int get playerCount => 1;
 
   bool remove(Player player) {
     return false;
@@ -280,40 +319,23 @@ class _SinglePlayerData implements PlayerData {
   }
 
   @override
-  void pushPlayerBack(Player player) {
+  void rotateForward() {
     return;
   }
 
   @override
-  void pushPlayerFront(Player player) {
+  void rotateBackwards() {
     return;
   }
 
   @override
-  Player? popPlayerFront() {
+  Player peekPlayerFront() {
     return currentPlayer;
   }
 
   @override
-  Player? popPlayerBack() {
+  Player peekPlayerBack() {
     return currentPlayer;
-  }
-
-  @override
-  void addWinner(Player player) {
-    if (player == currentPlayer) {
-      done = true;
-    }
-  }
-
-  @override
-  Player? popWinner() {
-    if (done) {
-      done = false;
-      return currentPlayer;
-    } else {
-      return null;
-    }
   }
 
   @override
@@ -322,7 +344,15 @@ class _SinglePlayerData implements PlayerData {
   }
 
   @override
-  Iterable<T> mapWinner<T>(T Function(Player) toElement) {
-    return done ? [currentPlayer].map(toElement) : [];
+  void organize(List<String> player) {
+    return;
+  }
+
+  @override
+  Player find(String name) {
+    if(name != currentPlayer.name) {
+      throw Exception('Player name unknown!');
+    }
+    return currentPlayer;
   }
 }
