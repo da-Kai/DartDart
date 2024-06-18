@@ -2,7 +2,9 @@ import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/pages/games/x01_game_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
+import 'package:dart_dart/widget/common/player_name_dialog.dart';
 import 'package:dart_dart/widget/x01/selection_row.dart';
+import 'package:dart_dart/widget/x01/settings_help.dart';
 import 'package:flutter/material.dart';
 
 typedef Validator = (bool, String?) Function(String);
@@ -64,18 +66,25 @@ class _X01PageState extends State<X01Setting> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          titleTextStyle: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            fontFamily: FontConstants.title.fontFamily,
-            color: colorScheme.onPrimary,
-          ),
-          foregroundColor: colorScheme.onPrimary,
-          backgroundColor: colorScheme.primary,
-          surfaceTintColor: colorScheme.onPrimary,
-          title: const Text('X01-Game'),
-          centerTitle: true,
-        ),
+            titleTextStyle: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: FontConstants.title.fontFamily,
+              color: colorScheme.onPrimary,
+            ),
+            foregroundColor: colorScheme.onPrimary,
+            backgroundColor: colorScheme.primary,
+            surfaceTintColor: colorScheme.onPrimary,
+            title: const Text('X01-Game'),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.question_mark),
+                onPressed: () {
+                  SettingsHelp(context: this.context).open();
+                }
+              ),
+            ]),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
           child: OrientationBuilder(builder: (context, orientation) {
@@ -147,72 +156,6 @@ class _LandscapeView extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _PlayerNameDialog {
-  final String? player;
-  final BuildContext context;
-  final Validator validate;
-
-  late final ColorScheme colorScheme;
-  late final TextEditingController textController;
-
-  String? errorText;
-
-  _PlayerNameDialog({required this.context, required this.validate, this.player}) {
-    colorScheme = Theme.of(context).colorScheme;
-    textController = TextEditingController(text: player);
-  }
-
-  Future<String?> open() async {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            title: Text(player == null ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
-            content: SingleChildScrollView(
-              child: TextField(
-                controller: textController,
-                decoration: InputDecoration(hintText: 'name', errorText: errorText),
-              ),
-            ),
-            backgroundColor: colorScheme.backgroundShade,
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              MaterialButton(
-                color: colorScheme.error,
-                textColor: colorScheme.onError,
-                child: const Text('CANCEL'),
-                onPressed: () => Navigator.pop(context),
-              ),
-              MaterialButton(
-                color: colorScheme.primary,
-                textColor: colorScheme.onPrimary,
-                child: const Text('OK'),
-                onPressed: () {
-                  var nextPlayer = textController.value.text;
-                  var (valid, errMsg) = validate(nextPlayer);
-                  if (valid) {
-                    setState(() {
-                      errorText = '';
-                      Navigator.pop(context);
-                    });
-                  } else {
-                    setState(() => errorText = errMsg);
-                  }
-                },
-              ),
-            ],
-          );
-        });
-      },
-    ).then((value) {
-      var nextPly = textController.value.text;
-      var (valid, _) = validate(nextPly);
-      return valid ? nextPly : null;
-    });
   }
 }
 
@@ -402,7 +345,7 @@ class _PlayerSettingContainer extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: () {
-                          _PlayerNameDialog(
+                          PlayerNameDialog(
                             context: context,
                             player: player,
                             validate: state.validate,
@@ -445,7 +388,7 @@ class _PlayerSettingContainer extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  _PlayerNameDialog(
+                  PlayerNameDialog(
                     context: context,
                     validate: state.validate,
                   ).open().then((newPly) {
