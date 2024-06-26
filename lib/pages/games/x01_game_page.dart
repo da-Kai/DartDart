@@ -1,11 +1,12 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/common.dart';
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
+
+import 'package:dart_dart/logic/x01/player.dart';
 
 class X01Game extends StatefulWidget {
   late final GameController data;
@@ -211,25 +212,7 @@ class _PlayersList extends StatelessWidget {
                     ],
                   ),
                 );
-              }).followedBy(data.mapWinner<Container>((ply) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: colorScheme.success,
-                  ),
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 80,
-                        child: Text(ply.name, overflow: TextOverflow.ellipsis),
-                      ),
-                      const SizedBox(width: 30, child: Icon(Icons.check)),
-                    ],
-                  ),
-                );
-              })).toList()),
+              }, skip: 1).toList()),
         ))
       ],
     );
@@ -289,6 +272,11 @@ class _CurrentPlayer extends StatelessWidget {
       fontWeight: FontWeight.bold,
     );
 
+    final TextStyle scoreStyle = titleStyle.copyWith(
+      fontWeight: FontWeight.normal,
+      fontStyle: FontStyle.italic,
+    );
+
     return Container(
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
@@ -300,13 +288,17 @@ class _CurrentPlayer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
+            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0, bottom: 5.0),
             child: Row(
               children: [
                 const Spacer(flex: 1),
                 Text(
                   game.curPly.name,
                   style: titleStyle,
+                ),
+                Text(
+                  ' (${game.curPly.points.sets}-${game.curPly.points.currentLegs})',
+                  style: scoreStyle,
                 ),
                 const Spacer(flex: 2),
                 game.curTurn.isCheckout
@@ -462,7 +454,7 @@ class _NextButton extends StatelessWidget {
                   data.next();
                 });
                 if (data.hasGameEnded) {
-                  var ply = data.winner;
+                  var ply = data.winner!;
                   _GameEnd(context: context, winner: ply.name)
                       .open() //
                       .then((rematch) {

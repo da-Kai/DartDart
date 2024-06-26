@@ -1,6 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/commands.dart';
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,35 +22,38 @@ void main() {
     });
     test('Test Switch', () {
       var settings = GameSettingFactory().get();
-      var plyData = PlayerData.get(['A', 'B'], 42);
+      Player plyFunc(name) => Player(name, settings.points);
+      var plyData = PlayerData.get(['A', 'B'], plyFunc);
       var gameRound = GameRound(settings);
       gameRound.current.thrown(Hit.doubleBullseye);
 
       var t = Switch.from(plyData, gameRound);
 
       expect(gameRound.current, t.round);
-      expect(plyData.currentPlayer, t.curPly);
+      expect(plyData.current, t.curPly);
       expect(t.curPly.turnHistory.length, 0);
       t.execute();
       expect(gameRound.current == t.round, false);
-      expect(plyData.currentPlayer == t.curPly, false);
+      expect(plyData.current == t.curPly, false);
       expect(t.curPly.turnHistory.length, 1);
       t.undo();
       expect(gameRound.current, t.round);
-      expect(plyData.currentPlayer, t.curPly);
+      expect(plyData.current, t.curPly);
       expect(t.curPly.turnHistory.length, 0);
     });
     test('Test Award', () {
-      var plyData = PlayerData.get(['A', 'B'], 42);
+      var player = ['A', 'B'];
+      var plyData = PlayerData.get(player, 42);
       var curPly = plyData.next;
+      var data = LegAndSetData(player);
 
-      var a = Award(plyData);
+      var a = EndLeg(data, plyData);
 
-      expect(plyData.winner, null);
+      expect(data.getLeader(), null);
       a.execute();
-      expect(plyData.winner, curPly);
+      expect(data.getLeader(), curPly);
       a.undo();
-      expect(plyData.winner, null);
+      expect(data.getLeader(), null);
     });
   });
 }

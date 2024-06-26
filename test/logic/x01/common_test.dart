@@ -23,11 +23,11 @@ void main() {
       expect(plyData.next, playerA);
       expect(plyData.popPlayerFront(), playerA);
 
-      expect(plyData.currentPlayer.name, 'B');
-      var playerB = plyData.currentPlayer;
+      expect(plyData.current.name, 'B');
+      var playerB = plyData.current;
       plyData.setCurrentPlayer(playerA);
       plyData.pushPlayerFront(playerB);
-      expect(plyData.currentPlayer, playerA);
+      expect(plyData.current, playerA);
 
       var front = plyData.popPlayerFront()!;
       expect(plyData.winner, null);
@@ -47,7 +47,7 @@ void main() {
       expect(plyData.isMultiPlayer, false);
       expect(plyData.playerCount, 1);
 
-      plyData.addWinner(plyData.currentPlayer);
+      plyData.addWinner(plyData.current);
       expect(plyData.playerCount, 0);
 
       plyData.popWinner();

@@ -1,6 +1,7 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/player.dart';
 
 /// Single Throw by a player.
 class Throw implements Command {
@@ -26,7 +27,7 @@ class Throw implements Command {
   }
 }
 
-/// End round and switch player.
+/// End round and prepare next player.
 ///
 /// Should only follow an [Throw] command.
 class Switch implements Command {
@@ -38,21 +39,23 @@ class Switch implements Command {
   final Player nextPly;
   final Player curPly;
   final PlayerTurn round;
+  final int leg;
 
   final PlayerData data;
   final GameRound game;
 
-  Switch(this.data, this.game, this.round, this.curPly, this.nextPly);
+  Switch._(this.data, this.game, this.round, this.curPly, this.nextPly, this.leg);
 
-  static Switch from(PlayerData data, GameRound round) {
-    var next = data.isMultiPlayer ? data.next : data.currentPlayer;
-    return Switch(data, round, round.current, data.currentPlayer, next);
+  static Switch from(PlayerData data, GameRound round, {Player? ply, Player? next}) {
+    var curPly = ply ?? data.current;
+    var nexPly = next ?? data.next;
+    return Switch._(data, round, round.current, curPly, nexPly, round.currentLeg);
   }
 
   @override
   void execute() {
     /// Apply Score if Valid.
-    data.currentPlayer.turnHistory.add(round);
+    data.current.pushTurn(leg, round);
     data.rotateForward();
     game.setupTurnFor(nextPly);
   }
@@ -60,7 +63,7 @@ class Switch implements Command {
   @override
   void undo() {
     /// Reset Score.
-    curPly.turnHistory.remove(round);
+    curPly.popTurn(leg);
     data.rotateBackwards();
     game.setupTurn(round);
   }
@@ -75,29 +78,48 @@ class EndLeg implements Command {
   @override
   Command? previous;
 
-  final PlayerData player;
-  final LegAndSetData data;
-  late final Player legWinner;
+  final Player winner;
+  final PlayerTurn round;
+  final int leg;
 
-  late Map<String, int> _leg;
+  final PlayerData data;
+  final GameRound game;
+
   late List<String> _player;
 
-  EndLeg(this.data, this.player) {
-    legWinner = player.currentPlayer;
+  EndLeg._(this.data, this.game, this.round, this.winner, this.leg);
+
+  static EndLeg from(PlayerData data, GameRound round, {Player? ply}) {
+    var winner = ply ?? data.current;
+    return EndLeg._(data, round, round.current, winner, round.currentLeg);
+  }
+
+  int order(Player a, Player b) {
+    return b.handicap.compareTo(a.handicap);
   }
 
   @override
   void execute() {
-    data.addLeg(legWinner.name);
-    _leg = data.resetLegs();
-    _player = player.reset();
+    data.current.pushTurn(leg, round);
+    data.forEach((ply) {
+      ply.points.pushLeg(ply == winner);
+    });
+    _player = data.reorder(order);
+    game.currentLeg++;
+
+    game.setupTurnFor(data.current);
   }
 
   @override
   void undo() {
-    data.removeLeg(legWinner.name);
-    data.setLegs(_leg);
-    player.organize(_player);
+    game.currentLeg--;
+    data.organize(_player, winner.name);
+    data.forEach((ply) {
+      ply.points.undo();
+    });
+    winner.popTurn(leg);
+
+    game.setupTurn(round);
   }
 }
 
@@ -110,12 +132,8 @@ class EndSet implements Command {
   EndSet();
 
   @override
-  void execute() {
-
-  }
+  void execute() {}
 
   @override
-  void undo() {
-
-  }
+  void undo() {}
 }
