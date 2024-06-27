@@ -22,5 +22,4 @@ void main() {
       expect(numCompare(a, c), NumCompare.equal);
     });
   });
-
 }

@@ -1,7 +1,4 @@
-import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/checkout.dart';
 import 'package:dart_dart/logic/x01/points.dart';
-import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

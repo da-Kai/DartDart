@@ -80,7 +80,7 @@ class EndLeg extends Command {
   }
 
   int order(Player a, Player b) {
-    return b.handicap.compareTo(a.handicap);
+    return a.handicap.compareTo(b.handicap);
   }
 
   @override
@@ -109,11 +109,49 @@ class EndLeg extends Command {
 }
 
 class EndSet extends Command {
-  EndSet();
+  final Player winner;
+  final PlayerTurn round;
+  final int leg;
+
+  final PlayerData data;
+  final GameRound game;
+
+  late List<String> _player;
+
+  EndSet._(this.data, this.game, this.round, this.winner, this.leg);
+
+  static EndSet from(PlayerData data, GameRound round, {Player? ply, Player? next}) {
+    var winner = ply ?? data.current;
+    return EndSet._(data, round, round.current, winner, round.currentLeg);
+  }
+
+  int order(Player a, Player b) {
+    return a.handicap.compareTo(b.handicap);
+  }
 
   @override
-  void execute() {}
+  void execute() {
+    data.current.pushTurn(leg, round);
+    data.forEach((ply) {
+      ply.points.pushLeg(ply == winner);
+      ply.points.pushSet(ply == winner);
+    });
+    _player = data.reorder(order);
+    game.currentLeg++;
+
+    game.setupTurnFor(data.current);
+  }
 
   @override
-  void undo() {}
+  void undo() {
+    game.currentLeg--;
+    data.organize(_player, winner.name);
+    data.forEach((ply) {
+      ply.points.undo();
+      ply.points.undo();
+    });
+    winner.popTurn(leg);
+
+    game.setupTurn(round);
+  }
 }

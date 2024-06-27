@@ -8,8 +8,8 @@ abstract class PlayerData {
   /// count of players still in the game (excluding current Player)
   int get playerCount;
 
-  /// Reset the players and return their current order
-  List<String> reset();
+  /// Reset the players
+  void reset();
 
   bool get isSinglePlayer;
 
@@ -47,28 +47,30 @@ abstract class PlayerData {
 }
 
 class _MultiPlayerData implements PlayerData {
-  late final List<Player> _playerList;
+  final PlayerFactory _playerFactory;
+  final List<String> _players;
+
+  final List<Player> _playerList = [];
 
   int _currentPlayer = 0;
 
-  _MultiPlayerData(List<String> players, PlayerFactory playerFactory) {
-    _playerList = players.map((p) => playerFactory(p)).toList();
+  _MultiPlayerData(this._players, this._playerFactory) {
     reset();
   }
 
   @override
-  List<String> reset() {
-    var cur = _playerList.map((p) => p.name).toList();
+  void reset() {
+    _playerList.clear();
+    for(var plyName in _players) {
+      var player = _playerFactory(plyName);
+      _playerList.add(player);
+    }
     _currentPlayer = 0;
-    return cur;
   }
 
   int _getIndex(int delta) {
-    var index = (_currentPlayer + delta) % _playerList.length;
-    while (index < 0) {
-      index += _playerList.length;
-    }
-    return index;
+    if(_playerList.isEmpty) return _currentPlayer;
+    return (_currentPlayer+delta) % _playerList.length;
   }
 
   Player _byDelta(int delta) {
@@ -143,19 +145,19 @@ class _MultiPlayerData implements PlayerData {
 }
 
 class _SinglePlayerData implements PlayerData {
+  final PlayerFactory _playerFactory;
   final String _playerName;
 
   @override
   late Player current;
 
-  _SinglePlayerData(this._playerName, PlayerFactory factory) {
-    current = factory(_playerName);
+  _SinglePlayerData(this._playerName, this._playerFactory) {
     reset();
   }
 
   @override
-  List<String> reset() {
-    return [_playerName];
+  void reset() {
+    current = _playerFactory(_playerName);
   }
 
   @override

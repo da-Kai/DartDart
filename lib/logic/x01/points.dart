@@ -2,6 +2,8 @@ abstract class _Turn {
   _Turn? previous;
   _Turn? next;
 
+  _Turn({this.previous});
+
   bool get won;
 
   int get currentLegs;
@@ -14,10 +16,8 @@ abstract class _Turn {
 class _Set extends _Turn {
   @override
   final bool won;
-  @override
-  _Turn? previous;
 
-  _Set(this.previous, this.won);
+  _Set(_Turn? previous, this.won) : super(previous: previous);
 
   @override
   int get currentLegs {
@@ -47,10 +47,8 @@ class _Set extends _Turn {
 class _Leg extends _Turn {
   @override
   final bool won;
-  @override
-  _Turn? previous;
 
-  _Leg(this.previous, this.won);
+  _Leg(previous, this.won) : super(previous: previous);
 
   @override
   int get currentLegs {
@@ -91,12 +89,8 @@ class _TurnList {
 
   void undo() {
     if (last != null) {
-      var prev = last!.previous;
-      if (prev != this) {
-        last = prev;
-      } else {
-        last = null;
-      }
+      final prev = last!.previous;
+      last = prev;
     }
   }
 
@@ -174,15 +168,5 @@ class PlayerPoints {
 
   bool operator >=(PlayerPoints other) {
     return compare(other) < 0;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is PlayerPoints) {
-      return compare(other) == 0;
-    } else {
-      return false;
-    }
   }
 }

@@ -51,23 +51,45 @@ class PlayerTurn extends Turn {
   }
 }
 
+class LegTurns {
+  final int leg;
+  final List<PlayerTurn> turns;
+  LegTurns(this.leg, this.turns);
+}
+
 class PlayerTurnHistory {
-  final Map<int, List<PlayerTurn>> turnHistory = HashMap();
+  final Map<int, List<PlayerTurn>> _turnsByLeg = HashMap();
 
   void add(int leg, PlayerTurn turn) {
-    var list = turnHistory.putIfAbsent(leg, () => []);
+    var list = _turnsByLeg.putIfAbsent(leg, () => []);
     list.add(turn);
   }
 
   PlayerTurn pop(int leg) {
-    return turnHistory[leg]!.removeLast();
+    return _turnsByLeg[leg]!.removeLast();
   }
 
   int? score(int leg) {
-    if (turnHistory.isEmpty || !turnHistory.containsKey(leg)) return null;
-    final turns = turnHistory[leg]!;
+    if (_turnsByLeg.isEmpty || !_turnsByLeg.containsKey(leg)) return null;
+    final turns = _turnsByLeg[leg]!;
     if (turns.isEmpty) return null;
     return turns.last.score;
+  }
+
+  Iterable<LegTurns> get entries {
+    return _turnsByLeg.entries.map((e) => LegTurns(e.key, e.value));
+  }
+
+  Iterable<int> get legScores {
+    return _turnsByLeg.entries.map((e) => e.value.isEmpty ? 0 : e.value.last.score);
+  }
+
+  int get turnCount {
+    int cnt = 0;
+    for (var leg in _turnsByLeg.values) {
+      cnt += leg.length;
+    }
+    return cnt;
   }
 }
 
@@ -86,8 +108,8 @@ class Player {
 
   int get handicap {
     int hc = 0;
-    for (var leg in turnHistory.turnHistory.values) {
-      hc += leg.last.score;
+    for (var score in turnHistory.legScores) {
+      hc += score;
     }
     return hc;
   }
@@ -113,7 +135,7 @@ class Player {
 class GameRound {
   final GameSettings _settings;
   late PlayerTurn current;
-  int currentLeg = 0;
+  int currentLeg = -1;
 
   GameRound(this._settings) {
     reset();
@@ -129,5 +151,6 @@ class GameRound {
 
   void reset() {
     current = PlayerTurn.from(_settings);
+    currentLeg = 0;
   }
 }

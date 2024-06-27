@@ -10,17 +10,24 @@ enum InputType { board, field }
 
 /// Represents a single Game
 class GameController {
+  final List<String> _playerNames;
   final GameSettings settings;
   late final PlayerData playerData;
 
   late final GameRound gameRound;
   final CommandStack commands = CommandStack();
 
-  GameController(List<String> playerNames, this.settings) {
+  GameController(this._playerNames, this.settings) {
     Player plyFunc(name) => Player(name, settings.points, () => gameRound.currentLeg);
     gameRound = GameRound(settings);
-    playerData = PlayerData.get(playerNames, plyFunc);
+    playerData = PlayerData.get(_playerNames, plyFunc);
     reset();
+  }
+
+  void reset() {
+    gameRound.reset();
+    playerData.reset();
+    commands.clear();
   }
 
   Checkout get checkout {
@@ -61,12 +68,6 @@ class GameController {
 
   bool get hasGameEnded => winner != null;
 
-  void reset() {
-    playerData.reset();
-    gameRound.reset();
-    commands.clear();
-  }
-
   void onThrow(Hit hit) {
     if(curTurn.done) return;
     var action = Throw(gameRound, hit, curTurn.count);
@@ -74,15 +75,17 @@ class GameController {
   }
 
   void next() {
-    final checkout = curTurn.isCheckout;
-
-    late Command cmd;
-    if (checkout) {
-      cmd = EndLeg.from(playerData, gameRound);
-    } else {
-      cmd = Switch.from(playerData, gameRound);
+    if(!curTurn.isCheckout) {
+      commands.execute(Switch.from(playerData, gameRound));
+      return;
     }
-    commands.execute(cmd);
+
+    if(curPly.points.currentLegs+1 < settings.legs) {
+      commands.execute(EndLeg.from(playerData, gameRound));
+      return;
+    }
+
+    commands.execute(EndSet.from(playerData, gameRound));
   }
 
   void undo() {
