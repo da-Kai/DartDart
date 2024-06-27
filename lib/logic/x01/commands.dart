@@ -4,12 +4,7 @@ import 'package:dart_dart/logic/x01/common.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 
 /// Single Throw by a player.
-class Throw implements Command {
-  @override
-  Command? next;
-  @override
-  Command? previous;
-
+class Throw extends Command {
   final GameRound round;
   final Hit hit;
   final int pos;
@@ -30,12 +25,7 @@ class Throw implements Command {
 /// End round and prepare next player.
 ///
 /// Should only follow an [Throw] command.
-class Switch implements Command {
-  @override
-  Command? next;
-  @override
-  Command? previous;
-
+class Switch extends Command {
   final Player nextPly;
   final Player curPly;
   final PlayerTurn round;
@@ -72,12 +62,7 @@ class Switch implements Command {
 /// Set the last Player as a winner, and move to winners List.
 ///
 /// Should be executed after a [Switch] command.
-class EndLeg implements Command {
-  @override
-  Command? next;
-  @override
-  Command? previous;
-
+class EndLeg extends Command {
   final Player winner;
   final PlayerTurn round;
   final int leg;
@@ -123,12 +108,7 @@ class EndLeg implements Command {
   }
 }
 
-class EndSet implements Command {
-  @override
-  Command? next;
-  @override
-  Command? previous;
-
+class EndSet extends Command {
   EndSet();
 
   @override

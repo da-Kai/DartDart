@@ -68,6 +68,7 @@ class GameController {
   }
 
   void onThrow(Hit hit) {
+    if(curTurn.done) return;
     var action = Throw(gameRound, hit, curTurn.count);
     commands.execute(action);
   }

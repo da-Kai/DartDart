@@ -447,7 +447,7 @@ class _NextButton extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.curTurn.done()
+        onPressed: !data.curTurn.done
             ? null
             : () {
                 update(() {

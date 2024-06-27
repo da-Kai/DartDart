@@ -16,7 +16,7 @@ class PlayerTurn extends Turn {
   }
 
   @override
-  bool done() {
+  bool get done {
     return count == 3 || isCheckout || overthrown;
   }
 
