@@ -42,27 +42,50 @@ void main() {
       expect(plyData.current, t.curPly);
       expect(t.curPly.turnHistory.turnCount, 0);
     });
-    test('Test Award', () {
+    test('Test EndLeg', () {
       var player = ['A', 'B'];
       var settings = GameSettings(Games.threeOOne, InOut.straight, InOut.straight, 2, 2);
       var data = GameController(player, settings);
-
-
-
+      
+      expect(data.commands.toString(), '[]');
 
       expect(data.leader!.name, 'A');
       var cmdSwitch = Switch.from(data.playerData, data.gameRound);
-      cmdSwitch.execute();
+      data.commands.execute(cmdSwitch);
+
+      expect(data.commands.toString(), '[(Switch)]');
 
       expect(data.leader!.name, 'A');
+      expect(data.leader!.points.currentLegs, 0);
       var cmdEndLeg = EndLeg.from(data.playerData, data.gameRound);
-      cmdEndLeg.execute();
+      data.commands.execute(cmdEndLeg);
+
+      expect(data.commands.toString(), '[Switch, (EndLeg)]');
+
+      expect(data.leader!.points.sets, 0);
+      expect(data.leader!.points.currentLegs, 1);
+      var cmdEndSet = EndSet.from(data.playerData, data.gameRound);
+      data.commands.execute(cmdEndSet);
+
+      expect(data.commands.toString(), '[Switch, EndLeg, (EndSet)]');
+
+      expect(data.leader!.points.sets, 1);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[Switch, (EndLeg), EndSet]');
 
       expect(data.leader!.name, 'B');
-      cmdEndLeg.undo();
+      expect(data.leader!.points.sets, 0);
+      expect(data.leader!.points.currentLegs, 1);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[(Switch), EndLeg, EndSet]');
 
       expect(data.leader!.name, 'A');
-      cmdSwitch.undo();
+      expect(data.leader!.points.currentLegs, 0);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[Switch, EndLeg, EndSet]');
 
       expect(data.leader!.name, 'A');
     });
