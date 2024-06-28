@@ -297,7 +297,7 @@ class _CurrentPlayer extends StatelessWidget {
                   style: titleStyle,
                 ),
                 Text(
-                  ' (${game.curPly.points.sets}-${game.curPly.points.currentLegs})',
+                  game.curPoints,
                   style: scoreStyle,
                 ),
                 const Spacer(flex: 2),

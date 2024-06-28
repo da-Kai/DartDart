@@ -47,8 +47,20 @@ class GameSettingFactory {
   int legs = 1;
   int sets = 1;
 
+  bool get _isOneDimensional {
+    return legs == 1 && sets > 1 || sets == 1 && legs > 1;
+  }
+
   GameSettings get() {
-    return GameSettings(game, gameIn, gameOut, sets, legs);
+    var l = legs;
+    var s = sets;
+
+    if(_isOneDimensional) {
+      l = legs == 1 ? sets : legs;
+      s = 1;
+    }
+
+    return GameSettings(game, gameIn, gameOut, s, l);
   }
 
   bool isNameFree(String name) {
@@ -76,6 +88,9 @@ class GameSettings {
 
   static const List<int> setOptions = <int>[1, 2, 3];
   static const List<int> legOptions = <int>[1, 2, 3];
+
+  bool get isLegsOnly => sets == 1;
+  bool get isFirstWins => isLegsOnly && legs == 1;
 
   /// Determine if the given hit is a potential fishing hit.
   bool isValidFinisher(Hit hit) {

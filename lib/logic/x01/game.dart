@@ -24,6 +24,16 @@ class GameController {
     reset();
   }
 
+  String get curPoints {
+    if(settings.isFirstWins) {
+      return '';
+    } else if(settings.isLegsOnly) {
+      return '(${curPly.points.currentLegs})';
+    } else {
+      return '(${curPly.points.sets}-${curPly.points.currentLegs})';
+    }
+  }
+
   void reset() {
     gameRound.reset();
     playerData.reset();
