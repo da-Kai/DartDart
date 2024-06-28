@@ -47,15 +47,15 @@ class GameSettingFactory {
   int legs = 1;
   int sets = 1;
 
-  bool get _isOneDimensional {
-    return legs == 1 && sets > 1 || sets == 1 && legs > 1;
+  bool get isOneDimensional {
+    return legs == 1 || sets == 1;
   }
 
   GameSettings get() {
     var l = legs;
     var s = sets;
 
-    if(_isOneDimensional) {
+    if(isOneDimensional) {
       l = legs == 1 ? sets : legs;
       s = 1;
     }
