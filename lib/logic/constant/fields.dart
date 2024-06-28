@@ -223,7 +223,7 @@ class Turn {
   }
 
   /// Return if all hits are taken.
-  bool done() {
+  bool get done {
     return count == 3;
   }
 }

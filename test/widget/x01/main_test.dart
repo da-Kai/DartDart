@@ -5,11 +5,48 @@ import 'package:dart_dart/widget/x01/number_field_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> press(WidgetTester tester, Hit hit) async {
-  var buttons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
-  var button = buttons.firstWhere((b) => b.hit == hit);
-  
+const vertical = Size(1080, 1920);
+const horizontal = Size(1920, 1080);
+
+Future<void> press(WidgetTester tester, HitNumber number, HitMultiplier multiplier) async {
+  final hit = Hit.get(number, multiplier);
+
+  final multButton = find.text(hit.multiplier.text);
+  await tester.tap(multButton);
+  await tester.pumpAndSettle();
+
+  final buttons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
+  final button = buttons.firstWhere((b) => b.hit == hit);
+
   await tester.tap(find.byWidget(button));
+  await tester.pumpAndSettle();
+}
+
+Future<void> rotate(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(vertical);
+  await tester.pumpAndSettle();
+  await tester.binding.setSurfaceSize(horizontal);
+  await tester.pumpAndSettle();
+}
+
+Future<void> addPlayer(WidgetTester tester, String playerName) async {
+  final addPlayerButton = find.byIcon(Icons.add);
+  await tester.tap(addPlayerButton);
+  await tester.pumpAndSettle();
+
+  final alertDialog = find.byType(AlertDialog);
+  expect(alertDialog, findsOneWidget);
+  final alert = tester.widget(alertDialog) as AlertDialog;
+  final alertScroll = alert.content! as SingleChildScrollView;
+  final alertInput = alertScroll.child! as TextField;
+  final alertControl = alertInput.controller!;
+
+  alertControl.text = playerName;
+
+  final findOkButton = find.text('OK');
+  expect(findOkButton, findsOneWidget);
+  await tester.tap(findOkButton);
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -17,80 +54,74 @@ void main() {
     testWidgets('Smoke Test Home Screen', (WidgetTester tester) async {
       await tester.pumpWidget(const DartDart());
 
+      await rotate(tester);
+
       expect(find.text('X01'), findsOneWidget);
 
-      var x01Button = find.text('X01');
+      final x01Button = find.text('X01');
       await tester.tap(x01Button);
       await tester.pumpAndSettle();
 
       expect(find.text('X01-Game'), findsOneWidget);
-      var addPlayerButton = find.byIcon(Icons.add);
-      await tester.tap(addPlayerButton);
-      await tester.pumpAndSettle();
 
-      var alertDialog = find.byType(AlertDialog);
-      expect(alertDialog, findsOneWidget);
-      var alert = tester.widget(alertDialog) as AlertDialog;
-      var alertScroll = alert.content! as SingleChildScrollView;
-      var alertInput = alertScroll.child! as TextField;
-      var alertControl = alertInput.controller!;
+      await rotate(tester);
 
-      alertControl.text = 'Name';
+      await addPlayer(tester, 'Player01');
+      await addPlayer(tester, 'Player02');
 
-      var findOkButton = find.text('OK');
-      expect(findOkButton, findsOneWidget);
-      await tester.tap(findOkButton);
-      await tester.pumpAndSettle();
-
-      var findStartButton = find.text('Start');
+      final findStartButton = find.text('Start');
       expect(findStartButton, findsOneWidget);
       await tester.tap(findStartButton);
       await tester.pumpAndSettle();
 
       expect(find.text('301'), findsAny);
-      
-      var findDartBoard = find.byType(BoardSelect);
+
+      await rotate(tester);
+
+      final findDartBoard = find.byType(BoardSelect);
       expect(findDartBoard, findsOneWidget);
 
       await tester.tap(find.text('FIELD'));
       await tester.pumpAndSettle();
 
-      /// Round 1
-      await tester.tap(find.text('x3'));
-      await tester.pumpAndSettle();
-
-      var tripleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.triple);
-      var tripleNineteen = Hit.get(HitNumber.nineteen, HitMultiplier.triple);
-      var doubleTwo = Hit.get(HitNumber.two, HitMultiplier.double);
-
-      await press(tester, tripleTwenty);
-      await press(tester, tripleTwenty);
-      await press(tester, tripleTwenty);
-      await tester.pumpAndSettle();
+      /// Player 1 - Round 1
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
 
       expect(find.text((301 - 180).toString()), findsOneWidget);
       await tester.tap(find.text('next'));
       await tester.pumpAndSettle();
 
-      /// Round 2 (Overthrow)
-      await press(tester, tripleTwenty);
-      await press(tester, tripleTwenty);
-      await press(tester, tripleTwenty);
+      /// Player 2 - Round 1
+      await press(tester, HitNumber.miss, HitMultiplier.single);
+      await press(tester, HitNumber.miss, HitMultiplier.single);
+      await press(tester, HitNumber.miss, HitMultiplier.single);
+
+      await tester.tap(find.text('next'));
       await tester.pumpAndSettle();
+
+      /// Player 1 - Round 2 (Overthrow)
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
 
       expect(find.text((301 - 180).toString()), findsOneWidget);
       await tester.tap(find.text('next'));
       await tester.pumpAndSettle();
 
-      /// Round 3
-      await press(tester, tripleTwenty);
-      await press(tester, tripleNineteen);
+      /// Player 2 - Round 2
+      await press(tester, HitNumber.miss, HitMultiplier.single);
+      await press(tester, HitNumber.miss, HitMultiplier.single);
+      await press(tester, HitNumber.miss, HitMultiplier.single);
 
-      await tester.tap(find.text('x2'));
+      await tester.tap(find.text('next'));
       await tester.pumpAndSettle();
 
-      await press(tester, doubleTwo);
-      await tester.pumpAndSettle();
+      /// Player 1 - Round 3 (Win)
+      await press(tester, HitNumber.twenty, HitMultiplier.triple);
+      await press(tester, HitNumber.nineteen, HitMultiplier.triple);
+      await press(tester, HitNumber.two, HitMultiplier.double);
 
       expect(find.byIcon(Icons.check), findsOneWidget);
       await tester.tap(find.text('next'));

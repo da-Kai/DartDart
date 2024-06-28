@@ -65,34 +65,34 @@ void main() {
       expect(turn.last, null);
       expect(turn.thrown(Hit.bullseye, pos: 5), -1);
 
-      expect(turn.done(), false);
+      expect(turn.done, false);
       expect(turn.count, 0);
       expect(turn.sum(), 0);
 
       var firstHit = Hit.get(HitNumber.twenty, HitMultiplier.triple);
       turn.thrown(firstHit);
 
-      expect(turn.done(), false);
+      expect(turn.done, false);
       expect(turn.count, 1);
       expect(turn.sum(), firstHit.value);
 
       var secondHit = Hit.get(HitNumber.one, HitMultiplier.double);
       turn.thrown(secondHit);
 
-      expect(turn.done(), false);
+      expect(turn.done, false);
       expect(turn.count, 2);
       expect(turn.sum(), firstHit + secondHit);
 
       var thirdHit = Hit.get(HitNumber.five, HitMultiplier.single);
       turn.thrown(thirdHit);
 
-      expect(turn.done(), true);
+      expect(turn.done, true);
       expect(turn.count, 3);
       expect(turn.sum(), firstHit + (secondHit + thirdHit));
 
       turn.undo();
 
-      expect(turn.done(), false);
+      expect(turn.done, false);
       expect(turn.count, 2);
       expect(turn.sum(), firstHit + secondHit);
       expect(turn.last, secondHit);

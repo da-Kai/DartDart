@@ -16,7 +16,7 @@ enum InOut {
   /// Check if the hit fits.
   bool fits(Hit? hit) {
     if (hit == null) return false;
-    return switch(this) {
+    return switch (this) {
       InOut.straight => true,
       InOut.double => hit.multiplier.isDouble,
       InOut.master => hit.multiplier.isDouble || hit.multiplier.isTriple,
@@ -47,8 +47,20 @@ class GameSettingFactory {
   int legs = 1;
   int sets = 1;
 
+  bool get isOneDimensional {
+    return legs == 1 || sets == 1;
+  }
+
   GameSettings get() {
-    return GameSettings(game, gameIn, gameOut, sets, legs);
+    var l = legs;
+    var s = sets;
+
+    if(isOneDimensional) {
+      l = legs == 1 ? sets : legs;
+      s = 1;
+    }
+
+    return GameSettings(game, gameIn, gameOut, s, l);
   }
 
   bool isNameFree(String name) {
@@ -74,8 +86,11 @@ class GameSettings {
     return game.val;
   }
 
-  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+  static const List<int> setOptions = <int>[1, 2, 3];
+  static const List<int> legOptions = <int>[1, 2, 3];
+
+  bool get isLegsOnly => sets == 1;
+  bool get isFirstWins => isLegsOnly && legs == 1;
 
   /// Determine if the given hit is a potential fishing hit.
   bool isValidFinisher(Hit hit) {
