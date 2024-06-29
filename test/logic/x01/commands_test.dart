@@ -1,6 +1,8 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/commands.dart';
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/game.dart';
+import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,35 +23,71 @@ void main() {
     });
     test('Test Switch', () {
       var settings = GameSettingFactory().get();
-      var plyData = PlayerData.get(['A', 'B'], 42);
+      Player plyFunc(name) => Player(name, settings.points, () => 0);
+      var plyData = PlayerData.get(['A', 'B'], plyFunc);
       var gameRound = GameRound(settings);
       gameRound.current.thrown(Hit.doubleBullseye);
 
       var t = Switch.from(plyData, gameRound);
 
       expect(gameRound.current, t.round);
-      expect(plyData.currentPlayer, t.curPly);
-      expect(t.curPly.turnHistory.length, 0);
+      expect(plyData.current, t.curPly);
+      expect(t.curPly.turnHistory.turnCount, 0);
       t.execute();
       expect(gameRound.current == t.round, false);
-      expect(plyData.currentPlayer == t.curPly, false);
-      expect(t.curPly.turnHistory.length, 1);
+      expect(plyData.current == t.curPly, false);
+      expect(t.curPly.turnHistory.turnCount, 1);
       t.undo();
       expect(gameRound.current, t.round);
-      expect(plyData.currentPlayer, t.curPly);
-      expect(t.curPly.turnHistory.length, 0);
+      expect(plyData.current, t.curPly);
+      expect(t.curPly.turnHistory.turnCount, 0);
     });
-    test('Test Award', () {
-      var plyData = PlayerData.get(['A', 'B'], 42);
-      var curPly = plyData.next;
+    test('Test EndLeg', () {
+      var player = ['A', 'B'];
+      var settings = GameSettings(Games.threeOOne, InOut.straight, InOut.straight, 2, 2);
+      var data = GameController(player, settings);
+      
+      expect(data.commands.toString(), '[]');
 
-      var a = Award(plyData);
+      expect(data.leader!.name, 'A');
+      var cmdSwitch = Switch.from(data.playerData, data.gameRound);
+      data.commands.execute(cmdSwitch);
 
-      expect(plyData.winner, null);
-      a.execute();
-      expect(plyData.winner, curPly);
-      a.undo();
-      expect(plyData.winner, null);
+      expect(data.commands.toString(), '[(Switch)]');
+
+      expect(data.leader!.name, 'A');
+      expect(data.leader!.points.currentLegs, 0);
+      var cmdEndLeg = EndLeg.from(data.playerData, data.gameRound);
+      data.commands.execute(cmdEndLeg);
+
+      expect(data.commands.toString(), '[Switch, (EndLeg)]');
+
+      expect(data.leader!.points.sets, 0);
+      expect(data.leader!.points.currentLegs, 1);
+      var cmdEndSet = EndSet.from(data.playerData, data.gameRound);
+      data.commands.execute(cmdEndSet);
+
+      expect(data.commands.toString(), '[Switch, EndLeg, (EndSet)]');
+
+      expect(data.leader!.points.sets, 1);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[Switch, (EndLeg), EndSet]');
+
+      expect(data.leader!.name, 'B');
+      expect(data.leader!.points.sets, 0);
+      expect(data.leader!.points.currentLegs, 1);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[(Switch), EndLeg, EndSet]');
+
+      expect(data.leader!.name, 'A');
+      expect(data.leader!.points.currentLegs, 0);
+      data.commands.undo();
+
+      expect(data.commands.toString(), '[Switch, EndLeg, EndSet]');
+
+      expect(data.leader!.name, 'A');
     });
   });
 }

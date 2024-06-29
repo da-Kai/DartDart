@@ -1,12 +1,7 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class TestCommand implements Command {
-  @override
-  Command? next;
-  @override
-  Command? previous;
-
+class TestCommand extends Command {
   bool executed = false;
 
   @override

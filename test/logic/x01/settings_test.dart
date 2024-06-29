@@ -10,6 +10,15 @@ void main() {
       game.players.add('A');
       expect(game.isNameFree('a'), false);
       expect(game.isNameFree('B'), true);
+
+      game.sets = game.legs = 1;
+      expect(true, game.isOneDimensional);
+      game.sets = 2;
+      expect(true, game.isOneDimensional);
+      game.legs = 2;
+      expect(false, game.isOneDimensional);
+      game.sets = 1;
+      expect(true, game.isOneDimensional);
     });
     test('Test X01 Settings', () {
       var factory = GameSettingFactory();

@@ -18,8 +18,9 @@ class Checkout {
 }
 
 Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
-  final done = dartsRemain == 0 || score == 0;
-  if (done || setting.highestCheckout() < score || setting == InOut.straight) {
+  final invalid = score > setting.highestCheckout || score < setting.lowestCheckout;
+  final done = dartsRemain == 0 || score <= 0;
+  if (done || invalid || setting == InOut.straight) {
     return Checkout();
   }
   final checkouts = _listOfCheckouts(setting, dartsRemain);

@@ -5,6 +5,9 @@ abstract class Command {
   void execute();
 
   void undo();
+
+  bool get hasNext => next != null;
+  bool get hasPrevious => next != null;
 }
 
 /// History of a games actions.
@@ -15,32 +18,37 @@ class CommandStack {
 
   void execute(Command command) {
     command.execute();
+
     if (current != null) {
-      current?.next = command;
-      command.previous = current;
+      final cur = current!;
+      command.previous = cur;
+      cur.next = command;
     } else {
       first = command;
     }
-    current = last = command;
+
+    current = command;
+    last = command;
   }
 
   void undo() {
     if (current != null) {
-      current!.undo();
-      current = current!.previous;
+      final cur = current!;
+      cur.undo();
+      current = cur.previous;
     }
   }
 
   void redo() {
-    if (current != null) {
-      if (current!.next != null) {
-        var next = current!.next!;
-        current = next;
-        next.execute();
-      }
-    } else if (first != null) {
-      current = first;
-      current!.execute();
+    if (current != null && current!.hasNext) {
+      final next = current!.next!;
+      next.execute();
+      current = next;
+    }
+    else if (current == null && first != null) {
+      final next = first!;
+      next.execute();
+      current = next;
     }
   }
 
@@ -63,4 +71,18 @@ class CommandStack {
   bool get canUndo => current != null;
 
   bool get canRedo => last != current;
+
+  @override
+  String toString() {
+    if(first == null) return '[]';
+    var cur = first;
+
+    final List<String> commands = [];
+    do {
+      commands.add(cur == current ? //
+      '(${cur.runtimeType})' : '${cur.runtimeType}');
+      cur = cur!.next;
+    } while(cur != null);
+    return '[${commands.join(', ')}]';
+  }
 }

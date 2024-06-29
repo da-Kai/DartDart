@@ -29,14 +29,14 @@ void main() {
     game.onThrow(Hit.miss);
     game.onThrow(Hit.miss);
     
-    expect(game.curTurn.done(), true);
+    expect(game.curTurn.done, true);
 
     game.undo();
     expect(game.canRedo, true);
-    expect(game.curTurn.done(), false);
+    expect(game.curTurn.done, false);
     game.redo();
 
-    expect(game.curTurn.done(), true);
+    expect(game.curTurn.done, true);
 
     game.next();
   });

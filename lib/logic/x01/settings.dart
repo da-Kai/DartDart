@@ -1,49 +1,25 @@
 import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 
-enum InOut {
-  straight,
-  double,
-  master,
-}
+typedef Check<T> = bool Function(T a);
 
-extension InOutExtension on InOut {
+enum InOut {
+  straight(180, 1),
+  double(170, 2),
+  master(180, 2);
+
+  final int highestCheckout;
+  final int lowestCheckout;
+
+  const InOut(this.highestCheckout, this.lowestCheckout);
+
   /// Check if the hit fits.
   bool fits(Hit? hit) {
     if (hit == null) return false;
-    if (this == InOut.straight) return true;
-    if (this == InOut.double) {
-      return hit.multiplier == HitMultiplier.double;
-    }
-    if (this == InOut.master) {
-      return hit.multiplier == HitMultiplier.double || //
-          hit.multiplier == HitMultiplier.triple;
-    }
-    return false;
-  }
-
-  /// Check if a finisher is possible with the remaining score.
-  bool possible(int remaining) {
-    if (remaining < 0) return false;
-    if (this == InOut.straight) return true;
-    if (this == InOut.double) return remaining >= 2;
-    if (this == InOut.master) return remaining >= 2;
-    return false;
-  }
-
-  int highestCheckout() {
     return switch (this) {
-      InOut.double => 170,
-      InOut.master => 180,
-      InOut.straight => 180,
-    };
-  }
-
-  int lowestCheckout() {
-    return switch (this) {
-      InOut.double => 2,
-      InOut.master => 2,
-      InOut.straight => 1,
+      InOut.straight => true,
+      InOut.double => hit.multiplier.isDouble,
+      InOut.master => hit.multiplier.isDouble || hit.multiplier.isTriple,
     };
   }
 }
@@ -71,8 +47,20 @@ class GameSettingFactory {
   int legs = 1;
   int sets = 1;
 
+  bool get isOneDimensional {
+    return legs == 1 || sets == 1;
+  }
+
   GameSettings get() {
-    return GameSettings(game, gameIn, gameOut, sets, legs);
+    var l = legs;
+    var s = sets;
+
+    if(isOneDimensional) {
+      l = legs == 1 ? sets : legs;
+      s = 1;
+    }
+
+    return GameSettings(game, gameIn, gameOut, s, l);
   }
 
   bool isNameFree(String name) {
@@ -98,8 +86,11 @@ class GameSettings {
     return game.val;
   }
 
-  static const List<int> setOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
-  static const List<int> legOptions = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
+  static const List<int> setOptions = <int>[1, 2, 3];
+  static const List<int> legOptions = <int>[1, 2, 3];
+
+  bool get isLegsOnly => sets == 1;
+  bool get isFirstWins => isLegsOnly && legs == 1;
 
   /// Determine if the given hit is a potential fishing hit.
   bool isValidFinisher(Hit hit) {
@@ -119,7 +110,7 @@ class GameSettings {
     var val = curScore - hit.value;
     return switch (numCheck(val)) {
       NumCheck.zero => isValidFinisher(hit),
-      NumCheck.positive => gameOut.possible(val),
+      NumCheck.positive => val >= gameOut.lowestCheckout,
       NumCheck.negative => false
     };
   }

@@ -61,6 +61,10 @@ enum HitMultiplier {
   final String prefix;
   final String text;
   final int multiplier;
+
+  bool get isSingle => this == HitMultiplier.single;
+  bool get isDouble => this == HitMultiplier.double;
+  bool get isTriple => this == HitMultiplier.triple;
 }
 
 /// Represents a single Dart hit.
@@ -80,7 +84,7 @@ class Hit {
     if (number == HitNumber.miss) {
       return Hit.miss;
     }
-    if (number == HitNumber.bullsEye && multiplier == HitMultiplier.triple) {
+    if (number == HitNumber.bullsEye && multiplier.isTriple) {
       return Hit.doubleBullseye;
     }
     return Hit._(number, multiplier);
@@ -219,7 +223,7 @@ class Turn {
   }
 
   /// Return if all hits are taken.
-  bool done() {
+  bool get done {
     return count == 3;
   }
 }

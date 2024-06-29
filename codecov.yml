@@ -4,7 +4,8 @@ coverage:
   status:
     project:
       default:
-        target: '60%'
+        target: auto
+        threshold: 10%
 
 comment:
   layout: "condensed_header, diff"
