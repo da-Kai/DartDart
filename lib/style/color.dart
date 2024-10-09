@@ -19,13 +19,13 @@ class ColorConstants {
   static const Color warning = Color.fromRGBO(254, 186, 83, 1.0);
   static const Color fault = Color.fromRGBO(224, 122, 95, 1.0);
 
-  static const Color textDark = Color.fromRGBO(57, 47, 45, 1.0);
+  static const Color textDark = Color.fromRGBO(32, 32, 32, 1.0);
   static const Color textLight = Color.fromRGBO(251, 246, 236, 1.0);
 
   static const Color backgroundDark = Color.fromRGBO(33, 33, 33, 1.0);
-  static const Color backgroundBeige2 = Color.fromRGBO(185, 168, 138, 1.0);
-  static const Color backgroundBeige = Color.fromRGBO(245, 243, 239, 1.0);
-  static const Color backgroundLight = Color.fromRGBO(220, 220, 225, 1.0);
+  static const Color backgroundLight = Color.fromRGBO(203, 211, 220, 1.0);
+  static const Color backgroundBeige2 = Color.fromRGBO(209, 195, 166, 1.0);
+  static const Color backgroundBeige = Color.fromRGBO(247, 244, 237, 1.0);
 
   static const Color shadow = Color.fromRGBO(5, 10, 20, 0.8);
 
@@ -33,7 +33,7 @@ class ColorConstants {
   static const Color primaryContainer = Color.fromRGBO(39, 45, 51, 1.0);
 
   // #cadeef
-  static const Color primaryContainerLight = Color.fromRGBO(221, 212, 198, 1.0);
+  static const Color primaryContainerLight = Color.fromRGBO(230, 225, 214, 1.0);
 }
 
 extension ColorSchemes on ColorScheme {
@@ -74,7 +74,7 @@ extension ColorSchemes on ColorScheme {
     primaryContainer: ColorConstants.primary,
     onPrimaryContainer: ColorConstants.textDark,
     shadow: ColorConstants.shadow,
-    surface: ColorConstants.backgroundBeige,
+    surface: ColorConstants.backgroundLight,
   );
 
   static const ColorScheme dark = ColorScheme.dark(
