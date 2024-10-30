@@ -231,11 +231,11 @@ class _ThrowBean extends StatelessWidget {
   BorderRadius getBorderRadius() {
     switch (placement) {
       case Placement.center:
-        return BorderRadius.zero;
+        return BorderRadius.circular(5);
       case Placement.left_end:
-        return BorderRadius.horizontal(left: Radius.circular(20));
+        return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
       case Placement.right_end:
-        return BorderRadius.horizontal(right: Radius.circular(20));
+        return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
       default:
         return BorderRadius.circular(20);
     }
