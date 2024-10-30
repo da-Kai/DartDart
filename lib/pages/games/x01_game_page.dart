@@ -232,9 +232,9 @@ class _ThrowBean extends StatelessWidget {
     switch (placement) {
       case Placement.center:
         return BorderRadius.circular(5);
-      case Placement.left_end:
+      case Placement.leftEnd:
         return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
-      case Placement.right_end:
+      case Placement.rightEnd:
         return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
       default:
         return BorderRadius.circular(20);
@@ -341,7 +341,7 @@ class _CurrentPlayer extends StatelessWidget {
                   child: _ThrowBean(
                     text: '${game.curTurn.first}',
                     tooltip: game.checkout.first,
-                    placement: Placement.left_end,
+                    placement: Placement.leftEnd,
                   ),
                 ),
                 Expanded(
@@ -355,7 +355,7 @@ class _CurrentPlayer extends StatelessWidget {
                   child: _ThrowBean(
                     text: '${game.curTurn.third}',
                     tooltip: game.checkout.third,
-                    placement: Placement.right_end,
+                    placement: Placement.rightEnd,
                   ),
                 ),
               ],
