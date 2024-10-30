@@ -1,12 +1,12 @@
+import 'package:dart_dart/logic/common/style_meta.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/game.dart';
+import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
-
-import 'package:dart_dart/logic/x01/player.dart';
 
 class X01Game extends StatefulWidget {
   late final GameController data;
@@ -220,29 +220,45 @@ class _PlayersList extends StatelessWidget {
 }
 
 class _ThrowBean extends StatelessWidget {
+  final double fontSize = 18;
+
   final String text;
   final String tooltip;
+  final Placement placement;
 
-  const _ThrowBean({required this.text, required this.tooltip});
+  const _ThrowBean({required this.text, required this.tooltip, required this.placement});
+
+  BorderRadius getBorderRadius() {
+    switch (placement) {
+      case Placement.center:
+        return BorderRadius.zero;
+      case Placement.left_end:
+        return BorderRadius.horizontal(left: Radius.circular(20));
+      case Placement.right_end:
+        return BorderRadius.horizontal(right: Radius.circular(20));
+      default:
+        return BorderRadius.circular(20);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final tooltipStyle = colorScheme.getTextStyle(
-      fontSize: 20,
+      fontSize: fontSize,
       color: colorScheme.onPrimary.withOpacity(0.4),
       fontStyle: FontStyle.italic,
     );
 
-    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: 20);
+    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: fontSize);
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: getBorderRadius(),
         color: colorScheme.primary,
       ),
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(3),
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
       child: Text(
@@ -322,13 +338,25 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: game.checkout.first),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.first}',
+                    tooltip: game.checkout.first,
+                    placement: Placement.left_end,
+                  ),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: game.checkout.second),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.second}',
+                    tooltip: game.checkout.second,
+                    placement: Placement.center,
+                  ),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: game.checkout.third),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.third}',
+                    tooltip: game.checkout.third,
+                    placement: Placement.right_end,
+                  ),
                 ),
               ],
             ),
