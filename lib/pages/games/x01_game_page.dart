@@ -1,12 +1,12 @@
+import 'package:dart_dart/logic/common/style_meta.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/game.dart';
+import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
-
-import 'package:dart_dart/logic/x01/player.dart';
 
 class X01Game extends StatefulWidget {
   late final GameController data;
@@ -31,61 +31,63 @@ class _X01PageState extends State<X01Game> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final GameController data = widget.data;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: FontConstants.title.fontFamily,
-          color: colorScheme.onSurface,
-        ),
-        backgroundColor: colorScheme.surface,
-        title: Text(data.settings.game.text),
-        leading: IconButton(
-          onPressed: () {
-            _CancelGame.open(context).then((quit) {
-              if (quit) {
-                setState(() {
-                  Navigator.pop(context);
-                });
-              }
-            });
-          },
-          icon: const Icon(Icons.close),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.undo),
-            onPressed: data.canUndo
-                ? () {
-                    setState(() {
-                      data.undo();
-                    });
-                  }
-                : null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.redo),
-            onPressed: data.canRedo
-                ? () {
-                    setState(() {
-                      data.redo();
-                    });
-                  }
-                : null,
-          )
-        ],
-      ),
-      body: OrientationBuilder(builder: (context, orientation) {
-        return orientation == Orientation.portrait
-            ? //
-            _PortraitView(this, setState)
-            : //
-            _LandscapeView(this, setState);
-      }),
-    );
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              titleTextStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: FontConstants.title.fontFamily,
+                color: colorScheme.onSurface,
+              ),
+              backgroundColor: colorScheme.surface,
+              title: Text(data.settings.game.text),
+              leading: IconButton(
+                onPressed: () {
+                  _CancelGame.open(context).then((quit) {
+                    if (quit) {
+                      setState(() {
+                        Navigator.pop(context);
+                      });
+                    }
+                  });
+                },
+                icon: const Icon(Icons.close),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.undo),
+                  onPressed: data.canUndo
+                      ? () {
+                          setState(() {
+                            data.undo();
+                          });
+                        }
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.redo),
+                  onPressed: data.canRedo
+                      ? () {
+                          setState(() {
+                            data.redo();
+                          });
+                        }
+                      : null,
+                )
+              ],
+            ),
+            body: OrientationBuilder(builder: (context, orientation) {
+                return orientation == Orientation.portrait
+                    ? //
+                    _PortraitView(this, setState)
+                    : //
+                    _LandscapeView(this, setState);
+              }),
+            ));
   }
 }
 
@@ -220,29 +222,45 @@ class _PlayersList extends StatelessWidget {
 }
 
 class _ThrowBean extends StatelessWidget {
+  final double fontSize = 18;
+
   final String text;
   final String tooltip;
+  final Placement placement;
 
-  const _ThrowBean({required this.text, required this.tooltip});
+  const _ThrowBean({required this.text, required this.tooltip, required this.placement});
+
+  BorderRadius getBorderRadius() {
+    switch (placement) {
+      case Placement.center:
+        return BorderRadius.circular(5);
+      case Placement.leftEnd:
+        return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
+      case Placement.rightEnd:
+        return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
+      default:
+        return BorderRadius.circular(20);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final tooltipStyle = colorScheme.getTextStyle(
-      fontSize: 20,
+      fontSize: fontSize,
       color: colorScheme.onPrimary.withOpacity(0.4),
       fontStyle: FontStyle.italic,
     );
 
-    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: 20);
+    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: fontSize);
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: getBorderRadius(),
         color: colorScheme.primary,
       ),
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(3),
       margin: const EdgeInsets.all(5),
       alignment: Alignment.center,
       child: Text(
@@ -322,13 +340,25 @@ class _CurrentPlayer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.first}', tooltip: game.checkout.first),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.first}',
+                    tooltip: game.checkout.first,
+                    placement: Placement.leftEnd,
+                  ),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.second}', tooltip: game.checkout.second),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.second}',
+                    tooltip: game.checkout.second,
+                    placement: Placement.center,
+                  ),
                 ),
                 Expanded(
-                  child: _ThrowBean(text: '${game.curTurn.third}', tooltip: game.checkout.third),
+                  child: _ThrowBean(
+                    text: '${game.curTurn.third}',
+                    tooltip: game.checkout.third,
+                    placement: Placement.rightEnd,
+                  ),
                 ),
               ],
             ),

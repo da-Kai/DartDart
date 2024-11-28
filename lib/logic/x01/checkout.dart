@@ -18,9 +18,9 @@ class Checkout {
 }
 
 Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
-  final invalid = score > setting.highestCheckout || score < setting.lowestCheckout;
   final done = dartsRemain == 0 || score <= 0;
-  if (done || invalid || setting == InOut.straight) {
+  final invalid = score > setting.highestCheckout || score < setting.lowestCheckout;
+  if (done || invalid) {
     return Checkout();
   }
   final checkouts = _listOfCheckouts(setting, dartsRemain);
@@ -35,6 +35,11 @@ Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
 
 List<Map<int, String>> _listOfCheckouts(InOut setting, int dartsRemain) {
   final List<Map<int, String>> checkouts = [];
+  if (setting == InOut.straight) {
+    if (dartsRemain >= 3) checkouts.add(singleCheckoutTriple);
+    if (dartsRemain >= 2) checkouts.add(singleCheckoutDouble);
+    if (dartsRemain >= 1) checkouts.add(singleCheckoutSingle);
+  }
   if (setting == InOut.master) {
     if (dartsRemain >= 3) checkouts.add(masterCheckoutTriple);
     if (dartsRemain >= 2) checkouts.add(masterCheckoutDouble);
@@ -264,4 +269,104 @@ final Map<int, String> doubleCheckoutSingle = Map.unmodifiable(HashMap.from({
   6: 'D3;;',
   4: 'D2;;',
   2: 'D1;;'
+}));
+
+final Map<int, String> singleCheckoutTriple = Map.unmodifiable(HashMap.from({
+  145: 'T20;T20;BULL',
+  140: 'T20;T20;20',
+  139: 'T20;T20;19',
+  138: 'T20;T20;18;',
+  137: 'T20;T19;20',
+  136: 'T20;T19;19',
+  135: 'T20;T19;18',
+  134: 'T20;T18;20',
+  133: 'T20;T18;19',
+  132: 'T20;T18;18',
+  131: 'T20;T17;20',
+  130: 'T20;T17;19',
+  129: 'T20;T17;18',
+  128: 'T20;T16;20',
+  127: 'T20;T16;19',
+  126: 'T20;T16;18',
+  125: 'T20;T15;20',
+  124: 'T20;T15;19',
+  123: 'T20;T15;18',
+  122: 'T20;T14;20',
+  121: 'T20;T14;19',
+  119: 'T20;D20;19',
+  118: 'T20;D19;20',
+  116: 'T20;D18;20',
+  115: 'T20;D18;19',
+  113: 'T20;D17;19',
+  112: 'T20;D16;20',
+  109: 'T20;D15;19',
+  106: 'T20;D13;20',
+  103: 'T20;D12;19',
+}));
+
+final Map<int, String> singleCheckoutDouble = Map.unmodifiable(HashMap.from({
+  85: 'T20;BULL;',
+  82: 'T19;BULL;',
+  80: 'T20;20;',
+  79: 'T20;19;',
+  78: 'T20;18;',
+  77: 'T19;20;',
+  76: 'T19;19;',
+  75: 'T19;18;',
+  74: 'T18;20;',
+  73: 'T18;19;',
+  72: 'T18;18;',
+  71: 'T17;20;',
+  70: 'T17;19;',
+  69: 'T17;18;',
+  68: 'T16;20;',
+  67: 'T16;19;',
+  66: 'T16;18;',
+  65: 'T15;20;',
+  64: 'T15;19;',
+  63: 'T15;18;',
+  62: 'T14;20;',
+  61: 'T14;19;',
+  59: 'D20;19;',
+  58: 'D19;20;',
+  56: 'D18;20;',
+  55: 'D18;19;',
+  53: 'D17;19;',
+  52: 'D16;20;',
+  49: 'D15;19;',
+  47: 'D14;19;',
+  46: 'D13;20;',
+  44: 'D12;20;',
+  43: 'D12;19;',
+  41: 'D11;19;',
+  37: '20;17;',
+  35: '20;15;',
+  31: '20;11;',
+  29: '20;9;',
+  23: '20;3;',
+  21: '20;1;',
+}));
+
+final Map<int, String> singleCheckoutSingle = Map.unmodifiable(HashMap.from({
+  25: 'BULL;;',
+  20: '20;;',
+  19: '19;;',
+  18: '18;;',
+  17: '17;;',
+  16: '16;;',
+  15: '15;;',
+  14: '14;;',
+  13: '13;;',
+  12: '12;;',
+  11: '11;;',
+  10: '10;;',
+  9: '9;;',
+  8: '8;;',
+  7: '7;;',
+  6: '6;;',
+  5: '5;;',
+  4: '4;;',
+  3: '3;;',
+  2: '2;;',
+  1: '1;;',
 }));

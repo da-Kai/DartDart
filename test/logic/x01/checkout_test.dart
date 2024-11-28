@@ -85,4 +85,32 @@ void main() {
       expect(score, 0);
     }
   });
+  test('Test Single Checkouts Fit', () {
+    for(var entry in singleCheckoutTriple.entries) {
+      var score = entry.key;
+      var three = entry.value.split(';');
+
+      var firstHit = Hit.getByAbbreviation(three[0]);
+      score -= firstHit.value;
+
+      var twoEntry = singleCheckoutDouble[score] ?? doubleCheckoutDouble[score] ??  masterCheckoutDouble[score];
+      expect(twoEntry != null, true, reason: 'no $score value for doubleOut');
+      var two = twoEntry!.split(';');
+      expect(three[1], two[0], reason: '${entry.key}: ${entry.value} != $twoEntry');
+      expect(three[2], two[1], reason: '${entry.key}: ${entry.value} != $twoEntry');
+
+      var secondHit = Hit.getByAbbreviation(two[0]);
+      score -= secondHit.value;
+
+      var oneEntry = singleCheckoutSingle[score] ?? doubleCheckoutSingle[score] ?? masterCheckoutSingle[score];
+      expect(oneEntry != null, true, reason: 'no $score value for singleOut');
+      var one = oneEntry!.split(';');
+      expect(one[0], two[1], reason: '${entry.key}: ${entry.value} != $twoEntry != $one');
+
+      var thirdHit = Hit.getByAbbreviation(one[0]);
+      score -= thirdHit.value;
+
+      expect(score, 0);
+    }
+  });
 }

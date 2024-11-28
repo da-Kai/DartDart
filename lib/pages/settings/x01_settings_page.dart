@@ -393,13 +393,6 @@ class _PlayerSettingContainer extends StatelessWidget {
                 children: state._data.players.map<Row>((String player) {
                   return Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          player,
-                          overflow: TextOverflow.ellipsis,
-                          style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
                       IconButton(
                         onPressed: () {
                           _PlayerNameDialog(
@@ -412,18 +405,25 @@ class _PlayerSettingContainer extends StatelessWidget {
                             }
                           });
                         },
-                        icon: const Icon(Icons.edit),
+                        icon: const Icon(Icons.edit_rounded),
                         color: colorScheme.onPrimaryContainer,
-                        iconSize: 22,
+                        iconSize: 20,
                         visualDensity: VisualDensity.compact,
+                      ),
+                      Expanded(
+                        child: Text(
+                          player,
+                          overflow: TextOverflow.ellipsis,
+                          style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
                           state._removePlayer(player);
                         },
-                        icon: const Icon(Icons.delete),
+                        icon: const Icon(Icons.close_rounded),
                         color: colorScheme.onPrimaryContainer,
-                        iconSize: 22,
+                        iconSize: 24,
                         visualDensity: VisualDensity.compact,
                       )
                     ],

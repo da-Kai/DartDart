@@ -4,11 +4,11 @@ homepage: "https://da-kai.github.io/DartDart/"
 repository: "https://github.com/da-Kai/DartDart"
 publish_to: 'none'
 
-version: 0.6.0
+version: 0.7.0
 version_alias: prototype
 
 environment:
-  sdk: '>=3.2.2 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -19,9 +19,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.13.1
-  test: ^1.25.2
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.1
+  test: ^1.25.0
 
 flutter_launcher_icons:
   image_path_android: "assets/icons/icon-colored-1024.png"
