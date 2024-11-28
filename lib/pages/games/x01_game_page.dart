@@ -31,61 +31,63 @@ class _X01PageState extends State<X01Game> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final GameController data = widget.data;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          fontFamily: FontConstants.title.fontFamily,
-          color: colorScheme.onSurface,
-        ),
-        backgroundColor: colorScheme.surface,
-        title: Text(data.settings.game.text),
-        leading: IconButton(
-          onPressed: () {
-            _CancelGame.open(context).then((quit) {
-              if (quit) {
-                setState(() {
-                  Navigator.pop(context);
-                });
-              }
-            });
-          },
-          icon: const Icon(Icons.close),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.undo),
-            onPressed: data.canUndo
-                ? () {
-                    setState(() {
-                      data.undo();
-                    });
-                  }
-                : null,
-          ),
-          IconButton(
-            icon: const Icon(Icons.redo),
-            onPressed: data.canRedo
-                ? () {
-                    setState(() {
-                      data.redo();
-                    });
-                  }
-                : null,
-          )
-        ],
-      ),
-      body: OrientationBuilder(builder: (context, orientation) {
-        return orientation == Orientation.portrait
-            ? //
-            _PortraitView(this, setState)
-            : //
-            _LandscapeView(this, setState);
-      }),
-    );
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              titleTextStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: FontConstants.title.fontFamily,
+                color: colorScheme.onSurface,
+              ),
+              backgroundColor: colorScheme.surface,
+              title: Text(data.settings.game.text),
+              leading: IconButton(
+                onPressed: () {
+                  _CancelGame.open(context).then((quit) {
+                    if (quit) {
+                      setState(() {
+                        Navigator.pop(context);
+                      });
+                    }
+                  });
+                },
+                icon: const Icon(Icons.close),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.undo),
+                  onPressed: data.canUndo
+                      ? () {
+                          setState(() {
+                            data.undo();
+                          });
+                        }
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.redo),
+                  onPressed: data.canRedo
+                      ? () {
+                          setState(() {
+                            data.redo();
+                          });
+                        }
+                      : null,
+                )
+              ],
+            ),
+            body: OrientationBuilder(builder: (context, orientation) {
+                return orientation == Orientation.portrait
+                    ? //
+                    _PortraitView(this, setState)
+                    : //
+                    _LandscapeView(this, setState);
+              }),
+            ));
   }
 }
 
