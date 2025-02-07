@@ -159,6 +159,7 @@ class _PlayerNameDialog {
   late final TextEditingController textController;
 
   String? errorText;
+  bool canceled = false;
 
   _PlayerNameDialog({required this.context, required this.validate, this.player}) {
     colorScheme = Theme.of(context).colorScheme;
@@ -185,7 +186,10 @@ class _PlayerNameDialog {
                 color: colorScheme.error,
                 textColor: colorScheme.onError,
                 child: const Text('CANCEL'),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  canceled = true;
+                  Navigator.pop(context);
+                },
               ),
               MaterialButton(
                 color: colorScheme.primary,
@@ -209,6 +213,7 @@ class _PlayerNameDialog {
         });
       },
     ).then((value) {
+      if (canceled) return null;
       var nextPly = textController.value.text;
       var (valid, _) = validate(nextPly);
       return valid ? nextPly : null;
