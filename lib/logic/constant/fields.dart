@@ -163,6 +163,17 @@ class Turn {
     }
   }
 
+  void set(int pos, Hit hit) {
+    switch (pos) {
+      case 0:
+        first = hit;
+      case 1:
+        second = hit;
+      case 2:
+        third = hit;
+    }
+  }
+
   /// Add Hit to throws and return the position.
   ///
   /// If no position is given, the next one is chosen.

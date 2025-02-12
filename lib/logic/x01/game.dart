@@ -113,4 +113,148 @@ class GameController {
   bool get canRedo {
     return commands.canRedo;
   }
+
+  GameStats getStats() {
+    return GameStats(commands, _playerNames, winner!.name);
+  }
+}
+
+class ProgressPerLeg {
+  final int set;
+  final int leg;
+  final Map<String, List<Turn>> turnsPerPlayer = {};
+
+  ProgressPerLeg(this.set, this.leg);
+
+  void applyTurn(String player, Turn turn) {
+    turnsPerPlayer.putIfAbsent(player, () => []);
+    turnsPerPlayer[player]!.add(turn);
+  }
+}
+
+class GameStats {
+  final CommandStack commands;
+  final Map<String, PlayerGameStats> playerStats = {};
+  final List<ProgressPerLeg> progress = [];
+
+  GameStats(this.commands, List<String> players, String winner) {
+    for (var ply in players) {
+      playerStats.putIfAbsent(ply, () => PlayerGameStats(ply == winner, ply));
+    }
+    progress.add(ProgressPerLeg(0, 0));
+
+    Command? cur = commands.first!;
+    String player = players.first;
+    Turn turn = Turn();
+
+    do {
+      if (cur is Throw) {
+        turn.set(cur.pos, cur.hit);
+      } else if (cur is Switch) {
+        playerStats[player]!.applyTurn(turn);
+        progress.last.applyTurn(player, turn);
+        turn = Turn();
+
+        player = cur.nextPly.name;
+      } else if (cur is EndLeg) {
+        playerStats[player]!.applyTurn(turn);
+        progress.last.applyTurn(player, turn);
+        turn = Turn();
+
+        String next = cur.nextPly();
+        player = players.firstWhere((ply) => ply == next);
+        progress.add(ProgressPerLeg(progress.last.set, progress.last.leg + 1));
+      } else if (cur is EndSet) {
+        playerStats[player]!.applyTurn(turn);
+        progress.last.applyTurn(player, turn);
+        turn = Turn();
+
+        var next = cur.nextPly();
+        player = players.firstWhere((ply) => ply == next);
+        progress.add(ProgressPerLeg(progress.last.set + 1, 0));
+      }
+
+      cur = cur!.next;
+    } while(cur != null);
+  }
+}
+
+class PlayerGameStats {
+  final bool isWinner;
+  final String player;
+  final Map<Hit, int> _hitPerField = {};
+
+  int _hitCount = 0;
+  int _hitTotal = 0;
+  Hit _hitMin = Hit.skipped;
+  Hit _hitMax = Hit.skipped;
+  int _sixtyPlusCnt = 0;
+  int _oneTwentyPlusCnt = 0;
+  int _oneEightyCnt = 0;
+
+  PlayerGameStats(this.isWinner, this.player);
+
+  void _checkMinMax(Hit hit) {
+    if (_hitCount == 0) {
+      _hitMin = _hitMax = hit;
+    } else if (_hitMin.value > hit.value) {
+      _hitMin = hit;
+    } else if (_hitMax.value < hit.value) {
+      _hitMax = hit;
+    }
+  }
+
+  void _checkTurn(Hit hit) {
+    if (hit != Hit.skipped) {
+      _checkMinMax(hit);
+      _hitTotal += hit.value;
+      _hitCount ++;
+      _hitPerField.update(hit, (value) => value++, ifAbsent: () => 1);
+    }
+  }
+
+  void applyTurn(Turn turn) {
+    _checkTurn(turn.first);
+    _checkTurn(turn.second);
+    _checkTurn(turn.third);
+
+    var sum = turn.sum();
+    if (sum >= 60) {
+      _sixtyPlusCnt++;
+      if (sum >= 120) {
+        _oneTwentyPlusCnt++;
+        if (sum == 180) _oneEightyCnt++;
+      }
+    }
+  }
+
+  double get avgScore {
+    return _hitTotal / _hitCount;
+  }
+
+  Hit get mostHit {
+    return _hitPerField.entries
+        .reduce((current, next) => current.value > next.value ? current : next)
+        .key;
+  }
+
+  int get minPoints {
+    return _hitMin.value;
+  }
+
+  int get maxPoints {
+    return _hitMax.value;
+  }
+
+  int get sixtyPlusCnt {
+    return _sixtyPlusCnt;
+  }
+
+  int get oneTwentyPlusCnt {
+    return _oneTwentyPlusCnt;
+  }
+
+  int get oneEightyCnt {
+    return _oneEightyCnt;
+  }
 }

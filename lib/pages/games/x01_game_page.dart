@@ -3,6 +3,7 @@ import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
+import 'package:dart_dart/pages/games/x01_game_statistics.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -369,58 +370,6 @@ class _CurrentPlayer extends StatelessWidget {
   }
 }
 
-class _GameEnd {
-  final String winner;
-  final BuildContext context;
-
-  late final ColorScheme colorScheme;
-
-  _GameEnd({required this.context, required this.winner}) {
-    colorScheme = Theme.of(context).colorScheme;
-  }
-
-  Future<bool> open() async {
-    bool rematch = false;
-
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Congratulations',
-          textAlign: TextAlign.center,
-          style: FontConstants.subtitle,
-        ),
-        content: Text(
-          '"$winner" won!',
-          textAlign: TextAlign.center,
-          style: FontConstants.text,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: <Widget>[
-          MaterialButton(
-            color: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            child: const Text('REMATCH'),
-            onPressed: () {
-              rematch = true;
-              Navigator.pop(context);
-            },
-          ),
-          MaterialButton(
-            color: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            child: const Text('QUIT'),
-            onPressed: () {
-              rematch = false;
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    ).then((_) => rematch);
-  }
-}
-
 class _CancelGame {
   _CancelGame._();
 
@@ -484,17 +433,13 @@ class _NextButton extends StatelessWidget {
                   data.next();
                 });
                 if (data.hasGameEnded) {
-                  var ply = data.winner!;
-                  _GameEnd(context: context, winner: ply.name)
-                      .open() //
-                      .then((rematch) {
-                    update(() {
-                      if (rematch) {
-                        data.reset();
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    });
+                  update(() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => //
+                          X01Statistics(stats: data.getStats())
+                    ));
                   });
                 }
               },
@@ -503,7 +448,7 @@ class _NextButton extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
         ),
-        child: const Text('next'),
+        child: data.hasGameEnded? const Text('end') : const Text('next'),
       ),
     );
   }
