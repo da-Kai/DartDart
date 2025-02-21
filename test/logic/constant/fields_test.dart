@@ -29,7 +29,7 @@ void main() {
       expect(doubleTwenty.value, 40);
       expect(tripleTwenty.value, 60);
 
-      var tripleBullsEye = Hit.get(HitNumber.bullsEye, HitMultiplier.triple);
+      var tripleBullsEye = Hit.get(HitNumber.bull, HitMultiplier.triple);
       expect(tripleBullsEye.multiplier, HitMultiplier.double);
     });
     test('Test Hit Names', () {
@@ -43,7 +43,7 @@ void main() {
       expect(twenty.abbreviation, '20');
       expect(doubleTwenty.abbreviation, 'D20');
       expect(tripleTwenty.abbreviation, 'T20');
-      expect(bullsEye.abbreviation, 'BULL');
+      expect(bullsEye.abbreviation, 'BEYE');
       expect(skipped.abbreviation, '');
       expect(miss.abbreviation, 'MISS');
 

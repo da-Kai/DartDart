@@ -42,7 +42,7 @@ void main() {
       var seventeen = Hit.get(HitNumber.seventeen, HitMultiplier.double);
       expect(FieldCalc.getField(angle: ang4, distance: dist4), seventeen);
 
-      expect(FieldCalc.getField(angle: ang5, distance: dist5), Hit.bullseye);
+      expect(FieldCalc.getField(angle: ang5, distance: dist5), Hit.bull);
     });
   });
 }

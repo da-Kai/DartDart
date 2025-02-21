@@ -26,7 +26,7 @@ void main() {
       Player plyFunc(name) => Player(name, settings.points, () => 0);
       var plyData = PlayerData.get(['A', 'B'], plyFunc);
       var gameRound = GameRound(settings);
-      gameRound.current.thrown(Hit.doubleBullseye);
+      gameRound.current.thrown(Hit.bullseye);
 
       var t = Switch.from(plyData, gameRound);
 
