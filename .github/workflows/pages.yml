@@ -30,7 +30,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: flutter build web --web-renderer canvaskit --release --base-href '/DartDart/'
+      - run: flutter build web --release --base-href '/DartDart/'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
