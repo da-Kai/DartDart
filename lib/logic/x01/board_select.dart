@@ -48,10 +48,10 @@ class FieldCalc {
 
     //BullsEye
     if (distance <= 7.1) {
-      return Hit.doubleBullseye;
+      return Hit.bullseye;
     }
     if (distance <= 16.0) {
-      return Hit.bullseye;
+      return Hit.bull;
     }
 
     HitMultiplier multiplier = HitMultiplier.single;
