@@ -239,8 +239,6 @@ class _ThrowBean extends StatelessWidget {
         return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
       case Placement.rightEnd:
         return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
-      default:
-        return BorderRadius.circular(20);
     }
   }
 
@@ -250,7 +248,7 @@ class _ThrowBean extends StatelessWidget {
 
     final tooltipStyle = colorScheme.getTextStyle(
       fontSize: fontSize,
-      color: colorScheme.onPrimary.withOpacity(0.4),
+      color: colorScheme.onPrimary.withAlpha(102),
       fontStyle: FontStyle.italic,
     );
 

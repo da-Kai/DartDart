@@ -22,7 +22,7 @@ enum HitNumber {
   eighteen('18', 18, 1),
   nineteen('19', 19, 10),
   twenty('20', 20, 19),
-  bullsEye('BULL', 25, 20);
+  bull('BULL', 25, 20);
 
   const HitNumber(this.abbr, this.value, this.segment);
 
@@ -72,8 +72,8 @@ class Hit {
   static const Hit miss = Hit._(HitNumber.miss, HitMultiplier.single);
   static const Hit skipped = Hit._(HitNumber.unthrown, HitMultiplier.single);
 
-  static const Hit bullseye = Hit._(HitNumber.bullsEye, HitMultiplier.single);
-  static const Hit doubleBullseye = Hit._(HitNumber.bullsEye, HitMultiplier.double);
+  static const Hit bull = Hit._(HitNumber.bull, HitMultiplier.single);
+  static const Hit bullseye = Hit._(HitNumber.bull, HitMultiplier.double);
 
   final HitNumber number;
   final HitMultiplier multiplier;
@@ -84,13 +84,20 @@ class Hit {
     if (number == HitNumber.miss) {
       return Hit.miss;
     }
-    if (number == HitNumber.bullsEye && multiplier.isTriple) {
-      return Hit.doubleBullseye;
+    if (number == HitNumber.bull && multiplier.isTriple) {
+      return Hit.bullseye;
     }
     return Hit._(number, multiplier);
   }
 
   static Hit getByAbbreviation(String abbr) {
+    if (abbr == 'BULL') {
+      return Hit.get(HitNumber.bull, HitMultiplier.single);
+    }
+    if (abbr == 'BEYE') {
+      return Hit.get(HitNumber.bull, HitMultiplier.double);
+    }
+
     var mult = HitMultiplier.single;
     if (abbr.startsWith('D')) {
       mult = HitMultiplier.double;
@@ -113,6 +120,14 @@ class Hit {
         return '';
       case HitNumber.miss:
         return 'MISS';
+      case HitNumber.bull:
+        switch (multiplier) {
+          case HitMultiplier.single:
+            return 'BULL';
+          case HitMultiplier.double:
+          case HitMultiplier.triple:
+            return 'BEYE';
+        }
       default:
         return multiplier.prefix + number.abbr;
     }

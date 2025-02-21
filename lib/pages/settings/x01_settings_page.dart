@@ -44,6 +44,16 @@ class _X01PageState extends State<X01Setting> {
         _data.players.removeAt(index + 1);
       });
 
+  void reorderPlayers(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex--;
+      }
+      final movedPlayer = _data.players.removeAt(oldIndex);
+      _data.players.insert(newIndex, movedPlayer);
+    });
+  }
+
   void _updateSets(int set) => setState(() => _data.sets = set);
 
   void _updateLegs(int leg) => setState(() => _data.legs = leg);
@@ -79,7 +89,9 @@ class _X01PageState extends State<X01Setting> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
           child: OrientationBuilder(builder: (context, orientation) {
-            return orientation == Orientation.portrait ? _PortraitView(this) : _LandscapeView(this);
+            return orientation == Orientation.portrait
+                ? _PortraitView(this)
+                : _LandscapeView(this);
           }),
         ),
         bottomNavigationBar: SizedBox(
@@ -159,8 +171,10 @@ class _PlayerNameDialog {
   late final TextEditingController textController;
 
   String? errorText;
+  bool canceled = false;
 
-  _PlayerNameDialog({required this.context, required this.validate, this.player}) {
+  _PlayerNameDialog(
+      {required this.context, required this.validate, this.player}) {
     colorScheme = Theme.of(context).colorScheme;
     textController = TextEditingController(text: player);
   }
@@ -171,11 +185,13 @@ class _PlayerNameDialog {
       builder: (context) {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
-            title: Text(player == null ? 'New Player' : 'Edit Player', textAlign: TextAlign.center),
+            title: Text(player == null ? 'New Player' : 'Edit Player',
+                textAlign: TextAlign.center),
             content: SingleChildScrollView(
               child: TextField(
                 controller: textController,
-                decoration: InputDecoration(hintText: 'name', errorText: errorText),
+                decoration:
+                    InputDecoration(hintText: 'name', errorText: errorText),
               ),
             ),
             backgroundColor: colorScheme.backgroundShade,
@@ -185,7 +201,10 @@ class _PlayerNameDialog {
                 color: colorScheme.error,
                 textColor: colorScheme.onError,
                 child: const Text('CANCEL'),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  canceled = true;
+                  Navigator.pop(context);
+                },
               ),
               MaterialButton(
                 color: colorScheme.primary,
@@ -209,6 +228,7 @@ class _PlayerNameDialog {
         });
       },
     ).then((value) {
+      if (canceled) return null;
       var nextPly = textController.value.text;
       var (valid, _) = validate(nextPly);
       return valid ? nextPly : null;
@@ -266,13 +286,16 @@ class _GameSettingContainer extends StatelessWidget {
               const Spacer(flex: 1),
               DropdownButton(
                 value: settings.sets,
-                items: GameSettings.setOptions.map<DropdownMenuItem<int>>((int value) {
+                items: GameSettings.setOptions
+                    .map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) { state._updateSets(v!); },
+                onChanged: (v) {
+                  state._updateSets(v!);
+                },
               ),
               const Spacer(flex: 3),
               Text('Legs',
@@ -282,13 +305,16 @@ class _GameSettingContainer extends StatelessWidget {
               const Spacer(flex: 1),
               DropdownButton(
                 value: settings.legs,
-                items: GameSettings.setOptions.map<DropdownMenuItem<int>>((int value) {
+                items: GameSettings.setOptions
+                    .map<DropdownMenuItem<int>>((int value) {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(value.toString()),
                   );
                 }).toList(),
-                onChanged: (v) { state._updateLegs(v!); },
+                onChanged: (v) {
+                  state._updateLegs(v!);
+                },
               ),
               const Spacer(flex: 3),
             ],
@@ -315,7 +341,8 @@ class _InOutSettingContainer extends StatelessWidget {
       padding: EdgeInsets.zero,
     );
 
-    final TextStyle textStyle = FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
+    final TextStyle textStyle =
+        FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -381,54 +408,73 @@ class _PlayerSettingContainer extends StatelessWidget {
             children: [
               Text(
                 'Player',
-                style: FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer),
+                style: FontConstants.subtitle
+                    .copyWith(color: colorScheme.onPrimaryContainer),
               ),
             ],
           ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                children: state._data.players.map<Row>((String player) {
-                  return Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          _PlayerNameDialog(
-                            context: context,
-                            player: player,
-                            validate: state.validate,
-                          ).open().then((newPly) {
-                            if (newPly != null) {
-                              state._updatePlayer(player, newPly);
-                            }
-                          });
-                        },
-                        icon: const Icon(Icons.edit_rounded),
-                        color: colorScheme.onPrimaryContainer,
-                        iconSize: 20,
-                        visualDensity: VisualDensity.compact,
+              child: ReorderableListView(
+                onReorder: state.reorderPlayers,
+                children: [
+                  for (final player in state._data.players)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      key: ValueKey(player),
+                      leading: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _PlayerNameDialog(
+                                context: context,
+                                player: player,
+                                validate: state.validate,
+                              ).open().then((newPly) {
+                                if (newPly != null) {
+                                  state._updatePlayer(player, newPly);
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.edit_rounded),
+                            color: colorScheme.onPrimaryContainer,
+                            iconSize: 20,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              state._removePlayer(player);
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                            color: colorScheme.onPrimaryContainer,
+                            iconSize: 24,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Text(
-                          player,
-                          overflow: TextOverflow.ellipsis,
-                          style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        player,
+                        overflow: TextOverflow.ellipsis,
+                        style: colorScheme.getTextStyle(
+                            fontWeight: FontWeight.bold),
+                      ),
+                      trailing: ReorderableDragStartListener(
+                        index: state._data.players.indexOf(player),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 0.0, horizontal: 20.0),
+                          color: Colors.transparent,
+                          child: Icon(
+                            Icons.drag_handle,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          state._removePlayer(player);
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                        color: colorScheme.onPrimaryContainer,
-                        iconSize: 24,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    ],
-                  );
-                }).toList(),
+                    )
+                ],
               ),
             ),
           ),
@@ -498,7 +544,9 @@ class _StartButton extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => //
-                            X01Game(player: state._data.players, settings: state._data.get())),
+                            X01Game(
+                                player: state._data.players,
+                                settings: state._data.get())),
                   );
                 }
               },

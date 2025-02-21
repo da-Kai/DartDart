@@ -31,7 +31,7 @@ class _FieldSelectState extends State<FieldSelect> {
       [HitNumber.six, HitNumber.seven, HitNumber.eight, HitNumber.nine, HitNumber.ten],
       [HitNumber.eleven, HitNumber.twelve, HitNumber.thirteen, HitNumber.fourteen, HitNumber.fifteen],
       [HitNumber.sixteen, HitNumber.seventeen, HitNumber.eighteen, HitNumber.nineteen, HitNumber.twenty],
-      [HitNumber.bullsEye, HitNumber.miss],
+      [HitNumber.bull, HitNumber.miss],
     ];
 
     void setHitMultiplier(HitMultiplier hm) {
@@ -78,9 +78,16 @@ class _FieldSelectState extends State<FieldSelect> {
               Column(
                 children: hitNumbers
                     .map<Row>((numRow) => Row(
-                          children: numRow
-                              .map<Widget>((hitNum) => HitButton(
-                                  style: buttonStyle, onPressed: widget.onSelect, hitMult: hitMultiplier, hitNum: hitNum))
+                          children: numRow.map<Widget>((hitNum) => HitButton(
+                                  style: buttonStyle,
+                              onPressed: (hit) {
+                                widget.onSelect(hit);
+                                setState(() {
+                                  hitMultiplier = HitMultiplier.single;
+                                });
+                              },
+                              hitMult: hitMultiplier,
+                              hitNum: hitNum))
                               .toList(),
                         ))
                     .toList(),
