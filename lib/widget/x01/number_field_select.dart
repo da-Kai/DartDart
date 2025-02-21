@@ -12,7 +12,6 @@ class FieldSelect extends StatefulWidget {
 
 class _FieldSelectState extends State<FieldSelect> {
   HitMultiplier hitMultiplier = HitMultiplier.single;
-  bool _multiplierLocked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +37,6 @@ class _FieldSelectState extends State<FieldSelect> {
     void setHitMultiplier(HitMultiplier hm) {
       setState(() {
         hitMultiplier = hm;
-        _multiplierLocked = false;
       });
     }
 
