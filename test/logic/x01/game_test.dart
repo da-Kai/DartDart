@@ -16,13 +16,13 @@ void main() {
     expect(game.curTurn.valid, true);
     expect(game.curTurn.first, Hit.skipped);
 
-    game.onThrow(Hit.bullseye);
+    game.onThrow(Hit.bull);
     expect(game.curTurn.valid, false);
 
     expect(game.curPly.name, 'Test1');
     expect(game.canUndo, true);
     expect(game.canRedo, false);
-    expect(game.curTurn.first, Hit.bullseye);
+    expect(game.curTurn.first, Hit.bull);
 
     expect(game.hasGameEnded, false);
     

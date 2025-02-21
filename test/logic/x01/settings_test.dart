@@ -27,14 +27,14 @@ void main() {
       factory.gameOut = InOut.master;
       var settings = factory.get();
 
-      expect(settings.isValid(301, Hit.bullseye), false);
-      expect(settings.isValid(301, Hit.doubleBullseye), true);
+      expect(settings.isValid(301, Hit.bull), false);
+      expect(settings.isValid(301, Hit.bullseye), true);
 
       var tripleThirteen = Hit.get(HitNumber.thirteen, HitMultiplier.triple);
       var doubleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
-      expect(settings.isInvalid(40, Hit.doubleBullseye), true);
+      expect(settings.isInvalid(40, Hit.bullseye), true);
       expect(settings.isValid(40, doubleTwenty), true);
-      expect(settings.isValid(40, Hit.bullseye), true);
+      expect(settings.isValid(40, Hit.bull), true);
       expect(settings.isInvalid(40, tripleThirteen), true);
     });
   });
