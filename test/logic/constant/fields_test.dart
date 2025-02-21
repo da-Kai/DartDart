@@ -43,7 +43,7 @@ void main() {
       expect(twenty.abbreviation, '20');
       expect(doubleTwenty.abbreviation, 'D20');
       expect(tripleTwenty.abbreviation, 'T20');
-      expect(bullsEye.abbreviation, 'BULL');
+      expect(bullsEye.abbreviation, 'BEYE');
       expect(skipped.abbreviation, '');
       expect(miss.abbreviation, 'MISS');
 
