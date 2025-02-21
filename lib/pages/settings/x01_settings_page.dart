@@ -44,6 +44,16 @@ class _X01PageState extends State<X01Setting> {
         _data.players.removeAt(index + 1);
       });
 
+  void reorderPlayers(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex--;
+      }
+      final movedPlayer = _data.players.removeAt(oldIndex);
+      _data.players.insert(newIndex, movedPlayer);
+    });
+  }
+
   void _updateSets(int set) => setState(() => _data.sets = set);
 
   void _updateLegs(int leg) => setState(() => _data.legs = leg);
@@ -393,12 +403,15 @@ class _PlayerSettingContainer extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                children: state._data.players.map<Row>((String player) {
-                  return Row(
-                    children: [
-                      IconButton(
+              child: ReorderableListView(
+                onReorder: state.reorderPlayers,
+                children: [
+                  for (final player in state._data.players)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      key: ValueKey(player),
+                      leading: IconButton(
                         onPressed: () {
                           _PlayerNameDialog(
                             context: context,
@@ -415,25 +428,38 @@ class _PlayerSettingContainer extends StatelessWidget {
                         iconSize: 20,
                         visualDensity: VisualDensity.compact,
                       ),
-                      Expanded(
-                        child: Text(
-                          player,
-                          overflow: TextOverflow.ellipsis,
-                          style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
-                        ),
+                      title: Text(
+                        player,
+                        overflow: TextOverflow.ellipsis,
+                        style: colorScheme.getTextStyle(fontWeight: FontWeight.bold),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          state._removePlayer(player);
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                        color: colorScheme.onPrimaryContainer,
-                        iconSize: 24,
-                        visualDensity: VisualDensity.compact,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ReorderableDragStartListener(
+                            index: state._data.players.indexOf(player),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
+                              color: Colors.transparent,
+                              child: Icon(
+                                Icons.drag_handle,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              state._removePlayer(player);
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                            color: colorScheme.onPrimaryContainer,
+                            iconSize: 24,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ],
                       )
-                    ],
-                  );
-                }).toList(),
+                    )
+                ],
               ),
             ),
           ),
