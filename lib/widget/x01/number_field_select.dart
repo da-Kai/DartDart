@@ -78,9 +78,16 @@ class _FieldSelectState extends State<FieldSelect> {
               Column(
                 children: hitNumbers
                     .map<Row>((numRow) => Row(
-                          children: numRow
-                              .map<Widget>((hitNum) => HitButton(
-                                  style: buttonStyle, onPressed: widget.onSelect, hitMult: hitMultiplier, hitNum: hitNum))
+                          children: numRow.map<Widget>((hitNum) => HitButton(
+                                  style: buttonStyle,
+                              onPressed: (hit) {
+                                widget.onSelect(hit);
+                                setState(() {
+                                  hitMultiplier = HitMultiplier.single;
+                                });
+                              },
+                              hitMult: hitMultiplier,
+                              hitNum: hitNum))
                               .toList(),
                         ))
                     .toList(),
