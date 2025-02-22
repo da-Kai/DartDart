@@ -100,24 +100,27 @@ class _PlayerStatsView extends StatelessWidget {
                 indent: 5.0,
               ),
             ),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    for (final player in data.playerStats.entries)
-                      _StatsColumn(
+            Expanded(
+              child: SizedBox(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final player in data.playerStats.entries)
+                        _StatsColumn(
                           name: player.key,
                           avg: player.value.avgScore.toStringAsFixed(2),
                           max: player.value.maxPoints.toString(),
                           min: player.value.minPoints.toString(),
                           most: player.value.mostHit.abbreviation,
                           sixtyPlus: player.value.sixtyPlusCnt.toString(),
-                          oneTwentyPlus:
-                              player.value.oneTwentyPlusCnt.toString(),
-                          oneEighty: player.value.oneEightyCnt.toString()),
-                  ],
-                )
-              ],
+                          oneTwentyPlus: player.value.oneTwentyPlusCnt.toString(),
+                          oneEighty: player.value.oneEightyCnt.toString(),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ));
