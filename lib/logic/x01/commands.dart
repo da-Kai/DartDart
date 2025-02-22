@@ -106,6 +106,10 @@ class EndLeg extends Command {
 
     game.setupTurn(round);
   }
+
+  String nextPly() {
+    return _player.first;
+  }
 }
 
 class EndSet extends Command {
@@ -153,5 +157,9 @@ class EndSet extends Command {
     winner.popTurn(leg);
 
     game.setupTurn(round);
+  }
+
+  String nextPly() {
+    return _player.first;
   }
 }

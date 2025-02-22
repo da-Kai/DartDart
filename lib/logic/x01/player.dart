@@ -44,6 +44,8 @@ abstract class PlayerData {
   void organize(List<String> player, String current);
 
   List<String> reorder(int Function(Player, Player) order);
+
+  List<Player> asList();
 }
 
 class _MultiPlayerData implements PlayerData {
@@ -142,6 +144,11 @@ class _MultiPlayerData implements PlayerData {
   void forEach(void Function(Player) action) {
     _playerList.forEach(action);
   }
+
+  @override
+  List<Player> asList() {
+    return _playerList;
+  }
 }
 
 class _SinglePlayerData implements PlayerData {
@@ -214,5 +221,10 @@ class _SinglePlayerData implements PlayerData {
   @override
   List<String> reorder(int Function(Player, Player) order) {
     return [current.name];
+  }
+
+  @override
+  List<Player> asList() {
+    return [current];
   }
 }
