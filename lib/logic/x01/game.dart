@@ -233,9 +233,17 @@ class PlayerGameStats {
   }
 
   Hit get mostHit {
-    return _hitPerField.entries
-        .reduce((current, next) => current.value > next.value ? current : next)
-        .key;
+    if ( _hitPerField.entries.isEmpty ) {
+      return Hit.miss;
+    }
+
+    var max = _hitPerField.entries.first;
+    for (var entry in _hitPerField.entries) {
+      if (entry.value > max.value) {
+        max = entry;
+      }
+    }
+    return max.key;
   }
 
   int get minPoints {

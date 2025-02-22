@@ -1,5 +1,6 @@
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
+import 'package:dart_dart/pages/settings/x01_settings_page.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:flutter/material.dart';
 
@@ -37,58 +38,30 @@ class _X01StatsState extends State<X01Statistics> {
             leading: IconButton(
               onPressed: () {
                 setState(() {
-                  Navigator.pop(context);
+                  int count = 0;
+                  Navigator.popUntil(context, (route) {
+                    return ++count > 2;
+                  });
                 });
               },
               icon: const Icon(Icons.close),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: () {
+                  setState(() {
+                    data.commands.undo();
+                    Navigator.pop(context);
+                    data.commands.undo();
+                  });
+                }
+              ),
+            ],
             centerTitle: true,
           ),
           body: _PlayerStatsView(this, setState)
         ));
-  }
-}
-
-class _TableView extends StatelessWidget {
-  final _X01StatsState state;
-  final Function update;
-
-  const _TableView(this.state, this.update);
-
-  @override
-  Widget build(BuildContext context) {
-    final GameStats data = state.widget.stats;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        DataTable(
-            columns: [
-              DataColumn(label: const Text('Name')),
-              DataColumn(label: const Text('AVG')),
-              DataColumn(label: const Text('MAX')),
-              DataColumn(label: const Text('MIN')),
-              DataColumn(label: const Text('Most-Hits')),
-              DataColumn(label: const Text('60+')),
-              DataColumn(label: const Text('120+')),
-              DataColumn(label: const Text('180=')),
-            ],
-            rows: [
-              for (final player in data.playerStats.entries)
-                DataRow(cells: [
-                  DataCell(Text(player.key)),
-                  DataCell(Text(player.value.avgScore.toStringAsFixed(2))),
-                  DataCell(Text(player.value.maxPoints.toString())),
-                  DataCell(Text(player.value.minPoints.toString())),
-                  DataCell(Text(player.value.mostHit.abbreviation)),
-                  DataCell(Text(player.value.sixtyPlusCnt.toString())),
-                  DataCell(Text(player.value.oneTwentyPlusCnt.toString())),
-                  DataCell(Text(player.value.oneEightyCnt.toString()))
-                ])
-            ],
-        )
-      ],
-    );
   }
 }
 
@@ -105,19 +78,16 @@ class _PlayerStatsView extends StatelessWidget {
     final TextStyle textStyle =
       FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
 
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-            ),
-            color: colorScheme.backgroundShade,
-          ),
-          child: _StatsColumn(
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: colorScheme.backgroundShade,
+      ),
+      child: Row(
+        children: [
+          _StatsColumn(
             name: 'Player',
             avg: 'AVG',
             max: 'MAX',
@@ -127,14 +97,13 @@ class _PlayerStatsView extends StatelessWidget {
             oneTwentyPlus: '120+',
             oneEighty: '180'
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-          decoration: BoxDecoration(
-            color: colorScheme.backgroundShade,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.0),
+            child: VerticalDivider(
+              indent: 5.0,
+            ),
           ),
-          child: Column(
+          Column(
             children: [
               Row(
                 children: [
@@ -152,9 +121,9 @@ class _PlayerStatsView extends StatelessWidget {
                 ],
               )
             ],
-          )
-        ),
-      ],
+          ),
+        ],
+      )
     );
   }
 }
