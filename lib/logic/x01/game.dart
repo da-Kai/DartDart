@@ -184,39 +184,48 @@ class PlayerGameStats {
   final String player;
   final Map<Hit, int> _hitPerField = {};
 
-  int _hitCount = 0;
-  int _hitTotal = 0;
-  Hit _hitMin = Hit.skipped;
-  Hit _hitMax = Hit.skipped;
+  int _turnCount = 0;
+  int _turnTotal = 0;
+  Turn? _turnMin;
+  Turn? _turnMax;
   int _sixtyPlusCnt = 0;
   int _oneTwentyPlusCnt = 0;
   int _oneEightyCnt = 0;
 
   PlayerGameStats(this.isWinner, this.player);
 
-  void _checkMinMax(Hit hit) {
-    if (_hitCount == 0) {
-      _hitMin = _hitMax = hit;
-    } else if (_hitMin.value > hit.value) {
-      _hitMin = hit;
-    } else if (_hitMax.value < hit.value) {
-      _hitMax = hit;
+  void _checkMinMax(Turn t) {
+    if (_turnMax == null && _turnMin == null) {
+      _turnMax = t;
+      _turnMin = t;
+      return;
+    }
+    if (_turnMin!.sum() > t.sum()) {
+      _turnMin = t;
+    }
+    if (_turnMax!.sum() < t.sum()) {
+      _turnMax = t;
     }
   }
 
-  void _checkTurn(Hit hit) {
-    if (hit != Hit.skipped) {
-      _checkMinMax(hit);
-      _hitTotal += hit.value;
-      _hitCount ++;
-      _hitPerField.update(hit, (value) => value++, ifAbsent: () => 1);
+  void _checkTurn(Turn turn) {
+    _checkMinMax(turn);
+    _turnTotal += turn.sum();
+    _turnCount ++;
+
+    if(turn.first != Hit.miss) {
+      _hitPerField.update(turn.first, (value) => value++, ifAbsent: () => 1);
+    }
+    if(turn.second != Hit.miss) {
+      _hitPerField.update(turn.second, (value) => value++, ifAbsent: () => 1);
+    }
+    if(turn.third != Hit.miss) {
+      _hitPerField.update(turn.third, (value) => value++, ifAbsent: () => 1);
     }
   }
 
   void applyTurn(Turn turn) {
-    _checkTurn(turn.first);
-    _checkTurn(turn.second);
-    _checkTurn(turn.third);
+    _checkTurn(turn);
 
     var sum = turn.sum();
     if (sum >= 60) {
@@ -229,7 +238,7 @@ class PlayerGameStats {
   }
 
   double get avgScore {
-    return _hitTotal / _hitCount;
+    return _turnTotal / _turnCount;
   }
 
   Hit get mostHit {
@@ -247,11 +256,11 @@ class PlayerGameStats {
   }
 
   int get minPoints {
-    return _hitMin.value;
+    return _turnMin != null ? _turnMin!.sum() : 0;
   }
 
   int get maxPoints {
-    return _hitMax.value;
+    return _turnMax != null ? _turnMax!.sum() : 0;
   }
 
   int get sixtyPlusCnt {
