@@ -436,7 +436,7 @@ class _NextButton extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => //
-                          X01Statistics(stats: data.getStats())
+                          X01Statistics(stats: data.getStats(), settings: data.settings)
                     ));
                   });
                 }
