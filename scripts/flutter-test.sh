@@ -1,6 +1,7 @@
 flutter pub get junitreport
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 flutter pub global activate junitreport
+sudo apt-get install xmlstarlet
 
 junitFile="./junit.xml"
 flutter test --machine --coverage --coverage-path=lcov.info | tojunit --output $junitFile
