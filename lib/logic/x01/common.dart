@@ -1,95 +1,76 @@
-import 'dart:collection';
-
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/points.dart';
-import 'package:dart_dart/logic/x01/settings.dart';
 
-class PlayerTurn extends Turn {
-  final GameSettings settings;
-  final int startScore;
+class TurnCheck {
+  /// Is a valid CheckIn
+  final bool isCheckIn;
 
-  PlayerTurn(this.settings, this.startScore,
-      {super.first = Hit.skipped, super.second = Hit.skipped, super.third = Hit.skipped});
+  /// Is a valid CheckOut
+  final bool isCheckOut;
 
-  static PlayerTurn from(GameSettings settings) {
-    return PlayerTurn(settings, settings.points);
+  /// Was a CheckOut possible / Counts as CheckOut try
+  final bool isCheckable;
+
+  /// Is the Turn valid at all
+  final bool isValid;
+
+  TurnCheck(this.isValid, this.isCheckIn, this.isCheckOut, this.isCheckable);
+
+  static TurnCheck instance() {
+    return TurnCheck(true, false, false, false);
   }
 
   @override
-  bool get done {
-    return count == 3 || isCheckout || overthrown;
-  }
-
-  bool get overthrown => startScore < sum();
-
-  bool get valid {
-    int val = startScore;
-    for (int i = 0; i < count; i++) {
-      var hit = get(i)!;
-      if (settings.isInvalid(val, hit)) {
-        return false;
-      }
-      val -= hit.value;
-      if (val == 0 && settings.isValidFinisher(hit)) {
-        return true;
-      }
-    }
-    return true;
-  }
-
-  int get score {
-    final updated = startScore - sum();
-    if (valid) {
-      return updated <= 0 ? 0 : updated;
-    } else {
-      return startScore;
-    }
-  }
-
-  bool get isCheckout {
-    return score == 0;
+  String toString() {
+    return 'isValid: $isValid, isCheckable: $isCheckable, isCheckOut: $isCheckOut, isCheckOut: $isCheckIn';
   }
 }
 
-class LegTurns {
-  final int leg;
-  final List<PlayerTurn> turns;
-  LegTurns(this.leg, this.turns);
+abstract class X01Turn extends Turn {
+  /// X01 Checks
+  final TurnCheck check;
+
+  X01Turn(
+      {required super.first,
+      required super.second,
+      required super.third,
+      required this.check});
+
+  int calcScore() {
+    return check.isValid ? sum() : 0;
+  }
+
+  int getScore();
 }
 
-class PlayerTurnHistory {
-  final Map<int, List<PlayerTurn>> _turnsByLeg = HashMap();
+class InitTurn extends X01Turn {
+  final int initScore;
 
-  void add(int leg, PlayerTurn turn) {
-    var list = _turnsByLeg.putIfAbsent(leg, () => []);
-    list.add(turn);
+  InitTurn(
+      {super.first = Hit.miss,
+      super.second = Hit.miss,
+      super.third = Hit.miss,
+      required super.check,
+      required this.initScore});
+
+  @override
+  int getScore() {
+    return initScore - calcScore();
   }
+}
 
-  PlayerTurn pop(int leg) {
-    return _turnsByLeg[leg]!.removeLast();
-  }
+class GameTurn extends X01Turn {
+  final X01Turn previous;
 
-  int? score(int leg) {
-    if (_turnsByLeg.isEmpty || !_turnsByLeg.containsKey(leg)) return null;
-    final turns = _turnsByLeg[leg]!;
-    if (turns.isEmpty) return null;
-    return turns.last.score;
-  }
+  GameTurn(
+      {super.first = Hit.miss,
+      super.second = Hit.miss,
+      super.third = Hit.miss,
+      required super.check,
+      required this.previous});
 
-  Iterable<LegTurns> get entries {
-    return _turnsByLeg.entries.map((e) => LegTurns(e.key, e.value));
-  }
-
-  Iterable<int> get legScores {
-    return _turnsByLeg.entries.map((e) => e.value.isEmpty ? 0 : e.value.last.score);
-  }
-
-  int get turnCount {
-    int cnt = 0;
-    for (var leg in _turnsByLeg.values) {
-      cnt += leg.length;
-    }
-    return cnt;
+  @override
+  int getScore() {
+    return previous.getScore() - calcScore();
   }
 }
 
@@ -98,59 +79,121 @@ typedef PlayerFactory = Player Function(String);
 /// Simple Player
 class Player {
   final String name;
-  final int startScore;
-  final PlayerTurnHistory turnHistory = PlayerTurnHistory();
 
-  final PlayerPoints points = PlayerPoints();
-  final int Function() leg;
-
-  Player(this.name, this.startScore, this.leg);
-
-  int get handicap {
-    int hc = 0;
-    for (var score in turnHistory.legScores) {
-      hc += score;
-    }
-    return hc;
-  }
-
-  int scoreLeg(int leg) {
-    return turnHistory.score(leg) ?? startScore;
-  }
-
-  int get score {
-    return scoreLeg(leg());
-  }
-
-  bool get done {
-    return score == 0;
-  }
-
-  void pushTurn(int leg, PlayerTurn turn) => turnHistory.add(leg, turn);
-
-  PlayerTurn popTurn(int leg) => turnHistory.pop(leg);
+  Player(this.name);
 }
 
-/// Container for the active Turn
-class GameRound {
-  final GameSettings _settings;
-  late PlayerTurn current;
-  int currentLeg = -1;
+class GameLeg {
+  final int id;
+  final Map<String, List<X01Turn>> playerTurnHistory = {};
+  String? _winner;
 
-  GameRound(this._settings) {
-    reset();
+  GameLeg(this.id);
+
+  void pushTurn(String playerId, X01Turn turn) {
+    playerTurnHistory.putIfAbsent(playerId, () => []).add(turn);
   }
 
-  void setupTurn(PlayerTurn round) {
-    current = round;
+  void popTurn(String playerId) {
+    playerTurnHistory[playerId]?.removeLast();
   }
 
-  void setupTurnFor(Player player) {
-    current = PlayerTurn(_settings, player.score);
+  void setWinner(String? playerId) => _winner = playerId;
+
+  bool isDone() => _winner != null;
+
+  String? winnerId() => _winner;
+
+  String? leader() {
+    if (playerTurnHistory.isEmpty) return null;
+
+    final validEntries =
+        playerTurnHistory.entries.where((entry) => entry.value.isNotEmpty);
+    if (validEntries.isEmpty) return playerTurnHistory.keys.first;
+
+    return validEntries.reduce((current, next) {
+      final currentScore = current.value.last.getScore();
+      final nextScore = next.value.last.getScore();
+      return nextScore < currentScore ? next : current;
+    }).key;
   }
 
-  void reset() {
-    current = PlayerTurn.from(_settings);
-    currentLeg = 0;
+  int? currentScoreFor(String player) {
+    return lastPlayerTurn(player)?.getScore();
+  }
+
+  X01Turn? lastPlayerTurn(String player) {
+    final turns = playerTurnHistory[player];
+    if (turns?.isEmpty ?? true) return null;
+    return turns!.last;
+  }
+}
+
+class GameSet {
+  final int id;
+  final List<GameLeg> _legs = [GameLeg(0)];
+  String? _winner;
+
+  GameSet(this.id);
+
+  void setWinner(String? playerId) => _winner = playerId;
+
+  bool isDone() => _winner != null;
+
+  String? winnerId() => _winner;
+
+  int get legCount {
+    return _legs.length;
+  }
+
+  GameLeg get currentLeg {
+    return _legs.last;
+  }
+
+  Map<String, int> legsWonPerPlayer() {
+    Map<String, int> perPlayerWins = {};
+    for (var leg in _legs) {
+      if (leg.isDone()) {
+        String winnerId = leg.winnerId()!;
+        perPlayerWins.update(winnerId, (old) => old++, ifAbsent: () => 1);
+      }
+    }
+    return perPlayerWins;
+  }
+
+  void pushLeg({GameLeg? leg}) {
+    var nextLeg = leg ?? GameLeg(_legs.length);
+    _legs.add(nextLeg);
+  }
+
+  void popLeg() {
+    _legs.removeLast();
+  }
+
+  String? calcPossibleWinnerId(int winningLegsCnt) {
+    var legStats = legsWonPerPlayer();
+    for (final entry in legStats.entries) {
+      if (entry.value >= winningLegsCnt) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
+  int legsWon(String player) {
+    var legStats = legsWonPerPlayer();
+    return legStats[player] ?? 0;
+  }
+
+  String? currentLegLeader() {
+    return currentLeg.leader();
+  }
+
+  int totalTurnCount(String player) {
+    int totalCnt = 0;
+    for (GameLeg leg in _legs) {
+      totalCnt += leg.playerTurnHistory[player]?.length ?? 0;
+    }
+    return totalCnt;
   }
 }

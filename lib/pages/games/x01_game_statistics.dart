@@ -1,10 +1,9 @@
-import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
-import 'package:dart_dart/pages/settings/x01_settings_page.dart';
+import 'package:dart_dart/logic/x01/statistics.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:flutter/material.dart';
 
-import '../../style/font.dart';
+import 'package:dart_dart/style/font.dart';
 
 class X01Statistics extends StatefulWidget {
   final GameStats stats;
@@ -20,7 +19,6 @@ class _X01StatsState extends State<X01Statistics> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameStats data = widget.stats;
 
     return PopScope(
         canPop: false,
@@ -51,30 +49,60 @@ class _X01StatsState extends State<X01Statistics> {
                     icon: const Icon(Icons.undo),
                     onPressed: () {
                       setState(() {
-                        data.commands.undo();
+                        //data.commands.undo();
                         Navigator.pop(context);
-                        data.commands.undo();
+                        //data.commands.undo();
                       });
                     }),
               ],
               centerTitle: true,
             ),
-            body: _PlayerStatsView(this, setState)));
+            body: Column(
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: _PlayerStatsView(this),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: _GameProgress(this),
+                )
+              ]
+            ),
+        )
+    );
+  }
+}
+
+class _GameProgress extends StatelessWidget {
+  final _X01StatsState state;
+
+  const _GameProgress(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+        padding: const EdgeInsets.all(10.0),
+        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: colorScheme.backgroundShade,
+        ),
+    );
   }
 }
 
 class _PlayerStatsView extends StatelessWidget {
   final _X01StatsState state;
-  final Function update;
 
-  const _PlayerStatsView(this.state, this.update);
+  const _PlayerStatsView(this.state);
 
   @override
   Widget build(BuildContext context) {
     final GameStats data = state.widget.stats;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final TextStyle textStyle =
-        FontConstants.subtitle.copyWith(color: colorScheme.onPrimaryContainer);
 
     return Container(
         padding: const EdgeInsets.all(10.0),
@@ -86,16 +114,16 @@ class _PlayerStatsView extends StatelessWidget {
         child: Row(
           children: [
             _StatsColumn(
-                name: 'Player',
+                name: '',
+                setsLegs: 'Sets/Legs',
+                nineAvg: '9-AVG',
                 avg: 'AVG',
                 max: 'MAX',
-                min: 'MIN',
-                most: 'Most-Hits',
                 sixtyPlus: '60+',
                 oneTwentyPlus: '120+',
-                oneEighty: '180'),
+                checkout: 'Checkout'),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 40.0),
               child: VerticalDivider(
                 indent: 5.0,
               ),
@@ -109,13 +137,13 @@ class _PlayerStatsView extends StatelessWidget {
                       for (final player in data.playerStats.entries)
                         _StatsColumn(
                           name: player.key,
-                          avg: player.value.avgScore.toStringAsFixed(2),
-                          max: player.value.maxPoints.toString(),
-                          min: player.value.minPoints.toString(),
-                          most: player.value.mostHit.abbreviation,
-                          sixtyPlus: player.value.sixtyPlusCnt.toString(),
-                          oneTwentyPlus: player.value.oneTwentyPlusCnt.toString(),
-                          oneEighty: player.value.oneEightyCnt.toString(),
+                          setsLegs: '0/0',
+                          nineAvg: '',
+                          avg: '',
+                          max: '',
+                          sixtyPlus: '',
+                          oneTwentyPlus: '',
+                          checkout: '5%',
                         ),
                     ],
                   ),
@@ -129,48 +157,59 @@ class _PlayerStatsView extends StatelessWidget {
 
 class _StatsColumn extends StatelessWidget {
   final String name;
+  final String setsLegs;
+  final String nineAvg;
   final String avg;
   final String max;
-  final String min;
-  final String most;
   final String sixtyPlus;
   final String oneTwentyPlus;
-  final String oneEighty;
+  final String checkout;
 
-  const _StatsColumn(
-      {required this.name,
+  const _StatsColumn({
+      required this.name,
+      required this.setsLegs,
+      required this.nineAvg,
       required this.avg,
       required this.max,
-      required this.min,
-      required this.most,
       required this.sixtyPlus,
       required this.oneTwentyPlus,
-      required this.oneEighty});
+      required this.checkout
+  });
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Column(children: [
-      Container(
+      if (name == '') Container(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(name),
+        child: Text('', style: FontConstants.subtitle),
+      ),
+      if (name != '') Container(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 25.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: colorScheme.primary,
+        ),
+        child: Text(name, style: FontConstants.subtitle),
       ),
       Container(
         padding: const EdgeInsets.only(
             top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
+        child: Text(setsLegs),
+      ),
+      Container(
+        padding: const EdgeInsets.only(
+            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
+        child: Text(nineAvg),
+      ),
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
         child: Text(avg),
       ),
       Container(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
         child: Text(max),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(min),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: Text(most),
       ),
       Container(
         padding: const EdgeInsets.only(
@@ -182,8 +221,9 @@ class _StatsColumn extends StatelessWidget {
         child: Text(oneTwentyPlus),
       ),
       Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(oneEighty),
+        padding: const EdgeInsets.only(
+            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
+        child: Text(checkout),
       ),
     ]);
   }

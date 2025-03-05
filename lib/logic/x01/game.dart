@@ -5,97 +5,253 @@ import 'package:dart_dart/logic/x01/commands.dart';
 import 'package:dart_dart/logic/x01/common.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
+import 'package:dart_dart/logic/x01/statistics.dart';
 
 enum InputType { board, field }
 
+class X01GamePoints {
+  int _sets = 0;
+  int _legs = 0;
+
+  int get legs => _legs;
+
+  int get sets => _sets;
+
+  X01GamePoints({int sets = 0, int legs = 0}) {
+    _sets = sets;
+    _legs = legs;
+  }
+
+  X01GamePoints incrementSets() {
+    _sets++;
+    return this;
+  }
+
+  X01GamePoints setLegs(int legs) {
+    _legs = legs;
+    return this;
+  }
+
+  bool lowerThan(X01GamePoints points) {
+    if (_sets < points._sets) {
+      return true;
+    } else if (_sets == points._sets) {
+      return _legs < points._legs;
+    } else {
+      return false;
+    }
+  }
+}
+
+class X01GameData {
+  final List<GameSet> _sets = [GameSet(0)];
+  late final int initialScore;
+
+  X01GameData(GameSettings settings) {
+    initialScore = settings.points;
+  }
+
+  int legsWonInTotal(Player? ply) {
+    if (ply == null) return 0;
+    int legs = 0;
+    for (var set in _sets) {
+      legs += set.legsWon(ply.name);
+    }
+    return legs;
+  }
+
+  int _setsWonInTotal(String? ply) {
+    if (ply == null) return 0;
+    return _sets.where((set) => set.winnerId() == ply).length;
+  }
+
+  (int, int) points(String? ply) {
+    if (ply == null) return (0, 0);
+    int sets = _setsWonInTotal(ply);
+    int legs = currentSet.legsWon(ply);
+    return (sets, legs);
+  }
+
+  int score(String ply) {
+    return currentLeg.currentScoreFor(ply) ?? initialScore;
+  }
+
+  String? leaderId() {
+    final perPlayerPoints = _perPlayerPoints();
+    if (perPlayerPoints.isEmpty) return null;
+
+    return perPlayerPoints.entries
+        .reduce((currentLeader, nextEntry) =>
+            currentLeader.value.lowerThan(nextEntry.value)
+                ? nextEntry
+                : currentLeader)
+        .key;
+  }
+
+  Map<String, X01GamePoints> _perPlayerPoints() {
+    Map<String, X01GamePoints> perPlayerWins = {};
+    for (var set in _sets) {
+      if (set.isDone()) {
+        final String player = set.winnerId()!;
+        perPlayerWins.update(
+          player,
+          (points) => points.incrementSets(),
+          ifAbsent: () => X01GamePoints(sets: 1),
+        );
+      }
+    }
+    for (var entry in currentSet.legsWonPerPlayer().entries) {
+      final String player = entry.key;
+      perPlayerWins.update(
+        player,
+        (points) => points.setLegs(entry.value),
+        ifAbsent: () => X01GamePoints(legs: entry.value),
+      );
+    }
+    return perPlayerWins;
+  }
+
+  void reset() {
+    _sets.clear();
+    pushSet();
+  }
+
+  int totalTurnCount(Player player) {
+    int total = 0;
+    for (GameSet set in _sets) {
+      total += set.totalTurnCount(player.name);
+    }
+    return total;
+  }
+
+  void pushSet({GameSet? set}) {
+    if (set == null) {
+      set = GameSet(_sets.length);
+      set.pushLeg();
+    }
+    _sets.add(set);
+  }
+
+  X01Turn? lastPlayerTurn(String player) {
+    return currentSet.currentLeg.lastPlayerTurn(player);
+  }
+
+  GameLeg get currentLeg => currentSet.currentLeg;
+
+  GameSet get currentSet => _sets.last;
+
+  void popSet() => _sets.removeLast();
+
+  void pushLeg({GameLeg? leg}) => _sets.last.pushLeg(leg: leg);
+
+  void popLeg() => _sets.last.popLeg();
+
+  void pushTurn(String player, X01Turn turn) =>
+      currentLeg.pushTurn(player, turn);
+
+  void popTurn(String player) => currentLeg.popTurn(player);
+
+  void setLegWinner(Player? player) => currentLeg.setWinner(player?.name);
+
+  void setSetWinner(Player? player) => currentSet.setWinner(player?.name);
+}
+
 /// Represents a single Game
 class GameController {
-  final List<String> _playerNames;
   final GameSettings settings;
-  late final PlayerData playerData;
-
-  late final GameRound gameRound;
   final CommandStack commands = CommandStack();
 
-  GameController(this._playerNames, this.settings) {
-    Player plyFunc(name) => Player(name, settings.points, () => gameRound.currentLeg);
-    gameRound = GameRound(settings);
-    playerData = PlayerData.get(_playerNames, plyFunc);
+  late final X01GameData gameData;
+  late final PlayerData playerData;
+  late final TurnBuilder turnBuilder;
+  late final List<String> _playerNames;
+
+  GameController(this.settings) {
+    _playerNames = settings.player;
+    turnBuilder = TurnBuilder(settings);
+    playerData = PlayerData.get(_playerNames);
+    gameData = X01GameData(settings);
     reset();
   }
 
   String get curPoints {
-    if(settings.isFirstWins) {
+    if (settings.isFirstWins) {
       return '';
-    } else if(settings.isLegsOnly) {
-      return '(${curPly.points.currentLegs})';
+    }
+    var setsLegs = gameData.points(curPly.name);
+    if (settings.isLegsOnly) {
+      return '(${setsLegs.$2})';
     } else {
-      return '(${curPly.points.sets}-${curPly.points.currentLegs})';
+      return '(${setsLegs.$1}-${setsLegs.$2})';
     }
   }
 
   void reset() {
-    gameRound.reset();
+    gameData.reset();
+    turnBuilder.reset();
     playerData.reset();
     commands.clear();
   }
 
   Checkout get checkout {
-    if (curTurn.valid) {
+    if (turnBuilder.valid) {
       final out = settings.gameOut;
-      final score = gameRound.current.score;
-      final remain = gameRound.current.remain;
+      final score = turnBuilder.score;
+      final remain = turnBuilder.remain;
       return calcCheckout(out, score, dartsRemain: remain);
     } else {
       return Checkout();
     }
   }
 
-  PlayerTurn get curTurn => gameRound.current;
+  (int, int) get leaderPoints => gameData.points(totalLeader?.name);
+
+  (int, int) get curPlyPoints => gameData.points(curPly.name);
 
   bool get isMultiPlayer => playerData.isMultiPlayer;
 
   Player get curPly => playerData.current;
 
-  Player? get leader {
-    Player? leader;
-    playerData.forEach((ply) {
-      if (leader == null) {
-        leader = ply;
-      } else {
-        if (leader!.points < ply.points) {
-          leader = ply;
-        }
-      }
-    });
-    return leader;
+  Player? get totalLeader {
+    var leaderName = gameData.leaderId();
+    return playerData.find(leaderName ?? _playerNames.first);
+  }
+
+  Player? get setLeader {
+    var leaderName = gameData.currentLeg.leader();
+    return playerData.find(leaderName ?? _playerNames.first);
   }
 
   Player? get winner {
-    var lead = leader;
-    return (lead != null && lead.points.sets == settings.sets) ? lead : null;
+    var name = gameData.leaderId();
+    if (name == null) return null;
+    var points = gameData.points(name);
+    if (points.$1 >= settings.sets) {
+      return playerData.find(name);
+    }
+    return null;
   }
 
   bool get hasGameEnded => winner != null;
 
   void onThrow(Hit hit) {
-    if(curTurn.done) return;
-    var action = Throw(gameRound, hit, curTurn.count);
+    if (turnBuilder.done) return;
+    var action = Throw(turnBuilder, hit, turnBuilder.count);
     commands.execute(action);
   }
 
   void next() {
-    if(!curTurn.isCheckout) {
-      commands.execute(Switch.from(playerData, gameRound));
+    if (!turnBuilder.isCheckout) {
+      commands.execute(Switch.from(playerData, gameData, turnBuilder));
       return;
     }
 
-    if(curPly.points.currentLegs+1 < settings.legs) {
-      commands.execute(EndLeg.from(playerData, gameRound));
+    if (gameData.currentLeg.isDone()) {
+      commands.execute(EndLeg.from(playerData, gameData, turnBuilder));
       return;
     }
 
-    commands.execute(EndSet.from(playerData, gameRound));
+    commands.execute(EndSet.from(playerData, gameData, turnBuilder));
   }
 
   void undo() {
@@ -115,163 +271,122 @@ class GameController {
   }
 
   GameStats getStats() {
-    return GameStats(commands, _playerNames, winner!.name);
+    return GameStats(gameData._sets, _playerNames, winner!.name);
   }
 }
 
-class ProgressPerLeg {
-  final int set;
-  final int leg;
-  final Map<String, List<Turn>> turnsPerPlayer = {};
+/// Container for the active Turn
+class TurnBuilder {
+  final GameSettings _settings;
 
-  ProgressPerLeg(this.set, this.leg);
+  late Turn _currentTurn;
+  X01Turn? _previous;
+  late TurnCheck _curCheck = TurnCheck.instance();
 
-  void applyTurn(String player, Turn turn) {
-    turnsPerPlayer.putIfAbsent(player, () => []);
-    turnsPerPlayer[player]!.add(turn);
+  TurnBuilder(this._settings) {
+    reset();
   }
-}
 
-class GameStats {
-  final CommandStack commands;
-  final Map<String, PlayerGameStats> playerStats = {};
-  final List<ProgressPerLeg> progress = [];
-
-  GameStats(this.commands, List<String> players, String winner) {
-    for (var ply in players) {
-      playerStats.putIfAbsent(ply, () => PlayerGameStats(ply == winner, ply));
-    }
-    progress.add(ProgressPerLeg(0, 0));
-
-    Command? cur = commands.first!;
-    String player = players.first;
-    Turn turn = Turn();
-
-    do {
-      if (cur is Throw) {
-        turn.set(cur.pos, cur.hit);
-      } else if (cur is Switch) {
-        playerStats[player]!.applyTurn(turn);
-        progress.last.applyTurn(player, turn);
-        turn = Turn();
-
-        player = cur.nextPly.name;
-      } else if (cur is EndLeg) {
-        playerStats[player]!.applyTurn(turn);
-        progress.last.applyTurn(player, turn);
-        turn = Turn();
-
-        String next = cur.nextPly();
-        player = players.firstWhere((ply) => ply == next);
-        progress.add(ProgressPerLeg(progress.last.set, progress.last.leg + 1));
-      } else if (cur is EndSet) {
-        playerStats[player]!.applyTurn(turn);
-        progress.last.applyTurn(player, turn);
-        turn = Turn();
-
-        var next = cur.nextPly();
-        player = players.firstWhere((ply) => ply == next);
-        progress.add(ProgressPerLeg(progress.last.set + 1, 0));
-      }
-
-      cur = cur!.next;
-    } while(cur != null);
+  int get _initScore {
+    return _previous == null ? _settings.game.val : _previous!.getScore();
   }
-}
 
-class PlayerGameStats {
-  final bool isWinner;
-  final String player;
-  final Map<Hit, int> _hitPerField = {};
+  int get startScore {
+    return _previous == null ? _settings.points : _previous!.getScore();
+  }
 
-  int _turnCount = 0;
-  int _turnTotal = 0;
-  Turn? _turnMin;
-  Turn? _turnMax;
-  int _sixtyPlusCnt = 0;
-  int _oneTwentyPlusCnt = 0;
-  int _oneEightyCnt = 0;
+  bool get done =>
+      _currentTurn.count == 3 || isCheckout || invalid || overthrown;
 
-  PlayerGameStats(this.isWinner, this.player);
+  bool get overthrown => startScore < _currentTurn.sum();
 
-  void _checkMinMax(Turn t) {
-    if (_turnMax == null && _turnMin == null) {
-      _turnMax = t;
-      _turnMin = t;
-      return;
-    }
-    if (_turnMin!.sum() > t.sum()) {
-      _turnMin = t;
-    }
-    if (_turnMax!.sum() < t.sum()) {
-      _turnMax = t;
+  bool get valid => _curCheck.isValid;
+
+  bool get invalid => !valid;
+
+  int get score {
+    final updated = startScore - _currentTurn.sum();
+    if (valid) {
+      return updated <= 0 ? 0 : updated;
+    } else {
+      return startScore;
     }
   }
 
-  void _checkTurn(Turn turn) {
-    _checkMinMax(turn);
-    _turnTotal += turn.sum();
-    _turnCount ++;
+  bool get isCheckout {
+    return _curCheck.isCheckOut;
+  }
 
-    if(turn.first != Hit.miss) {
-      _hitPerField.update(turn.first, (value) => value++, ifAbsent: () => 1);
+  int get remain => _currentTurn.remain;
+
+  int get count => _currentTurn.count;
+
+  Hit get first => _currentTurn.first;
+
+  Hit get second => _currentTurn.second;
+
+  Hit get third => _currentTurn.third;
+
+  //Private
+  void _updateCheck() {
+    _curCheck = _settings.check(_initScore, _currentTurn);
+  }
+
+  void _setTo(Turn turn, X01Turn? previous) {
+    _currentTurn = turn;
+    _previous = previous;
+    _updateCheck();
+  }
+
+  //Public
+  void thrown(Hit hit, {int? pos}) {
+    _currentTurn.thrown(hit, pos: pos??count);
+    _updateCheck();
+  }
+
+  void undo(int pos) {
+    _currentTurn.undo(pos: pos);
+    _updateCheck();
+  }
+
+  void setupTurn(Turn turn, X01Turn? previous) {
+    _setTo(turn, previous);
+  }
+
+  void setupTurnFor(X01Turn? previous) {
+    _setTo(Turn(), previous);
+  }
+
+  void reset() {
+    _setTo(Turn(), null);
+  }
+
+  void resetTo(X01Turn turn) {
+    var nextTurn =
+        Turn(first: turn.first, second: turn.second, third: turn.third);
+    X01Turn? nextPrevious;
+    if (turn is GameTurn) {
+      nextPrevious = turn.previous;
     }
-    if(turn.second != Hit.miss) {
-      _hitPerField.update(turn.second, (value) => value++, ifAbsent: () => 1);
+    _setTo(nextTurn, nextPrevious);
+  }
+
+  X01Turn build() {
+    if (_previous == null) {
+      return InitTurn(
+          first: _currentTurn.first,
+          second: _currentTurn.second,
+          third: _currentTurn.third,
+          check: _curCheck,
+          initScore: _settings.game.val);
+    } else {
+      return GameTurn(
+        first: _currentTurn.first,
+        second: _currentTurn.second,
+        third: _currentTurn.third,
+        check: _curCheck,
+        previous: _previous!,
+      );
     }
-    if(turn.third != Hit.miss) {
-      _hitPerField.update(turn.third, (value) => value++, ifAbsent: () => 1);
-    }
-  }
-
-  void applyTurn(Turn turn) {
-    _checkTurn(turn);
-
-    var sum = turn.sum();
-    if (sum >= 60) {
-      _sixtyPlusCnt++;
-      if (sum >= 120) {
-        _oneTwentyPlusCnt++;
-        if (sum == 180) _oneEightyCnt++;
-      }
-    }
-  }
-
-  double get avgScore {
-    return _turnTotal / _turnCount;
-  }
-
-  Hit get mostHit {
-    if ( _hitPerField.entries.isEmpty ) {
-      return Hit.miss;
-    }
-
-    var max = _hitPerField.entries.first;
-    for (var entry in _hitPerField.entries) {
-      if (entry.value > max.value) {
-        max = entry;
-      }
-    }
-    return max.key;
-  }
-
-  int get minPoints {
-    return _turnMin != null ? _turnMin!.sum() : 0;
-  }
-
-  int get maxPoints {
-    return _turnMax != null ? _turnMax!.sum() : 0;
-  }
-
-  int get sixtyPlusCnt {
-    return _sixtyPlusCnt;
-  }
-
-  int get oneTwentyPlusCnt {
-    return _oneTwentyPlusCnt;
-  }
-
-  int get oneEightyCnt {
-    return _oneEightyCnt;
   }
 }

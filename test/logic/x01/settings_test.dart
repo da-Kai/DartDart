@@ -7,7 +7,7 @@ void main() {
     test('Test X01 SettingFactory', () {
       var game = GameSettingFactory();
       expect(game.isNameFree('A'), true);
-      game.players.add('A');
+      game.playerNames.add('A');
       expect(game.isNameFree('a'), false);
       expect(game.isNameFree('B'), true);
 

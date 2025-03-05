@@ -31,11 +31,12 @@ abstract class PlayerData {
 
   void forEach(void Function(Player) action);
 
-  static PlayerData get(List<String> player, PlayerFactory factory) {
+  static PlayerData get(List<String> playernames) {
+    List<Player> player = playernames.map((name) => Player(name)).toList();
     if (player.length == 1) {
-      return _SinglePlayerData(player.first, factory);
+      return _SinglePlayerData(player.first);
     } else {
-      return _MultiPlayerData(player, factory);
+      return _MultiPlayerData(player);
     }
   }
 
@@ -49,24 +50,16 @@ abstract class PlayerData {
 }
 
 class _MultiPlayerData implements PlayerData {
-  final PlayerFactory _playerFactory;
-  final List<String> _players;
-
-  final List<Player> _playerList = [];
+  final List<Player> _playerList;
 
   int _currentPlayer = 0;
 
-  _MultiPlayerData(this._players, this._playerFactory) {
+  _MultiPlayerData(this._playerList) {
     reset();
   }
 
   @override
   void reset() {
-    _playerList.clear();
-    for(var plyName in _players) {
-      var player = _playerFactory(plyName);
-      _playerList.add(player);
-    }
     _currentPlayer = 0;
   }
 
@@ -152,20 +145,15 @@ class _MultiPlayerData implements PlayerData {
 }
 
 class _SinglePlayerData implements PlayerData {
-  final PlayerFactory _playerFactory;
-  final String _playerName;
-
   @override
-  late Player current;
+  final Player current;
 
-  _SinglePlayerData(this._playerName, this._playerFactory) {
+  _SinglePlayerData(this.current) {
     reset();
   }
 
   @override
-  void reset() {
-    current = _playerFactory(_playerName);
-  }
+  void reset() {}
 
   @override
   bool get isSinglePlayer => true;

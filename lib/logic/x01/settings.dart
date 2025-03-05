@@ -1,5 +1,7 @@
 import 'package:dart_dart/logic/common/math.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:dart_dart/logic/x01/checkout.dart';
+import 'package:dart_dart/logic/x01/common.dart';
 
 typedef Check<T> = bool Function(T a);
 
@@ -39,7 +41,7 @@ enum Games {
 }
 
 class GameSettingFactory {
-  final List<String> players = [];
+  final List<String> playerNames = [];
 
   Games game = Games.threeOOne;
   InOut gameIn = InOut.straight;
@@ -60,11 +62,11 @@ class GameSettingFactory {
       s = 1;
     }
 
-    return GameSettings(game, gameIn, gameOut, s, l);
+    return GameSettings(game, gameIn, gameOut, s, l, playerNames);
   }
 
   bool isNameFree(String name) {
-    for (var plyName in players) {
+    for (var plyName in playerNames) {
       if (plyName.toLowerCase() == name.toLowerCase()) {
         return false;
       }
@@ -79,8 +81,9 @@ class GameSettings {
   final InOut gameOut;
   final int legs;
   final int sets;
+  final List<String> player;
 
-  GameSettings(this.game, this.gameIn, this.gameOut, this.sets, this.legs);
+  GameSettings(this.game, this.gameIn, this.gameOut, this.sets, this.legs, this.player);
 
   int get points {
     return game.val;
@@ -91,6 +94,37 @@ class GameSettings {
 
   bool get isLegsOnly => sets == 1;
   bool get isFirstWins => isLegsOnly && legs == 1;
+
+  TurnCheck check(int initScore, Turn turn) {
+    if (turn.count == 0) {
+      return TurnCheck(true, false, false, false);
+    }
+
+    if (initScore == points) {
+      if (gameIn.fits(turn.first)) {
+        return TurnCheck(true, true, false, false);
+      } else {
+        return TurnCheck(false, false, false, false);
+      }
+    }
+    bool checkable = isCheckoutPossible(gameOut, initScore);
+    int endScore = initScore - turn.sum();
+    if (checkable && endScore <= 0) {
+      int remainScore = initScore;
+      for (Hit hit in turn.hits) {
+        remainScore -= hit.value;
+        if (remainScore == 0) {
+          var validCheckOut = gameOut.fits(hit);
+          return TurnCheck(validCheckOut, false, validCheckOut, true);
+        }
+        if (remainScore < 0) {
+          return TurnCheck(false, false, false, true);
+        }
+      }
+    }
+    bool highEnough = gameOut.lowestCheckout < endScore;
+    return TurnCheck(highEnough, false, false, checkable);
+  }
 
   /// Determine if the given hit is a potential fishing hit.
   bool isValidFinisher(Hit hit) {
@@ -118,5 +152,9 @@ class GameSettings {
   /// Determine if the given hit is NOT valid to the currentScore.
   bool isInvalid(int curScore, Hit hit) {
     return !isValid(curScore, hit);
+  }
+
+  String getPlayer(int playerId) {
+    return player[playerId];
   }
 }

@@ -1,5 +1,6 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,9 +10,7 @@ void main() {
     test('Test X01 PlayerData', () {
       /// Test Multiplayer
       var player = ['B', 'C', 'D'];
-
-      Player factory(str) => Player(str, 101, () => 0);
-      var plyData = PlayerData.get(player, factory);
+      var plyData = PlayerData.get(player);
 
       expect(plyData.isSinglePlayer, false);
       expect(plyData.isMultiPlayer, true);
@@ -25,7 +24,7 @@ void main() {
       expect(previous, plyData.current);
 
       /// Test SinglePlayer
-      plyData = PlayerData.get(['nerd'], factory);
+      plyData = PlayerData.get(['nerd']);
 
       expect(plyData.isSinglePlayer, true);
       expect(plyData.isMultiPlayer, false);
@@ -35,14 +34,17 @@ void main() {
       var gameFactory = GameSettingFactory();
       var set = gameFactory.get();
 
-      var turn = PlayerTurn.from(set);
+      var turn = TurnBuilder(set);
       expect(turn.startScore, gameFactory.game.val);
       expect(turn.score, gameFactory.game.val);
 
       var hitOne = Hit.get(HitNumber.one, HitMultiplier.single);
       var hitDTwenty = Hit.get(HitNumber.twenty, HitMultiplier.double);
 
-      turn = PlayerTurn(set, 40);
+      final TurnCheck check = TurnCheck(true, false, false, false);
+
+      turn = TurnBuilder(set);
+      turn.setupTurnFor(InitTurn(check: check, initScore: 40));
       expect(turn.done, false);
       turn.thrown(hitOne);
       turn.thrown(hitOne);
@@ -50,7 +52,8 @@ void main() {
       expect(turn.done, true);
       expect(turn.isCheckout, false);
 
-      turn = PlayerTurn(set, 40);
+      turn = TurnBuilder(set);
+      turn.setupTurnFor(InitTurn(check: check, initScore: 40));
       expect(turn.done, false);
       turn.thrown(hitDTwenty);
       expect(turn.done, true);
@@ -59,56 +62,91 @@ void main() {
     test('Test X01 GameRound', () {
       var gameFactory = GameSettingFactory();
       var set = gameFactory.get();
-      var round = GameRound(set);
+      var round = TurnBuilder(set);
+      final TurnCheck check = TurnCheck(true, false, false, false);
 
-      expect(round.current.startScore, set.points);
+      expect(round.startScore, set.points);
 
-      round.setupTurn(PlayerTurn(set, 60));
-      expect(round.current.startScore, 60);
-
-      var ply = Player('Test', 101, () => 0);
-      round.setupTurnFor(ply);
-      expect(round.current.startScore, ply.score);
+      final X01Turn init = InitTurn(check: check, initScore: 60);
+      round.setupTurn(GameTurn(check: check, previous: init), init);
+      expect(round.startScore, 60);
     });
-    test('Test X01 PlayerTurn', () {
+    test('Test X01 TurnBuilder', () {
       var gameFactory = GameSettingFactory();
+      gameFactory.game = Games.threeOOne;
+      gameFactory.gameIn = InOut.straight;
+      gameFactory.gameOut = InOut.double;
       var set = gameFactory.get();
 
-      var ply = Player('Test', set.points, () => 0);
+      expect(set.gameOut, InOut.double);
+      var builder = TurnBuilder(set);
 
-      expect(ply.turnHistory.turnCount, 0);
-      expect(ply.score, set.points);
-      expect(ply.done, false);
+      final Hit tripleTwenty = Hit.get(HitNumber.twenty, HitMultiplier.triple);
 
-      var turnOne = PlayerTurn(set, ply.score);
-      expect(turnOne.done, false);
-      turnOne.thrown(Hit.get(HitNumber.twenty, HitMultiplier.triple));
-      turnOne.thrown(Hit.get(HitNumber.twenty, HitMultiplier.triple));
-      turnOne.thrown(Hit.get(HitNumber.twenty, HitMultiplier.triple));
-      expect(turnOne.done, true);
+      expect(builder.done, false);
+      builder.thrown(tripleTwenty);
+      expect(builder.done, false);
+      builder.thrown(tripleTwenty);
+      expect(builder.done, false);
+      builder.thrown(tripleTwenty);
+      expect(builder.done, true);
 
-      ply.turnHistory.add(0, turnOne);
-      expect(ply.turnHistory.turnCount, 1);
-      expect(ply.score, 121);
-      expect(ply.done, false);
+      var turn = builder.build();
+      expect(turn.done, true);
+      expect(turn.sum(), tripleTwenty.value * 3);
+      expect(turn.getScore(), 301 - 180);
 
-      var turnTwo = PlayerTurn(set, ply.score);
-      turnTwo.thrown(Hit.get(HitNumber.twenty, HitMultiplier.triple));
-      turnTwo.thrown(Hit.get(HitNumber.nineteen, HitMultiplier.triple));
+      final X01Turn init = InitTurn(check: TurnCheck.instance(), initScore: 60);
+      builder.setupTurnFor(init);
+      expect(builder.score, 60);
 
-      ply.turnHistory.add(0, turnTwo);
-      expect(ply.turnHistory.turnCount, 2);
-      expect(ply.score, 4);
-      expect(ply.done, false);
+      builder.thrown(Hit.get(HitNumber.bull, HitMultiplier.double));
+      expect(builder.score, 10);
+      expect(builder.done, false);
+      expect(builder.valid, true);
 
-      var turnThree = PlayerTurn(set, ply.score);
-      turnThree.thrown(Hit.get(HitNumber.two, HitMultiplier.double));
-      expect(turnOne.done, true);
+      builder.thrown(Hit.get(HitNumber.nine, HitMultiplier.single));
+      expect(builder.score, 60);
+      expect(builder.overthrown, false);
+      expect(builder.done, true);
+      expect(builder.valid, false);
+      expect(builder.isCheckout, false);
 
-      ply.turnHistory.add(0, turnThree);
-      expect(ply.turnHistory.turnCount, 3);
-      expect(ply.score, 0);
-      expect(ply.done, true);
+      builder.undo(1);
+      expect(builder.score, 10);
+      expect(builder.done, false);
+      expect(builder.valid, true);
+
+      builder.thrown(Hit.get(HitNumber.ten, HitMultiplier.single));
+      expect(builder.score, 60);
+      expect(builder.overthrown, false);
+      expect(builder.done, true);
+      expect(builder.valid, false);
+      expect(builder.isCheckout, false);
+
+      builder.undo(1);
+      expect(builder.score, 10);
+      expect(builder.done, false);
+      expect(builder.valid, true);
+
+      builder.thrown(Hit.get(HitNumber.twenty, HitMultiplier.single));
+      expect(builder.score, 60);
+      expect(builder.overthrown, true);
+      expect(builder.done, true);
+      expect(builder.valid, false);
+      expect(builder.isCheckout, false);
+
+      builder.undo(1);
+      expect(builder.score, 10);
+      expect(builder.done, false);
+      expect(builder.valid, true);
+
+      builder.thrown(Hit.get(HitNumber.five, HitMultiplier.double));
+      expect(builder.score, 0);
+      expect(builder.overthrown, false);
+      expect(builder.done, true);
+      expect(builder.valid, true);
+      expect(builder.isCheckout, true);
     });
   });
 }

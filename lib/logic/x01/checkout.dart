@@ -1,20 +1,38 @@
 import 'dart:collection';
 
+import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 
 class Checkout {
-  final String first;
-  final String second;
-  final String third;
+  final Hit first;
+  final Hit second;
+  final Hit third;
 
-  Checkout({this.first = '', this.second = '', this.third = ''});
+  Checkout({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
   static Checkout from(String str, {int dartsRemain = 0}) {
     final shift = 3 - dartsRemain;
     final prefix = ''.padLeft(shift, ';');
     final List<String> throws = '$prefix$str'.split(';');
-    return Checkout(first: throws[0], second: throws[1], third: throws[2]);
+    return Checkout(
+        first: Hit.getByAbbreviation(throws[0]),
+        second: Hit.getByAbbreviation(throws[1]),
+        third: Hit.getByAbbreviation(throws[2]));
   }
+
+  bool get valid {
+    return first != Hit.skipped;
+  }
+}
+
+bool isCheckoutPossible(InOut setting, int score) {
+  if (setting.highestCheckout < score) {
+    return false;
+  }
+  if (setting.lowestCheckout > score) {
+    return false;
+  }
+  return !invalidCheckoutsBelowMax[setting]!.contains(score);
 }
 
 Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
@@ -50,6 +68,12 @@ List<Map<int, String>> _listOfCheckouts(InOut setting, int dartsRemain) {
   if (dartsRemain >= 1) checkouts.add(doubleCheckoutSingle);
   return checkouts;
 }
+
+final Map<InOut, List<int>> invalidCheckoutsBelowMax = Map.unmodifiable(HashMap.from({
+    InOut.straight: <int>[],
+    InOut.double: <int>[169, 168, 166, 165, 163, 162, 159],
+    InOut.master: <int>[179, 178, 176, 175, 173, 172, 169, 166, 163],
+}));
 
 final Map<int, String> masterCheckoutTriple = Map.unmodifiable(HashMap.from({
   180: 'T20;T20;T20',
@@ -91,10 +115,10 @@ final Map<int, String> masterCheckoutSingle = Map.unmodifiable(HashMap.from({
 }));
 
 final Map<int, String> doubleCheckoutTriple = Map.unmodifiable(HashMap.from({
-  170: 'T20;T20;DBULL',
-  167: 'T20;T19;DBULL',
-  164: 'T20;T18;DBULL',
-  161: 'T20;T17;DBULL',
+  170: 'T20;T20;BEYE',
+  167: 'T20;T19;BEYE',
+  164: 'T20;T18;BEYE',
+  161: 'T20;T17;BEYE',
   160: 'T20;T20;D20',
   158: 'T20;T20;D19',
   157: 'T20;T19;D20',
@@ -157,10 +181,10 @@ final Map<int, String> doubleCheckoutTriple = Map.unmodifiable(HashMap.from({
 }));
 
 final Map<int, String> doubleCheckoutDouble = Map.unmodifiable(HashMap.from({
-  110: 'T20;DBULL;',
-  107: 'T19;DBULL;',
-  104: 'T18;DBULL;',
-  101: 'T17;DBULL;',
+  110: 'T20;BEYE;',
+  107: 'T19;BEYE;',
+  104: 'T18;BEYE;',
+  101: 'T17;BEYE;',
   100: 'T20;D20;',
   98: 'T20;D19;',
   97: 'T19;D20;',
@@ -248,7 +272,7 @@ final Map<int, String> doubleCheckoutDouble = Map.unmodifiable(HashMap.from({
 }));
 
 final Map<int, String> doubleCheckoutSingle = Map.unmodifiable(HashMap.from({
-  50: 'DBULL;;',
+  50: 'BEYE;;',
   40: 'D20;;',
   38: 'D19;;',
   36: 'D18;;',

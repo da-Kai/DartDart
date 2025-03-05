@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 class X01Game extends StatefulWidget {
   late final GameController data;
 
-  X01Game({super.key, required List<String> player, required GameSettings settings}) {
-    data = GameController(player, settings);
+  X01Game({super.key, required GameSettings settings}) {
+    data = GameController(settings);
   }
 
   @override
@@ -170,6 +170,7 @@ class _PlayersList extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final PlayerData data = state.widget.data.playerData;
+    final X01GameData gameData = state.widget.data.gameData;
 
     return Row(
       children: <Widget>[
@@ -208,7 +209,7 @@ class _PlayersList extends StatelessWidget {
                       SizedBox(
                         width: 35,
                         child: Text(
-                          ply.score.toString(),
+                          gameData.score(ply.name).toString(),
                           style: FontConstants.text.copyWith(color: colorScheme.onPrimary),
                         ),
                       ),
@@ -281,6 +282,7 @@ class _CurrentPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final curTurn = game.turnBuilder;
 
     final TextStyle titleStyle = TextStyle(
       color: colorScheme.onPrimaryContainer,
@@ -318,14 +320,14 @@ class _CurrentPlayer extends StatelessWidget {
                   style: scoreStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curTurn.isCheckout
+                game.turnBuilder.isCheckout
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        game.curTurn.score.toString(),
+                        game.turnBuilder.score.toString(),
                         style: titleStyle.copyWith(
-                            color: game.curTurn.valid //
+                            color: curTurn.valid //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),
@@ -340,22 +342,22 @@ class _CurrentPlayer extends StatelessWidget {
               children: [
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.first}',
-                    tooltip: game.checkout.first,
+                    text: '${curTurn.first}',
+                    tooltip: game.checkout.first.abbreviation,
                     placement: Placement.leftEnd,
                   ),
                 ),
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.second}',
-                    tooltip: game.checkout.second,
+                    text: '${curTurn.second}',
+                    tooltip: game.checkout.second.abbreviation,
                     placement: Placement.center,
                   ),
                 ),
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.third}',
-                    tooltip: game.checkout.third,
+                    text: '${curTurn.third}',
+                    tooltip: game.checkout.third.abbreviation,
                     placement: Placement.rightEnd,
                   ),
                 ),
@@ -419,12 +421,13 @@ class _NextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final GameController data = state.widget.data;
+    final TurnBuilder gameData = data.turnBuilder;
 
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.curTurn.done
+        onPressed: !gameData.done
             ? null
             : () {
                 update(() {
