@@ -151,9 +151,13 @@ class X01GameData {
 
   void popTurn(String player) => currentLeg.popTurn(player);
 
-  void setLegWinner(Player? player) => currentLeg.setWinner(player?.name);
+  void revokeLegWinner() => currentLeg.revokeWinner();
 
-  void setSetWinner(Player? player) => currentSet.setWinner(player?.name);
+  void revokeSetWinner() => currentSet.revokeWinner();
+
+  void setLegWinner(Player player) => currentLeg.setWinner(player.name);
+
+  void setSetWinner(Player player) => currentSet.setWinner(player.name);
 }
 
 /// Represents a single Game

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 typedef Validator = (bool, String?) Function(String);
 
 const playerNameMinLength = 2;
+const playerNameMaxLength = 12;
 
 class X01Setting extends StatefulWidget {
   final GameSettingFactory _data = GameSettingFactory();
@@ -25,9 +26,9 @@ class _X01PageState extends State<X01Setting> {
 
   (bool, String?) validate(String playerName) {
     if (playerName.length < playerNameMinLength) {
-      return (false, 'Name to short');
-    } else if (playerName.length > 24) {
-      return (false, 'Name to long');
+      return (false, 'Name to short; min $playerNameMinLength characters');
+    } else if (playerName.length > 12) {
+      return (false, 'Name to long; max $playerNameMaxLength characters');
     } else if (!_data.isNameFree(playerName)) {
       return (false, 'Name already taken');
     }

@@ -27,6 +27,12 @@ class _X01PageState extends State<X01Game> {
     });
   }
 
+  void undo() {
+    setState(() {
+      widget.data.undo();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -35,60 +41,60 @@ class _X01PageState extends State<X01Game> {
     return PopScope(
         canPop: false,
         child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              titleTextStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: FontConstants.title.fontFamily,
-                color: colorScheme.onSurface,
-              ),
-              backgroundColor: colorScheme.surface,
-              title: Text(data.settings.game.text),
-              leading: IconButton(
-                onPressed: () {
-                  _CancelGame.open(context).then((quit) {
-                    if (quit) {
-                      setState(() {
-                        Navigator.pop(context);
-                      });
-                    }
-                  });
-                },
-                icon: const Icon(Icons.close),
-              ),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.undo),
-                  onPressed: data.canUndo
-                      ? () {
-                          setState(() {
-                            data.undo();
-                          });
-                        }
-                      : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.redo),
-                  onPressed: data.canRedo
-                      ? () {
-                          setState(() {
-                            data.redo();
-                          });
-                        }
-                      : null,
-                )
-              ],
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: FontConstants.title.fontFamily,
+              color: colorScheme.onSurface,
             ),
-            body: OrientationBuilder(builder: (context, orientation) {
-                return orientation == Orientation.portrait
-                    ? //
-                    _PortraitView(this, setState)
-                    : //
-                    _LandscapeView(this, setState);
-              }),
-            ));
+            backgroundColor: colorScheme.surface,
+            title: Text(data.settings.game.text),
+            leading: IconButton(
+              onPressed: () {
+                _CancelGame.open(context).then((quit) {
+                  if (quit) {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  }
+                });
+              },
+              icon: const Icon(Icons.close),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: data.canUndo
+                    ? () {
+                        setState(() {
+                          data.undo();
+                        });
+                      }
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.redo),
+                onPressed: data.canRedo
+                    ? () {
+                        setState(() {
+                          data.redo();
+                        });
+                      }
+                    : null,
+              )
+            ],
+          ),
+          body: OrientationBuilder(builder: (context, orientation) {
+            return orientation == Orientation.portrait
+                ? //
+                _PortraitView(this, setState)
+                : //
+                _LandscapeView(this, setState);
+          }),
+        ));
   }
 }
 
@@ -193,7 +199,8 @@ class _PlayersList extends StatelessWidget {
                     color: colorScheme.primary,
                   ),
                   margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 5.0, horizontal: 5.0),
                   child: Row(
                     children: [
                       SizedBox(
@@ -210,7 +217,8 @@ class _PlayersList extends StatelessWidget {
                         width: 35,
                         child: Text(
                           gameData.score(ply.name).toString(),
-                          style: FontConstants.text.copyWith(color: colorScheme.onPrimary),
+                          style: FontConstants.text
+                              .copyWith(color: colorScheme.onPrimary),
                         ),
                       ),
                     ],
@@ -230,16 +238,19 @@ class _ThrowBean extends StatelessWidget {
   final String tooltip;
   final Placement placement;
 
-  const _ThrowBean({required this.text, required this.tooltip, required this.placement});
+  const _ThrowBean(
+      {required this.text, required this.tooltip, required this.placement});
 
   BorderRadius getBorderRadius() {
     switch (placement) {
       case Placement.center:
         return BorderRadius.circular(5);
       case Placement.leftEnd:
-        return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
+        return BorderRadius.horizontal(
+            left: Radius.circular(20), right: Radius.circular(5));
       case Placement.rightEnd:
-        return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
+        return BorderRadius.horizontal(
+            right: Radius.circular(20), left: Radius.circular(5));
     }
   }
 
@@ -253,7 +264,8 @@ class _ThrowBean extends StatelessWidget {
       fontStyle: FontStyle.italic,
     );
 
-    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: fontSize);
+    final textStyle = colorScheme.getTextStyle(
+        color: colorScheme.onPrimary, fontSize: fontSize);
 
     return Container(
       decoration: BoxDecoration(
@@ -307,7 +319,8 @@ class _CurrentPlayer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0, bottom: 5.0),
+            margin: const EdgeInsets.only(
+                left: 20.0, right: 20.0, top: 0.0, bottom: 5.0),
             child: Row(
               children: [
                 const Spacer(flex: 1),
@@ -436,11 +449,13 @@ class _NextButton extends StatelessWidget {
                 if (data.hasGameEnded) {
                   update(() {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => //
-                          X01Statistics(stats: data.getStats(), settings: data.settings)
-                    ));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => //
+                                X01Statistics(
+                                    stats: data.getStats(),
+                                    settings: data.settings,
+                                    onUndo: state.undo)));
                   });
                 }
               },
@@ -449,7 +464,7 @@ class _NextButton extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
         ),
-        child: data.hasGameEnded? const Text('end') : const Text('next'),
+        child: data.hasGameEnded ? const Text('end') : const Text('next'),
       ),
     );
   }

@@ -20,9 +20,7 @@ class TurnCheck {
   }
 
   @override
-  String toString() {
-    return 'isValid: $isValid, isCheckable: $isCheckable, isCheckOut: $isCheckOut, isCheckOut: $isCheckIn';
-  }
+  String toString() => 'isValid: $isValid, isCheckable: $isCheckable, isCheckOut: $isCheckOut, isCheckOut: $isCheckIn';
 }
 
 abstract class X01Turn extends Turn {
@@ -81,8 +79,20 @@ class Player {
   final String name;
 
   Player(this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Player && runtimeType == other.runtimeType && name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  String toString() => name;
 }
 
+/// Represents a leg in a game, which consists of multiple turns for each player.
 class GameLeg {
   final int id;
   final Map<String, List<X01Turn>> playerTurnHistory = {};
@@ -90,25 +100,32 @@ class GameLeg {
 
   GameLeg(this.id);
 
-  void pushTurn(String playerId, X01Turn turn) {
-    playerTurnHistory.putIfAbsent(playerId, () => []).add(turn);
-  }
+  /// Returns the list of turns for the specified player.
+  List<X01Turn> turns(String player) => playerTurnHistory[player] ?? [];
 
-  void popTurn(String playerId) {
-    playerTurnHistory[playerId]?.removeLast();
-  }
+  /// Adds a turn for the specified player.
+  void pushTurn(String playerId, X01Turn turn) => playerTurnHistory.putIfAbsent(playerId, () => []).add(turn);
 
-  void setWinner(String? playerId) => _winner = playerId;
+  /// Removes the last turn for the specified player.
+  void popTurn(String playerId) => playerTurnHistory[playerId]?.removeLast();
 
+  /// Unsets the winner of the leg.
+  void revokeWinner() => _winner = null;
+
+  /// Sets the winner of the leg.
+  void setWinner(String playerId) => _winner = playerId;
+
+  /// Checks if the leg is done.
   bool isDone() => _winner != null;
 
+  /// Returns the winner ID of the leg.
   String? winnerId() => _winner;
 
+  /// Returns the leader of the leg based on the current scores.
   String? leader() {
     if (playerTurnHistory.isEmpty) return null;
 
-    final validEntries =
-        playerTurnHistory.entries.where((entry) => entry.value.isNotEmpty);
+    final validEntries = playerTurnHistory.entries.where((entry) => entry.value.isNotEmpty);
     if (validEntries.isEmpty) return playerTurnHistory.keys.first;
 
     return validEntries.reduce((current, next) {
@@ -118,10 +135,10 @@ class GameLeg {
     }).key;
   }
 
-  int? currentScoreFor(String player) {
-    return lastPlayerTurn(player)?.getScore();
-  }
+  /// Returns the current score for the specified player.
+  int? currentScoreFor(String player) => lastPlayerTurn(player)?.getScore();
 
+  /// Returns the last turn for the specified player.
   X01Turn? lastPlayerTurn(String player) {
     final turns = playerTurnHistory[player];
     if (turns?.isEmpty ?? true) return null;
@@ -129,6 +146,7 @@ class GameLeg {
   }
 }
 
+/// Represents a set in a game, which consists of multiple legs.
 class GameSet {
   final int id;
   final List<GameLeg> _legs = [GameLeg(0)];
@@ -136,39 +154,33 @@ class GameSet {
 
   GameSet(this.id);
 
-  void setWinner(String? playerId) => _winner = playerId;
-
+  void revokeWinner() => _winner = null;
+  void setWinner(String playerId) => _winner = playerId;
   bool isDone() => _winner != null;
-
   String? winnerId() => _winner;
 
-  int get legCount {
-    return _legs.length;
-  }
-
-  GameLeg get currentLeg {
-    return _legs.last;
-  }
+  int get legCount => _legs.length;
+  GameLeg get currentLeg => _legs.last;
+  List<GameLeg> get legs => _legs;
 
   Map<String, int> legsWonPerPlayer() {
-    Map<String, int> perPlayerWins = {};
-    for (var leg in _legs) {
+    final Map<String, int> perPlayerWins = {};
+    for (final leg in _legs) {
       if (leg.isDone()) {
         String winnerId = leg.winnerId()!;
-        perPlayerWins.update(winnerId, (old) => old++, ifAbsent: () => 1);
+        perPlayerWins.update(winnerId, (old) => old + 1, ifAbsent: () => 1);
       }
     }
     return perPlayerWins;
   }
 
-  void pushLeg({GameLeg? leg}) {
-    var nextLeg = leg ?? GameLeg(_legs.length);
-    _legs.add(nextLeg);
-  }
+  void pushLeg({GameLeg? leg}) => _legs.add(leg ?? GameLeg(_legs.length));
 
-  void popLeg() {
-    _legs.removeLast();
-  }
+  void popLeg() => _legs.removeLast();
+
+  int legsWon(String player) => legsWonPerPlayer()[player] ?? 0;
+
+  String? currentLegLeader() => currentLeg.leader();
 
   String? calcPossibleWinnerId(int winningLegsCnt) {
     var legStats = legsWonPerPlayer();
@@ -178,15 +190,6 @@ class GameSet {
       }
     }
     return null;
-  }
-
-  int legsWon(String player) {
-    var legStats = legsWonPerPlayer();
-    return legStats[player] ?? 0;
-  }
-
-  String? currentLegLeader() {
-    return currentLeg.leader();
   }
 
   int totalTurnCount(String player) {

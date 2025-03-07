@@ -8,8 +8,9 @@ import 'package:dart_dart/style/font.dart';
 class X01Statistics extends StatefulWidget {
   final GameStats stats;
   final GameSettings settings;
+  final VoidCallback onUndo;
 
-  const X01Statistics({super.key, required this.stats, required this.settings});
+  const X01Statistics({super.key, required this.stats, required this.settings, required this.onUndo});
 
   @override
   State<X01Statistics> createState() => _X01StatsState();
@@ -23,54 +24,49 @@ class _X01StatsState extends State<X01Statistics> {
     return PopScope(
         canPop: false,
         child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              titleTextStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: FontConstants.title.fontFamily,
-                color: colorScheme.onSurface,
-              ),
-              backgroundColor: colorScheme.surface,
-              title: const Text('Statistics'),
-              leading: IconButton(
-                onPressed: () {
-                  setState(() {
-                    int count = 0;
-                    Navigator.popUntil(context, (route) {
-                      return ++count > 2;
-                    });
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: FontConstants.title.fontFamily,
+              color: colorScheme.onSurface,
+            ),
+            backgroundColor: colorScheme.surface,
+            title: const Text('Statistics'),
+            leading: IconButton(
+              onPressed: () {
+                setState(() {
+                  int count = 0;
+                  Navigator.popUntil(context, (route) {
+                    return ++count > 2;
                   });
-                },
-                icon: const Icon(Icons.close),
-              ),
-              actions: [
-                IconButton(
-                    icon: const Icon(Icons.undo),
-                    onPressed: () {
-                      setState(() {
-                        //data.commands.undo();
-                        Navigator.pop(context);
-                        //data.commands.undo();
-                      });
-                    }),
-              ],
-              centerTitle: true,
+                });
+              },
+              icon: const Icon(Icons.close),
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  flex: 6,
-                  child: _PlayerStatsView(this),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: _GameProgress(this),
-                )
-              ]
+            actions: [
+              //TODO implement undo functionality
+              IconButton(
+                  icon: const Icon(Icons.undo),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onUndo();
+                  }),
+            ],
+            centerTitle: true,
+          ),
+          body: Column(children: [
+            Expanded(
+              flex: 6,
+              child: _PlayerStatsView(this),
             ),
-        )
-    );
+            Expanded(
+              flex: 5,
+              child: _GameProgress(this),
+            )
+          ]),
+        ));
   }
 }
 
@@ -84,12 +80,12 @@ class _GameProgress extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-        padding: const EdgeInsets.all(10.0),
-        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: colorScheme.backgroundShade,
-        ),
+      padding: const EdgeInsets.all(10.0),
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: colorScheme.backgroundShade,
+      ),
     );
   }
 }
@@ -112,6 +108,7 @@ class _PlayerStatsView extends StatelessWidget {
           color: colorScheme.backgroundShade,
         ),
         child: Row(
+          spacing: 5.0,
           children: [
             _StatsColumn(
                 name: '',
@@ -121,9 +118,10 @@ class _PlayerStatsView extends StatelessWidget {
                 max: 'MAX',
                 sixtyPlus: '60+',
                 oneTwentyPlus: '120+',
+                oneEighty: '180=',
                 checkout: 'Checkout'),
             Padding(
-              padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 40.0),
+              padding: EdgeInsets.only(top: 40.0),
               child: VerticalDivider(
                 indent: 5.0,
               ),
@@ -133,17 +131,20 @@ class _PlayerStatsView extends StatelessWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
+                    spacing: 5.0,
                     children: [
                       for (final player in data.playerStats.entries)
                         _StatsColumn(
                           name: player.key,
-                          setsLegs: '0/0',
-                          nineAvg: '',
-                          avg: '',
-                          max: '',
-                          sixtyPlus: '',
-                          oneTwentyPlus: '',
-                          checkout: '5%',
+                          setsLegs: '${player.value.sets}/${player.value.legs}',
+                          nineAvg: player.value.nineAvg.toStringAsFixed(2),
+                          avg: player.value.avg.toStringAsFixed(2),
+                          max: player.value.max.toString(),
+                          sixtyPlus: player.value.sixtyPlus.toString(),
+                          oneTwentyPlus: player.value.oneTwentyPlus.toString(),
+                          oneEighty: player.value.oneEighty.toString(),
+                          checkout:
+                              '${(player.value.checkoutRate * 100).toStringAsFixed(1)}%',
                         ),
                     ],
                   ),
@@ -163,68 +164,53 @@ class _StatsColumn extends StatelessWidget {
   final String max;
   final String sixtyPlus;
   final String oneTwentyPlus;
+  final String oneEighty;
   final String checkout;
 
-  const _StatsColumn({
-      required this.name,
+  const _StatsColumn(
+      {required this.name,
       required this.setsLegs,
       required this.nineAvg,
       required this.avg,
       required this.max,
       required this.sixtyPlus,
       required this.oneTwentyPlus,
-      required this.checkout
-  });
+      required this.oneEighty,
+      required this.checkout});
+
+  Container getHeaderBean(String? name, ColorScheme colorScheme) {
+    final String nameVal = name ?? '';
+    final Decoration? deco = nameVal.isEmpty
+        ? null
+        : BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: colorScheme.primary,
+          );
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      decoration: deco,
+      child: Text(nameVal, style: FontConstants.subtitle),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Column(children: [
-      if (name == '') Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text('', style: FontConstants.subtitle),
-      ),
-      if (name != '') Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 25.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: colorScheme.primary,
-        ),
-        child: Text(name, style: FontConstants.subtitle),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: Text(setsLegs),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: Text(nineAvg),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(avg),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(max),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: Text(sixtyPlus),
-      ),
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-        child: Text(oneTwentyPlus),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-            top: 20.0, bottom: 5.0, left: 5.0, right: 5.0),
-        child: Text(checkout),
-      ),
+    return Column(spacing: 8.0, children: [
+      getHeaderBean(name, colorScheme),
+      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0)),
+      Text(setsLegs),
+      Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
+      Text(nineAvg),
+      Text(avg),
+      Text(max),
+      Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
+      Text(sixtyPlus),
+      Text(oneTwentyPlus),
+      Text(oneEighty),
+      Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
+      Text(checkout),
     ]);
   }
 }

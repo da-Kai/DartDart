@@ -94,7 +94,7 @@ class EndLeg extends Command {
   @override
   void undo() {
     gameData.popLeg();
-    gameData.setLegWinner(null);
+    gameData.revokeLegWinner();
     data.rotateBackwards();
     gameData.popTurn(winner.name);
 
@@ -131,8 +131,8 @@ class EndSet extends Command {
   @override
   void undo() {
     gameData.popSet();
-    gameData.setSetWinner(null);
-    gameData.setSetWinner(null);
+    gameData.revokeSetWinner();
+    gameData.revokeLegWinner();
     data.rotateBackwards();
     gameData.popTurn(winner.name);
 
