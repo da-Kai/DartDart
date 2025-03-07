@@ -12,13 +12,25 @@ class X01Statistics extends StatefulWidget {
   final GameSettings settings;
   final VoidCallback onUndo;
 
-  const X01Statistics({super.key, required this.stats, required this.settings, required this.onUndo});
+  const X01Statistics(
+      {super.key,
+      required this.stats,
+      required this.settings,
+      required this.onUndo});
 
   @override
   State<X01Statistics> createState() => _X01StatsState();
 }
 
 class _X01StatsState extends State<X01Statistics> {
+  int leg = 0;
+
+  void setLeg(double val) {
+    setState(() {
+      leg = val.toInt();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -26,54 +38,50 @@ class _X01StatsState extends State<X01Statistics> {
     return PopScope(
         canPop: false,
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            titleTextStyle: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              fontFamily: FontConstants.title.fontFamily,
-              color: colorScheme.onSurface,
-            ),
-            backgroundColor: colorScheme.surface,
-            title: const Text('Statistics'),
-            leading: IconButton(
-              onPressed: () {
-                setState(() {
-                  int count = 0;
-                  Navigator.popUntil(context, (route) {
-                    return ++count > 2;
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              titleTextStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: FontConstants.title.fontFamily,
+                color: colorScheme.onSurface,
+              ),
+              backgroundColor: colorScheme.surface,
+              title: const Text('Statistics'),
+              leading: IconButton(
+                onPressed: () {
+                  setState(() {
+                    int count = 0;
+                    Navigator.popUntil(context, (route) {
+                      return ++count > 2;
+                    });
                   });
-                });
-              },
-              icon: const Icon(Icons.close),
+                },
+                icon: const Icon(Icons.close),
+              ),
+              actions: [
+                IconButton(
+                    icon: const Icon(Icons.undo),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      widget.onUndo();
+                    }),
+              ],
+              centerTitle: true,
             ),
-            actions: [
-              //TODO implement undo functionality
-              IconButton(
-                  icon: const Icon(Icons.undo),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onUndo();
-                  }),
-            ],
-            centerTitle: true,
-          ),
-          body: Padding(
+            body: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Column(
-                  spacing: 10.0,
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: _PlayerStatsView(this),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: _GameProgress(this),
-                    )
-                  ]),
-          )
-        ));
+              child: Column(spacing: 10.0, children: [
+                Expanded(
+                  flex: 5,
+                  child: _PlayerStatsView(this),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: _GameProgress(this),
+                )
+              ]),
+            )));
   }
 }
 
@@ -87,9 +95,15 @@ class _GameProgress extends StatelessWidget {
     final game = state.widget.settings.game;
     final gameFlow = state.widget.stats.gameFlow;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final List<Color> playerColors = [Colors.red, Colors.blue, Colors.green, Colors.yellow];
+    final List<Color> playerColors = [
+      Colors.red.withAlpha(128),
+      Colors.blue.withAlpha(128),
+      Colors.green.withAlpha(128),
+      Colors.yellow.withAlpha(128)
+    ];
 
-    final lineChartData = FlowChart.from(game, gameFlow.playerScores, playerColors);
+    final lineChartData =
+        FlowChart.from(game, gameFlow.playerScores, playerColors);
 
     return Container(
       padding: const EdgeInsets.all(10.0),
@@ -97,19 +111,20 @@ class _GameProgress extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.0),
         color: colorScheme.backgroundShade,
       ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            clipBehavior: Clip.none,
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: lineChartData.dataPoints * 1.5,
-              child: LineChart(lineChartData.chartData),
-            ),
-          )
-        ),
-      ),
+      child: Column(
+        children: [
+          Expanded(
+              child: SingleChildScrollView(
+                clipBehavior: Clip.hardEdge,
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: lineChartData.dataPoints * 50,
+                  child: LineChart(lineChartData.chartData),
+                ),
+              )),
+        ],
+      )
     );
   }
 }

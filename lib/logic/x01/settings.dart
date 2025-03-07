@@ -122,7 +122,7 @@ class GameSettings {
         }
       }
     }
-    bool highEnough = gameOut.lowestCheckout < endScore;
+    bool highEnough = endScore >= gameOut.lowestCheckout;
     return TurnCheck(highEnough, false, false, checkable);
   }
 

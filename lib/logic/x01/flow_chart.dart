@@ -4,7 +4,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 
 class FlowChart {
-  static FlowChart from(final Games game, final Map<String, PlayerFlow> playerScores, final List<Color> playerColors) {
+  static FlowChart from(
+      final Games game,
+      final Map<String, PlayerFlow> playerScores,
+      final List<Color> playerColors) {
     final List<LineChartBarData> lineBarsData = [];
     int playerIndex = 0;
 
@@ -13,7 +16,8 @@ class FlowChart {
       int turnCount = 0;
       for (final leg in flow.scoreFlowPerLeg) {
         for (final score in leg) {
-          dataPoints.add(FlSpot(turnCount.toDouble(), score.toDouble()));
+          final spot = FlSpot(turnCount.toDouble(), score.toDouble());
+          dataPoints.add(spot);
           turnCount++;
         }
       }
@@ -38,9 +42,10 @@ class FlowChart {
 
   int get dataPoints {
     int maxPoints = 0;
-    for(final dataSet in data) {
-      if (dataSet.spots.last.y > maxPoints) {
-        maxPoints = dataSet.spots.last.y.toInt();
+    for (final dataSet in data) {
+      final dataCnt = dataSet.spots.length;
+      if (dataCnt > maxPoints) {
+        maxPoints = dataCnt;
       }
     }
     return maxPoints;
@@ -100,16 +105,14 @@ class FlowChart {
   }
 
   FlTitlesData get titlesData => FlTitlesData(
-    bottomTitles: AxisTitles(sideTitles: bottomSideTiles),
-    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-    leftTitles: AxisTitles(sideTitles: leftSideTitles)
-  );
+      bottomTitles: AxisTitles(sideTitles: bottomSideTiles),
+      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      leftTitles: AxisTitles(sideTitles: leftSideTitles));
 
   LineChartData get chartData => LineChartData(
-    gridData: FlGridData(show: false),
-    titlesData: titlesData,
-    borderData: FlBorderData(show: false),
-    lineBarsData: data,
-  );
+      gridData: FlGridData(show: false),
+      titlesData: titlesData,
+      borderData: FlBorderData(show: false),
+      lineBarsData: data);
 }

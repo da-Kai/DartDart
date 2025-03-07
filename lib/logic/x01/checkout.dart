@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 
@@ -32,7 +31,8 @@ bool isCheckoutPossible(InOut setting, int score) {
   if (setting.lowestCheckout > score) {
     return false;
   }
-  return !invalidCheckoutsBelowMax[setting]!.contains(score);
+  final invalid = invalidCheckoutsBelowMax[setting]?.contains(score)??false;
+  return !invalid;
 }
 
 Checkout calcCheckout(InOut setting, int score, {int dartsRemain = 0}) {
