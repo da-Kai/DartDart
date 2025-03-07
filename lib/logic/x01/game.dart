@@ -125,11 +125,7 @@ class X01GameData {
   }
 
   void pushSet({GameSet? set}) {
-    if (set == null) {
-      set = GameSet(_sets.length);
-      set.pushLeg();
-    }
-    _sets.add(set);
+    _sets.add(set ?? GameSet(_sets.length));
   }
 
   X01Turn? lastPlayerTurn(String player) {
@@ -175,7 +171,6 @@ class GameController {
     turnBuilder = TurnBuilder(settings);
     playerData = PlayerData.get(_playerNames);
     gameData = X01GameData(settings);
-    reset();
   }
 
   String get curPoints {
@@ -255,7 +250,12 @@ class GameController {
       return;
     }
 
-    commands.execute(EndSet.from(playerData, gameData, turnBuilder));
+    if (gameData.currentSet.isDone()) {
+      commands.execute(EndSet.from(playerData, gameData, turnBuilder));
+      return;
+    }
+
+    commands.execute(EndGame.from(playerData, gameData, turnBuilder));
   }
 
   void undo() {
@@ -271,11 +271,12 @@ class GameController {
   }
 
   bool get canRedo {
-    return commands.canRedo;
+    final nextIsGameEnd = commands.current?.next is EndGame;
+    return commands.canRedo && !nextIsGameEnd;
   }
 
   GameStats getStats() {
-    return GameStats(gameData._sets, _playerNames, winner!.name);
+    return GameStats(gameData._sets, _playerNames, winner!.name, settings.game);
   }
 }
 

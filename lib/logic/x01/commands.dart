@@ -139,3 +139,36 @@ class EndSet extends Command {
     turnBuilder.resetTo(turn);
   }
 }
+
+class EndGame extends Command {
+  final Player winner;
+  final X01Turn turn;
+
+  final X01GameData gameData;
+  final TurnBuilder turnBuilder;
+
+  EndGame._(this.gameData, this.turnBuilder, this.turn, this.winner);
+
+  static EndGame from(PlayerData data, X01GameData gameData, TurnBuilder turnBuilder, {Player? ply}) {
+    var winner = ply ?? data.current;
+    return EndGame._(gameData, turnBuilder, turnBuilder.build(), winner);
+  }
+
+  @override
+  void execute() {
+    gameData.pushTurn(winner.name, turn);
+    gameData.setLegWinner(winner);
+    gameData.setSetWinner(winner);
+
+    turnBuilder.reset();
+  }
+
+  @override
+  void undo() {
+    gameData.revokeSetWinner();
+    gameData.revokeLegWinner();
+    gameData.popTurn(winner.name);
+
+    turnBuilder.resetTo(turn);
+  }
+}

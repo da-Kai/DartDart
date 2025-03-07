@@ -1,4 +1,8 @@
+import 'dart:developer' as developer;
+
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
+import 'package:dart_dart/pages/games/x01_game_page.dart';
 
 class PlayerGameStats {
   final bool isWinner;
@@ -97,19 +101,36 @@ class PlayerGameStats {
   }
 }
 
-class LegStats {
-  Map<String, List<int>> playerScores = {};
-}
-
-class SetStats {
-  List<LegStats> legs = [];
+class PlayerFlow {
+  final List<List<int>> scoreFlowPerLeg = [];
 }
 
 class GameFlow {
-  List<SetStats> sets = [];
+  final Map<String, PlayerFlow> playerScores;
 
-  GameFlow({required List<GameSet> stats}) {
-    //TODO fill values
+  GameFlow(this.playerScores);
+
+  static GameFlow from(List<String> players, List<GameSet> stats, Games game) {
+    final Map<String, PlayerFlow> playerScores = {
+      for (final ply in players) ply: PlayerFlow()
+    };
+
+    for (final set in stats) {
+      for (final leg in set.legs) {
+        for (final String ply in players) {
+          final List<int> scores = [game.val];
+          for (final turn in leg.turns(ply)) {
+            scores.add(turn.getScore());
+          }
+
+          developer.log('set: ${set.id}, leg: ${leg.id}, ply: $ply, scores: $scores');
+
+          playerScores[ply]!.scoreFlowPerLeg.add(scores);
+        }
+      }
+    }
+
+    return GameFlow(playerScores);
   }
 }
 
@@ -118,11 +139,11 @@ class GameStats {
   final Map<String, PlayerGameStats> playerStats = {};
   late final GameFlow gameFlow;
 
-  GameStats(this.sets, List<String> players, String winner) {
+  GameStats(this.sets, List<String> players, String winner, Games game) {
     for (var ply in players) {
       playerStats.putIfAbsent(
           ply, () => PlayerGameStats.from(ply, ply == winner, stats: sets));
     }
-    gameFlow = GameFlow(stats: sets);
+    gameFlow = GameFlow.from(players, sets, game);
   }
 }

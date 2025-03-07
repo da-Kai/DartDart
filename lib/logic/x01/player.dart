@@ -64,12 +64,13 @@ class _MultiPlayerData implements PlayerData {
   }
 
   int _getIndex(int delta) {
-    if(_playerList.isEmpty) return _currentPlayer;
+    if(_playerList.isEmpty) return -1;
     return (_currentPlayer+delta) % _playerList.length;
   }
 
   Player _byDelta(int delta) {
-    return _playerList[_getIndex(delta)];
+    final playerIndex = _getIndex(delta);
+    return playerIndex == -1 ? Player('ERR') : _playerList[playerIndex];
   }
 
   @override

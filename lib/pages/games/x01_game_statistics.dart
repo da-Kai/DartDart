@@ -1,9 +1,11 @@
+import 'package:dart_dart/logic/x01/flow_chart.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/logic/x01/statistics.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dart_dart/style/font.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class X01Statistics extends StatefulWidget {
   final GameStats stats;
@@ -56,16 +58,21 @@ class _X01StatsState extends State<X01Statistics> {
             ],
             centerTitle: true,
           ),
-          body: Column(children: [
-            Expanded(
-              flex: 6,
-              child: _PlayerStatsView(this),
-            ),
-            Expanded(
-              flex: 5,
-              child: _GameProgress(this),
-            )
-          ]),
+          body: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                  spacing: 10.0,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: _PlayerStatsView(this),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: _GameProgress(this),
+                    )
+                  ]),
+          )
         ));
   }
 }
@@ -77,14 +84,31 @@ class _GameProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final game = state.widget.settings.game;
+    final gameFlow = state.widget.stats.gameFlow;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final List<Color> playerColors = [Colors.red, Colors.blue, Colors.green, Colors.yellow];
+
+    final lineChartData = FlowChart.from(game, gameFlow.playerScores, playerColors);
 
     return Container(
       padding: const EdgeInsets.all(10.0),
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
         color: colorScheme.backgroundShade,
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            clipBehavior: Clip.none,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: lineChartData.dataPoints * 1.5,
+              child: LineChart(lineChartData.chartData),
+            ),
+          )
+        ),
       ),
     );
   }
@@ -97,12 +121,11 @@ class _PlayerStatsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GameStats data = state.widget.stats;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final data = state.widget.stats.playerStats;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
         padding: const EdgeInsets.all(10.0),
-        margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
           color: colorScheme.backgroundShade,
@@ -133,7 +156,7 @@ class _PlayerStatsView extends StatelessWidget {
                   child: Row(
                     spacing: 5.0,
                     children: [
-                      for (final player in data.playerStats.entries)
+                      for (final player in data.entries)
                         _StatsColumn(
                           name: player.key,
                           setsLegs: '${player.value.sets}/${player.value.legs}',
