@@ -1,8 +1,5 @@
-import 'dart:developer' as developer;
-
 import 'package:dart_dart/logic/x01/common.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
-import 'package:dart_dart/pages/games/x01_game_page.dart';
 
 class PlayerGameStats {
   final bool isWinner;
@@ -122,9 +119,6 @@ class GameFlow {
           for (final turn in leg.turns(ply)) {
             scores.add(turn.getScore());
           }
-
-          developer.log('set: ${set.id}, leg: ${leg.id}, ply: $ply, scores: $scores');
-
           playerScores[ply]!.scoreFlowPerLeg.add(scores);
         }
       }
