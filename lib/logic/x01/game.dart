@@ -51,6 +51,8 @@ class X01GameData {
     initialScore = settings.points;
   }
 
+
+
   int legsWonInTotal(Player? ply) {
     if (ply == null) return 0;
     int legs = 0;
@@ -240,22 +242,23 @@ class GameController {
   }
 
   void next() {
+    final command = _nextCommand();
+    commands.execute(command);
+  }
+
+  Command _nextCommand() {
     if (!turnBuilder.isCheckout) {
-      commands.execute(Switch.from(playerData, gameData, turnBuilder));
-      return;
+      return Switch.from(playerData, gameData, turnBuilder);
     }
+    final playerPoints = gameData.points(curPly.name);
 
-    if (gameData.currentLeg.isDone()) {
-      commands.execute(EndLeg.from(playerData, gameData, turnBuilder));
-      return;
+    if (playerPoints.$2+1 == settings.legs) {
+      if (playerPoints.$1+1 == settings.sets) {
+        return EndGame.from(playerData, gameData, turnBuilder);
+      }
+      return EndSet.from(playerData, gameData, turnBuilder);
     }
-
-    if (gameData.currentSet.isDone()) {
-      commands.execute(EndSet.from(playerData, gameData, turnBuilder));
-      return;
-    }
-
-    commands.execute(EndGame.from(playerData, gameData, turnBuilder));
+    return EndLeg.from(playerData, gameData, turnBuilder);
   }
 
   void undo() {
