@@ -104,15 +104,19 @@ class PlayerFlow {
 
 class GameFlow {
   final Map<String, PlayerFlow> playerScores;
+  final int legCount;
 
-  GameFlow(this.playerScores);
+  GameFlow(this.playerScores, this.legCount);
 
   static GameFlow from(List<String> players, List<GameSet> stats, Games game) {
     final Map<String, PlayerFlow> playerScores = {
       for (final ply in players) ply: PlayerFlow()
     };
 
+    int legs = 0;
+
     for (final set in stats) {
+      legs += set.legs.length;
       for (final leg in set.legs) {
         for (final String ply in players) {
           final List<int> scores = [game.val];
@@ -124,16 +128,17 @@ class GameFlow {
       }
     }
 
-    return GameFlow(playerScores);
+    return GameFlow(playerScores, legs);
   }
 }
 
 class GameStats {
+  final String winner;
   final List<GameSet> sets;
   final Map<String, PlayerGameStats> playerStats = {};
   late final GameFlow gameFlow;
 
-  GameStats(this.sets, List<String> players, String winner, Games game) {
+  GameStats(this.sets, this.winner, List<String> players, Games game) {
     for (var ply in players) {
       playerStats.putIfAbsent(
           ply, () => PlayerGameStats.from(ply, ply == winner, stats: sets));

@@ -79,30 +79,37 @@ class _X01StatsState extends State<X01Statistics> {
                 ),
                 Expanded(
                   flex: 5,
-                  child: _GameProgress(this),
+                  child: _GameProgress(data: widget.settings.game, gameFlow: widget.stats.gameFlow),
                 )
               ]),
             )));
   }
 }
 
-class _GameProgress extends StatelessWidget {
-  final _X01StatsState state;
+class _GameProgress extends StatefulWidget {
+  final Games data;
+  final GameFlow gameFlow;
 
-  const _GameProgress(this.state);
+  const _GameProgress({required this.data, required this.gameFlow});
+
+  @override
+  State<_GameProgress> createState() => _GameProgressState();
+}
+
+class _GameProgressState extends State<_GameProgress> {
+  int currentLeg = 0;
 
   @override
   Widget build(BuildContext context) {
-    final game = state.widget.settings.game;
-    final gameFlow = state.widget.stats.gameFlow;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final legCount = widget.gameFlow.legCount;
 
     final List<Color> playerColors = colorScheme.brightness == Brightness.light //
         ? PlayerColors.light //
         : PlayerColors.dark;
 
     final lineChartData =
-        FlowChart.from(game, gameFlow.playerScores, playerColors);
+      FlowChart.from(widget.data, widget.gameFlow.playerScores, currentLeg, playerColors);
 
     return Container(
       padding: const EdgeInsets.all(10.0),
@@ -112,6 +119,18 @@ class _GameProgress extends StatelessWidget {
       ),
       child: Column(
         children: [
+          legCount <= 1 ? Container() :
+          Slider(
+              value: currentLeg.toDouble(),
+              divisions: legCount-1,
+              max: (legCount-1).toDouble(),
+              min: 0,
+              label: '${currentLeg+1}. Leg',
+              onChanged: (val) {
+            setState(() {
+              currentLeg = val.toInt();
+            });
+          }),
           Expanded(
               child: SingleChildScrollView(
                 clipBehavior: Clip.hardEdge,
@@ -183,6 +202,7 @@ class _PlayerStatsView extends StatelessWidget {
                       for (final player in data.entries)
                         _StatsColumn(
                           name: player.key,
+                          winner: player.key == state.widget.stats.winner,
                           setsLegs: '${player.value.sets}/${player.value.legs}',
                           nineAvg: player.value.nineAvg.toStringAsFixed(2),
                           avg: player.value.avg.toStringAsFixed(2),
@@ -215,6 +235,9 @@ class _StatsColumn extends StatelessWidget {
   final String oneEighty;
   final String checkout;
   final Color? color;
+  final bool winner;
+
+  final Shadow shadow = const Shadow(color: Colors.black, blurRadius: 0.0, offset: Offset(0.0, 1.0));
 
   const _StatsColumn(
       {required this.name,
@@ -226,7 +249,18 @@ class _StatsColumn extends StatelessWidget {
       required this.oneTwentyPlus,
       required this.oneEighty,
       required this.checkout,
-      this.color});
+      this.color, this.winner = false});
+
+  Widget getColorIcon() {
+    if (color == null) {
+      return Container();
+    }
+    if (winner) {
+      return Icon(Icons.emoji_events, color: color, shadows: [shadow]);
+    } else {
+      return Icon(Icons.circle, color: color, shadows: [shadow]);
+    }
+  }
 
   Container getHeaderBean(String? name, ColorScheme colorScheme) {
     final String nameVal = name ?? '';
@@ -244,7 +278,7 @@ class _StatsColumn extends StatelessWidget {
           Text(nameVal, style: FontConstants.subtitle),
           Padding(
               padding: EdgeInsets.only(left: 5.0, top: 2.0, bottom: 2.0),
-              child: color == null ? Container() : Icon(Icons.circle, color: color),
+              child: getColorIcon(),
           )
         ],
       )

@@ -7,6 +7,7 @@ class FlowChart {
   static FlowChart from(
       final Games game,
       final Map<String, PlayerFlow> playerScores,
+      final int leg,
       final List<Color> playerColors) {
     final List<LineChartBarData> lineBarsData = [];
     int playerIndex = 0;
@@ -14,6 +15,13 @@ class FlowChart {
     playerScores.forEach((player, flow) {
       final List<FlSpot> dataPoints = [];
       int turnCount = 0;
+      for (final score in flow.scoreFlowPerLeg[leg]) {
+        final spot = FlSpot(turnCount.toDouble(), score.toDouble());
+        dataPoints.add(spot);
+        turnCount++;
+      }
+
+      /*
       for (final leg in flow.scoreFlowPerLeg) {
         for (final score in leg) {
           final spot = FlSpot(turnCount.toDouble(), score.toDouble());
@@ -21,6 +29,7 @@ class FlowChart {
           turnCount++;
         }
       }
+      */
 
       lineBarsData.add(LineChartBarData(
         spots: dataPoints,

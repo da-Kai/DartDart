@@ -279,7 +279,7 @@ class GameController {
   }
 
   GameStats getStats() {
-    return GameStats(gameData._sets, _playerNames, winner!.name, settings.game);
+    return GameStats(gameData._sets, winner!.name, _playerNames, settings.game);
   }
 }
 
