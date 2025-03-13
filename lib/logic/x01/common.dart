@@ -21,7 +21,7 @@ class TurnCheck {
 
   @override
   String toString() =>
-      'isValid: $isValid, isCheckIn: $isCheckIn isCheckOut: $isCheckOut, isCheckable: $isCheckable';
+      'isValid: $isValid, isCheckIn: $isCheckIn, isCheckOut: $isCheckOut, isCheckable: $isCheckable';
 }
 
 abstract class X01Turn extends Turn {

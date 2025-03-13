@@ -29,8 +29,6 @@ abstract class PlayerData {
 
   Iterable<T> mapPlayer<T>(T Function(Player) toElement, {int skip = 0});
 
-  void forEach(void Function(Player) action);
-
   static PlayerData get(List<String> playernames) {
     List<Player> player = playernames.map((name) => Player(name)).toList();
     if (player.length == 1) {
@@ -41,12 +39,6 @@ abstract class PlayerData {
   }
 
   Player find(String name);
-
-  void organize(List<String> player, String current);
-
-  List<String> reorder(int Function(Player, Player) order);
-
-  List<Player> asList();
 }
 
 class _MultiPlayerData implements PlayerData {
@@ -107,41 +99,8 @@ class _MultiPlayerData implements PlayerData {
   }
 
   @override
-  void organize(List<String> player, String curPly) {
-    if (player.length != _playerList.length) {
-      throw Exception("Player list is not of same Length! can't organize.");
-    }
-    for (var name in player) {
-      var ply = find(name);
-      _playerList.remove(ply);
-      _playerList.add(ply);
-    }
-    _currentPlayer = 0;
-    while (curPly == current.name) {
-      _currentPlayer++;
-    }
-  }
-
-  @override
-  List<String> reorder(int Function(Player, Player) order) {
-    var current = _playerList.map((p) => p.name).toList();
-    _playerList.sort(order);
-    return current;
-  }
-
-  @override
   Player find(String name) {
     return _playerList.firstWhere((p) => p.name == name);
-  }
-
-  @override
-  void forEach(void Function(Player) action) {
-    _playerList.forEach(action);
-  }
-
-  @override
-  List<Player> asList() {
-    return _playerList;
   }
 }
 
@@ -192,28 +151,10 @@ class _SinglePlayerData implements PlayerData {
   }
 
   @override
-  void organize(List<String> player, String current) {
-    return;
-  }
-
-  @override
   Player find(String name) {
     if (name != current.name) {
       throw Exception('Player name unknown!');
     }
     return current;
-  }
-
-  @override
-  void forEach(void Function(Player) action) => action(current);
-
-  @override
-  List<String> reorder(int Function(Player, Player) order) {
-    return [current.name];
-  }
-
-  @override
-  List<Player> asList() {
-    return [current];
   }
 }

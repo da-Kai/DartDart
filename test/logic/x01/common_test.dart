@@ -14,8 +14,13 @@ void main() {
 
       expect(plyData.isSinglePlayer, false);
       expect(plyData.isMultiPlayer, true);
+      expect(plyData.playerCount, 3);
 
       final next = plyData.next;
+
+      expect('B', plyData.current.name);
+      expect('C', plyData.next.name);
+      expect('D', plyData.last.name);
       plyData.rotateForward();
       expect(next, plyData.current);
 
@@ -147,6 +152,10 @@ void main() {
       expect(builder.done, true);
       expect(builder.valid, true);
       expect(builder.isCheckout, true);
+    });
+    test('Test X01 TurnBuilder', () {
+      final check = TurnCheck(true, false, true, false);
+      expect('isValid: true, isCheckIn: false, isCheckOut: true, isCheckable: false', check.toString());
     });
   });
 }
