@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 typedef Validator = (bool, String?) Function(String);
 
 const playerNameMinLength = 2;
+const playerNameMaxLength = 12;
 
 class X01Setting extends StatefulWidget {
   final GameSettingFactory _data = GameSettingFactory();
@@ -25,23 +26,25 @@ class _X01PageState extends State<X01Setting> {
 
   (bool, String?) validate(String playerName) {
     if (playerName.length < playerNameMinLength) {
-      return (false, 'Name to short');
-    } else if (playerName.length > 24) {
-      return (false, 'Name to long');
+      return (false, 'Name to short; min $playerNameMinLength characters');
+    } else if (playerName.length > 12) {
+      return (false, 'Name to long; max $playerNameMaxLength characters');
     } else if (!_data.isNameFree(playerName)) {
       return (false, 'Name already taken');
     }
     return (true, null);
   }
 
-  void _removePlayer(String ply) => setState(() => _data.players.remove(ply));
+  bool _canAddPlayer() => _data.playerNames.length < maxPlayers;
 
-  void _addPlayer(String player) => setState(() => _data.players.add(player));
+  void _removePlayer(String ply) => setState(() => _data.playerNames.remove(ply));
+
+  void _addPlayer(String player) => setState(() => _data.playerNames.add(player));
 
   void _updatePlayer(String oldName, String newName) => setState(() {
-        int index = _data.players.indexOf(oldName);
-        _data.players.insert(index, newName);
-        _data.players.removeAt(index + 1);
+        int index = _data.playerNames.indexOf(oldName);
+        _data.playerNames.insert(index, newName);
+        _data.playerNames.removeAt(index + 1);
       });
 
   void reorderPlayers(int oldIndex, int newIndex) {
@@ -49,8 +52,8 @@ class _X01PageState extends State<X01Setting> {
       if (newIndex > oldIndex) {
         newIndex--;
       }
-      final movedPlayer = _data.players.removeAt(oldIndex);
-      _data.players.insert(newIndex, movedPlayer);
+      final movedPlayer = _data.playerNames.removeAt(oldIndex);
+      _data.playerNames.insert(newIndex, movedPlayer);
     });
   }
 
@@ -419,7 +422,7 @@ class _PlayerSettingContainer extends StatelessWidget {
               child: ReorderableListView(
                 onReorder: state.reorderPlayers,
                 children: [
-                  for (final player in state._data.players)
+                  for (final player in state._data.playerNames)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       dense: true,
@@ -462,7 +465,7 @@ class _PlayerSettingContainer extends StatelessWidget {
                             fontWeight: FontWeight.bold),
                       ),
                       trailing: ReorderableDragStartListener(
-                        index: state._data.players.indexOf(player),
+                        index: state._data.playerNames.indexOf(player),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               vertical: 0.0, horizontal: 20.0),
@@ -489,22 +492,29 @@ class _PlayerSettingContainer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () {
-                  _PlayerNameDialog(
-                    context: context,
-                    validate: state.validate,
-                  ).open().then((newPly) {
-                    if (newPly != null) {
-                      state._addPlayer(newPly);
-                    }
-                  });
-                },
-                icon: Icon(
-                  Icons.add,
-                  color: colorScheme.onPrimaryContainer,
-                ),
-              )
+              state._canAddPlayer()
+                  ? IconButton(
+                  onPressed: () {
+                    _PlayerNameDialog(
+                      context: context,
+                      validate: state.validate,
+                    ).open().then((newPly) {
+                      if (newPly != null) {
+                        state._addPlayer(newPly);
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.add,
+                    color: colorScheme.onPrimaryContainer,
+                  )
+                ) : IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Icons.block,
+                        color: colorScheme.onPrimaryContainer.withAlpha(127),
+                      ),
+                  )
             ],
           ),
         ],
@@ -536,7 +546,7 @@ class _StartButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         style: startButtonStyle,
-        onPressed: state._data.players.isEmpty
+        onPressed: state._data.playerNames.isEmpty
             ? null
             : () {
                 if (state._formKey.currentState!.validate()) {
@@ -544,9 +554,8 @@ class _StartButton extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => //
-                            X01Game(
-                                player: state._data.players,
-                                settings: state._data.get())),
+                            X01Game(settings: state._data.get())
+                    ),
                   );
                 }
               },

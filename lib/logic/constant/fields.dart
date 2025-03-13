@@ -161,6 +161,12 @@ class Turn {
 
   Turn({this.first = Hit.skipped, this.second = Hit.skipped, this.third = Hit.skipped});
 
+  List<Hit> get hits {
+    return [first, second, third]
+        .where((hit) => hit != Hit.skipped)
+        .toList();
+  }
+
   Hit? get last {
     return get(count - 1);
   }
@@ -175,6 +181,17 @@ class Turn {
         return third;
       default:
         return null;
+    }
+  }
+
+  void set(int pos, Hit hit) {
+    switch (pos) {
+      case 0:
+        first = hit;
+      case 1:
+        second = hit;
+      case 2:
+        third = hit;
     }
   }
 
