@@ -1,11 +1,12 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/common.dart';
+import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 
 /// Single Throw by a player.
 class Throw extends Command {
-  final GameRound round;
+  final TurnBuilder round;
   final Hit hit;
   final int pos;
 
@@ -13,12 +14,12 @@ class Throw extends Command {
 
   @override
   void execute() {
-    round.current.thrown(hit, pos: pos);
+    round.thrown(hit, pos: pos);
   }
 
   @override
   void undo() {
-    round.current.undo(pos: pos);
+    round.undo(pos);
   }
 }
 
@@ -28,34 +29,37 @@ class Throw extends Command {
 class Switch extends Command {
   final Player nextPly;
   final Player curPly;
-  final PlayerTurn round;
-  final int leg;
+  final X01Turn turn;
 
   final PlayerData data;
-  final GameRound game;
+  final X01GameData gameData;
+  final TurnBuilder turnBuilder;
 
-  Switch._(this.data, this.game, this.round, this.curPly, this.nextPly, this.leg);
+  Switch._(this.data, this.gameData, this.turnBuilder, this.turn, this.curPly, this.nextPly);
 
-  static Switch from(PlayerData data, GameRound round, {Player? ply, Player? next}) {
+  static Switch from(PlayerData data, X01GameData gameData, TurnBuilder turnBuilder, {Player? ply, Player? next}) {
     var curPly = ply ?? data.current;
     var nexPly = next ?? data.next;
-    return Switch._(data, round, round.current, curPly, nexPly, round.currentLeg);
+    return Switch._(data, gameData, turnBuilder, turnBuilder.build(), curPly, nexPly);
   }
 
   @override
   void execute() {
     /// Apply Score if Valid.
-    data.current.pushTurn(leg, round);
+    gameData.pushTurn(curPly.name, turn);
     data.rotateForward();
-    game.setupTurnFor(nextPly);
+
+    var nextPlyLastTurn = gameData.lastPlayerTurn(nextPly.name);
+    turnBuilder.setupTurnFor(nextPlyLastTurn);
   }
 
   @override
   void undo() {
     /// Reset Score.
-    curPly.popTurn(leg);
     data.rotateBackwards();
-    game.setupTurn(round);
+    gameData.popTurn(curPly.name);
+
+    turnBuilder.resetTo(turn);
   }
 }
 
@@ -64,94 +68,107 @@ class Switch extends Command {
 /// Should be executed after a [Switch] command.
 class EndLeg extends Command {
   final Player winner;
-  final PlayerTurn round;
-  final int leg;
+  final X01Turn turn;
 
   final PlayerData data;
-  final GameRound game;
+  final X01GameData gameData;
+  final TurnBuilder turnBuilder;
 
-  late List<String> _player;
+  EndLeg._(this.data, this.gameData, this.turnBuilder, this.turn, this.winner);
 
-  EndLeg._(this.data, this.game, this.round, this.winner, this.leg);
-
-  static EndLeg from(PlayerData data, GameRound round, {Player? ply}) {
+  static EndLeg from(PlayerData data, X01GameData gameData, TurnBuilder turnBuilder, {Player? ply}) {
     var winner = ply ?? data.current;
-    return EndLeg._(data, round, round.current, winner, round.currentLeg);
-  }
-
-  int order(Player a, Player b) {
-    return a.handicap.compareTo(b.handicap);
+    return EndLeg._(data, gameData, turnBuilder, turnBuilder.build(), winner);
   }
 
   @override
   void execute() {
-    data.current.pushTurn(leg, round);
-    data.forEach((ply) {
-      ply.points.pushLeg(ply == winner);
-    });
-    _player = data.reorder(order);
-    game.currentLeg++;
+    gameData.pushTurn(winner.name, turn);
+    data.rotateForward();
+    gameData.setLegWinner(winner);
+    gameData.pushLeg();
 
-    game.setupTurnFor(data.current);
+    turnBuilder.reset();
   }
 
   @override
   void undo() {
-    game.currentLeg--;
-    data.organize(_player, winner.name);
-    data.forEach((ply) {
-      ply.points.undo();
-    });
-    winner.popTurn(leg);
+    gameData.popLeg();
+    gameData.revokeLegWinner();
+    data.rotateBackwards();
+    gameData.popTurn(winner.name);
 
-    game.setupTurn(round);
+    turnBuilder.resetTo(turn);
   }
 }
 
 class EndSet extends Command {
   final Player winner;
-  final PlayerTurn round;
-  final int leg;
+  final X01Turn turn;
 
   final PlayerData data;
-  final GameRound game;
+  final X01GameData gameData;
+  final TurnBuilder turnBuilder;
 
-  late List<String> _player;
+  EndSet._(this.data, this.gameData, this.turnBuilder, this.turn, this.winner);
 
-  EndSet._(this.data, this.game, this.round, this.winner, this.leg);
-
-  static EndSet from(PlayerData data, GameRound round, {Player? ply, Player? next}) {
+  static EndSet from(PlayerData data, X01GameData gameData, TurnBuilder turnBuilder, {Player? ply}) {
     var winner = ply ?? data.current;
-    return EndSet._(data, round, round.current, winner, round.currentLeg);
-  }
-
-  int order(Player a, Player b) {
-    return a.handicap.compareTo(b.handicap);
+    return EndSet._(data, gameData, turnBuilder, turnBuilder.build(), winner);
   }
 
   @override
   void execute() {
-    data.current.pushTurn(leg, round);
-    data.forEach((ply) {
-      ply.points.pushLeg(ply == winner);
-      ply.points.pushSet(ply == winner);
-    });
-    _player = data.reorder(order);
-    game.currentLeg++;
+    gameData.pushTurn(winner.name, turn);
+    data.rotateForward();
+    gameData.setLegWinner(winner);
+    gameData.setSetWinner(winner);
+    gameData.pushSet();
 
-    game.setupTurnFor(data.current);
+    turnBuilder.reset();
   }
 
   @override
   void undo() {
-    game.currentLeg--;
-    data.organize(_player, winner.name);
-    data.forEach((ply) {
-      ply.points.undo();
-      ply.points.undo();
-    });
-    winner.popTurn(leg);
+    gameData.popSet();
+    gameData.revokeSetWinner();
+    gameData.revokeLegWinner();
+    data.rotateBackwards();
+    gameData.popTurn(winner.name);
 
-    game.setupTurn(round);
+    turnBuilder.resetTo(turn);
+  }
+}
+
+class EndGame extends Command {
+  final Player winner;
+  final X01Turn turn;
+
+  final X01GameData gameData;
+  final TurnBuilder turnBuilder;
+
+  EndGame._(this.gameData, this.turnBuilder, this.turn, this.winner);
+
+  static EndGame from(PlayerData data, X01GameData gameData, TurnBuilder turnBuilder, {Player? ply}) {
+    var winner = ply ?? data.current;
+    return EndGame._(gameData, turnBuilder, turnBuilder.build(), winner);
+  }
+
+  @override
+  void execute() {
+    gameData.pushTurn(winner.name, turn);
+    gameData.setLegWinner(winner);
+    gameData.setSetWinner(winner);
+
+    turnBuilder.reset();
+  }
+
+  @override
+  void undo() {
+    gameData.revokeSetWinner();
+    gameData.revokeLegWinner();
+    gameData.popTurn(winner.name);
+
+    turnBuilder.resetTo(turn);
   }
 }

@@ -3,6 +3,7 @@ import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
+import 'package:dart_dart/pages/games/x01_game_statistics.dart';
 import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
@@ -11,8 +12,8 @@ import 'package:flutter/material.dart';
 class X01Game extends StatefulWidget {
   late final GameController data;
 
-  X01Game({super.key, required List<String> player, required GameSettings settings}) {
-    data = GameController(player, settings);
+  X01Game({super.key, required GameSettings settings}) {
+    data = GameController(settings);
   }
 
   @override
@@ -26,6 +27,12 @@ class _X01PageState extends State<X01Game> {
     });
   }
 
+  void undo() {
+    setState(() {
+      widget.data.undo();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -34,60 +41,60 @@ class _X01PageState extends State<X01Game> {
     return PopScope(
         canPop: false,
         child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              titleTextStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: FontConstants.title.fontFamily,
-                color: colorScheme.onSurface,
-              ),
-              backgroundColor: colorScheme.surface,
-              title: Text(data.settings.game.text),
-              leading: IconButton(
-                onPressed: () {
-                  _CancelGame.open(context).then((quit) {
-                    if (quit) {
-                      setState(() {
-                        Navigator.pop(context);
-                      });
-                    }
-                  });
-                },
-                icon: const Icon(Icons.close),
-              ),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.undo),
-                  onPressed: data.canUndo
-                      ? () {
-                          setState(() {
-                            data.undo();
-                          });
-                        }
-                      : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.redo),
-                  onPressed: data.canRedo
-                      ? () {
-                          setState(() {
-                            data.redo();
-                          });
-                        }
-                      : null,
-                )
-              ],
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: FontConstants.title.fontFamily,
+              color: colorScheme.onSurface,
             ),
-            body: OrientationBuilder(builder: (context, orientation) {
-                return orientation == Orientation.portrait
-                    ? //
-                    _PortraitView(this, setState)
-                    : //
-                    _LandscapeView(this, setState);
-              }),
-            ));
+            backgroundColor: colorScheme.surface,
+            title: Text(data.settings.game.text),
+            leading: IconButton(
+              onPressed: () {
+                _CancelGame.open(context).then((quit) {
+                  if (quit) {
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  }
+                });
+              },
+              icon: const Icon(Icons.close),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.undo),
+                onPressed: data.canUndo
+                    ? () {
+                        setState(() {
+                          data.undo();
+                        });
+                      }
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.redo),
+                onPressed: data.canRedo
+                    ? () {
+                        setState(() {
+                          data.redo();
+                        });
+                      }
+                    : null,
+              )
+            ],
+          ),
+          body: OrientationBuilder(builder: (context, orientation) {
+            return orientation == Orientation.portrait
+                ? //
+                _PortraitView(this, setState)
+                : //
+                _LandscapeView(this, setState);
+          }),
+        ));
   }
 }
 
@@ -169,6 +176,7 @@ class _PlayersList extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final PlayerData data = state.widget.data.playerData;
+    final X01GameData gameData = state.widget.data.gameData;
 
     return Row(
       children: <Widget>[
@@ -191,7 +199,8 @@ class _PlayersList extends StatelessWidget {
                     color: colorScheme.primary,
                   ),
                   margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 5.0, horizontal: 5.0),
                   child: Row(
                     children: [
                       SizedBox(
@@ -207,8 +216,9 @@ class _PlayersList extends StatelessWidget {
                       SizedBox(
                         width: 35,
                         child: Text(
-                          ply.score.toString(),
-                          style: FontConstants.text.copyWith(color: colorScheme.onPrimary),
+                          gameData.score(ply.name).toString(),
+                          style: FontConstants.text
+                              .copyWith(color: colorScheme.onPrimary),
                         ),
                       ),
                     ],
@@ -228,16 +238,19 @@ class _ThrowBean extends StatelessWidget {
   final String tooltip;
   final Placement placement;
 
-  const _ThrowBean({required this.text, required this.tooltip, required this.placement});
+  const _ThrowBean(
+      {required this.text, required this.tooltip, required this.placement});
 
   BorderRadius getBorderRadius() {
     switch (placement) {
       case Placement.center:
         return BorderRadius.circular(5);
       case Placement.leftEnd:
-        return BorderRadius.horizontal(left: Radius.circular(20), right: Radius.circular(5));
+        return BorderRadius.horizontal(
+            left: Radius.circular(20), right: Radius.circular(5));
       case Placement.rightEnd:
-        return BorderRadius.horizontal(right: Radius.circular(20), left: Radius.circular(5));
+        return BorderRadius.horizontal(
+            right: Radius.circular(20), left: Radius.circular(5));
     }
   }
 
@@ -251,7 +264,8 @@ class _ThrowBean extends StatelessWidget {
       fontStyle: FontStyle.italic,
     );
 
-    final textStyle = colorScheme.getTextStyle(color: colorScheme.onPrimary, fontSize: fontSize);
+    final textStyle = colorScheme.getTextStyle(
+        color: colorScheme.onPrimary, fontSize: fontSize);
 
     return Container(
       decoration: BoxDecoration(
@@ -280,6 +294,7 @@ class _CurrentPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final curTurn = game.turnBuilder;
 
     final TextStyle titleStyle = TextStyle(
       color: colorScheme.onPrimaryContainer,
@@ -304,7 +319,8 @@ class _CurrentPlayer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0, bottom: 5.0),
+            margin: const EdgeInsets.only(
+                left: 20.0, right: 20.0, top: 0.0, bottom: 5.0),
             child: Row(
               children: [
                 const Spacer(flex: 1),
@@ -317,14 +333,14 @@ class _CurrentPlayer extends StatelessWidget {
                   style: scoreStyle,
                 ),
                 const Spacer(flex: 2),
-                game.curTurn.isCheckout
+                game.turnBuilder.isCheckout
                     ? //
                     Icon(Icons.check, color: colorScheme.success)
                     : //
                     Text(
-                        game.curTurn.score.toString(),
+                        game.turnBuilder.score.toString(),
                         style: titleStyle.copyWith(
-                            color: game.curTurn.valid //
+                            color: curTurn.valid //
                                 ? colorScheme.onPrimaryContainer //
                                 : colorScheme.error),
                       ),
@@ -339,22 +355,22 @@ class _CurrentPlayer extends StatelessWidget {
               children: [
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.first}',
-                    tooltip: game.checkout.first,
+                    text: '${curTurn.first}',
+                    tooltip: game.checkout.first.abbreviation,
                     placement: Placement.leftEnd,
                   ),
                 ),
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.second}',
-                    tooltip: game.checkout.second,
+                    text: '${curTurn.second}',
+                    tooltip: game.checkout.second.abbreviation,
                     placement: Placement.center,
                   ),
                 ),
                 Expanded(
                   child: _ThrowBean(
-                    text: '${game.curTurn.third}',
-                    tooltip: game.checkout.third,
+                    text: '${curTurn.third}',
+                    tooltip: game.checkout.third.abbreviation,
                     placement: Placement.rightEnd,
                   ),
                 ),
@@ -364,58 +380,6 @@ class _CurrentPlayer extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _GameEnd {
-  final String winner;
-  final BuildContext context;
-
-  late final ColorScheme colorScheme;
-
-  _GameEnd({required this.context, required this.winner}) {
-    colorScheme = Theme.of(context).colorScheme;
-  }
-
-  Future<bool> open() async {
-    bool rematch = false;
-
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Congratulations',
-          textAlign: TextAlign.center,
-          style: FontConstants.subtitle,
-        ),
-        content: Text(
-          '"$winner" won!',
-          textAlign: TextAlign.center,
-          style: FontConstants.text,
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: <Widget>[
-          MaterialButton(
-            color: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            child: const Text('REMATCH'),
-            onPressed: () {
-              rematch = true;
-              Navigator.pop(context);
-            },
-          ),
-          MaterialButton(
-            color: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            child: const Text('QUIT'),
-            onPressed: () {
-              rematch = false;
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    ).then((_) => rematch);
   }
 }
 
@@ -470,29 +434,28 @@ class _NextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final GameController data = state.widget.data;
+    final TurnBuilder gameData = data.turnBuilder;
 
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ElevatedButton(
-        onPressed: !data.curTurn.done
+        onPressed: !gameData.done
             ? null
             : () {
                 update(() {
                   data.next();
                 });
                 if (data.hasGameEnded) {
-                  var ply = data.winner!;
-                  _GameEnd(context: context, winner: ply.name)
-                      .open() //
-                      .then((rematch) {
-                    update(() {
-                      if (rematch) {
-                        data.reset();
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    });
+                  update(() {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => //
+                                X01Statistics(
+                                    stats: data.getStats(),
+                                    settings: data.settings,
+                                    onUndo: state.undo)));
                   });
                 }
               },
@@ -501,7 +464,7 @@ class _NextButton extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
         ),
-        child: const Text('next'),
+        child: data.hasGameEnded ? const Text('end') : const Text('next'),
       ),
     );
   }

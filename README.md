@@ -4,6 +4,11 @@
 
 DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It allows you to keep track of your dart games.
 
+<p align="center">
+  <img src="docs/Screenshot_20250226_194409.png" width=256pt style="margin-right: 10px;"/>
+  <img src="docs/Screenshot_20250226_194438.png" width=256pt />
+</p>
+
 ### X01
 
 Play a classic game of 301, 501 or 701.

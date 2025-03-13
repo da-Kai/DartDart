@@ -128,11 +128,7 @@ void main() {
       await tester.pumpAndSettle();
 
       /// Finish
-      expect(find.text('Congratulations'), findsOneWidget);
-      await tester.tap(find.text('QUIT'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('X01-Game'), findsOneWidget);
+      expect(find.text('Statistics'), findsOneWidget);
     });
   });
 }

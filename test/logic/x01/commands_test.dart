@@ -1,6 +1,5 @@
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/commands.dart';
-import 'package:dart_dart/logic/x01/common.dart';
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
@@ -10,84 +9,93 @@ void main() {
   group('Test X01 Commands', () {
     test('Test Throw', () {
       var settings = GameSettingFactory().get();
-      var round = GameRound(settings);
+      var round = TurnBuilder(settings);
       var hit = Hit.bullseye;
 
       var t = Throw(round, hit, 0);
 
-      expect(round.current.first, Hit.skipped);
+      expect(round.first, Hit.skipped);
       t.execute();
-      expect(round.current.first, hit);
+      expect(round.first, hit);
       t.undo();
-      expect(round.current.first, Hit.skipped);
+      expect(round.first, Hit.skipped);
     });
     test('Test Switch', () {
       var settings = GameSettingFactory().get();
-      Player plyFunc(name) => Player(name, settings.points, () => 0);
-      var plyData = PlayerData.get(['A', 'B'], plyFunc);
-      var gameRound = GameRound(settings);
-      gameRound.current.thrown(Hit.bullseye);
+      var plyData = PlayerData.get(['A', 'B']);
+      var gameRound = TurnBuilder(settings);
+      var gameData = X01GameData(settings);
+      gameRound.thrown(Hit.bullseye);
 
-      var t = Switch.from(plyData, gameRound);
+      var t = Switch.from(plyData, gameData, gameRound);
 
-      expect(gameRound.current, t.round);
       expect(plyData.current, t.curPly);
-      expect(t.curPly.turnHistory.turnCount, 0);
+      expect(gameData.totalTurnCount(t.curPly), 0);
       t.execute();
-      expect(gameRound.current == t.round, false);
       expect(plyData.current == t.curPly, false);
-      expect(t.curPly.turnHistory.turnCount, 1);
+      expect(gameData.totalTurnCount(t.curPly), 1);
       t.undo();
-      expect(gameRound.current, t.round);
       expect(plyData.current, t.curPly);
-      expect(t.curPly.turnHistory.turnCount, 0);
+      expect(gameData.totalTurnCount(t.curPly), 0);
     });
     test('Test EndLeg', () {
       var player = ['A', 'B'];
-      var settings = GameSettings(Games.threeOOne, InOut.straight, InOut.straight, 2, 2);
-      var data = GameController(player, settings);
+      var settings = GameSettings(Games.threeOOne, InOut.straight, InOut.straight, 1, 2, player);
+      var data = GameController(settings);
       
       expect(data.commands.toString(), '[]');
+      expect(data.totalLeader?.name, 'A');
 
-      expect(data.leader!.name, 'A');
-      var cmdSwitch = Switch.from(data.playerData, data.gameRound);
+      var cmdSwitch = Switch.from(data.playerData, data.gameData, data.turnBuilder);
       data.commands.execute(cmdSwitch);
+      expect(data.curPly.name, 'B');
 
       expect(data.commands.toString(), '[(Switch)]');
 
-      expect(data.leader!.name, 'A');
-      expect(data.leader!.points.currentLegs, 0);
-      var cmdEndLeg = EndLeg.from(data.playerData, data.gameRound);
+      expect(data.totalLeader?.name, 'A');
+      expect(data.leaderPoints, (0, 0));
+      expect(data.curPly.name, 'B');
+      var legWinner = data.playerData.find('B');
+      var cmdEndLeg = EndLeg.from(data.playerData, data.gameData, data.turnBuilder, ply: legWinner);
       data.commands.execute(cmdEndLeg);
 
+      expect(data.curPly.name, 'A');
       expect(data.commands.toString(), '[Switch, (EndLeg)]');
 
-      expect(data.leader!.points.sets, 0);
-      expect(data.leader!.points.currentLegs, 1);
-      var cmdEndSet = EndSet.from(data.playerData, data.gameRound);
+      expect(data.totalLeader?.name, 'B');
+      expect(data.totalLeader?.name, legWinner.name);
+      expect(data.leaderPoints, (0, 1));
+
+      var cmdSwitch3 = Switch.from(data.playerData, data.gameData, data.turnBuilder);
+      data.commands.execute(cmdSwitch3);
+
+      expect(data.curPly.name, 'B');
+
+      var cmdEndSet = EndSet.from(data.playerData, data.gameData, data.turnBuilder);
       data.commands.execute(cmdEndSet);
 
-      expect(data.commands.toString(), '[Switch, EndLeg, (EndSet)]');
+      expect(data.commands.toString().endsWith('[Switch, EndLeg, Switch, (EndSet)]'), true);
+      expect(data.leaderPoints, (1, 0));
 
-      expect(data.leader!.points.sets, 1);
+      data.commands.undo();
+      expect(data.commands.toString(), '[Switch, EndLeg, (Switch), EndSet]');
+
+      data.commands.undo();
+      expect(data.commands.toString(), '[Switch, (EndLeg), Switch, EndSet]');
+
+      expect(data.totalLeader?.name, 'B');
+      expect(data.leaderPoints, (0, 1));
       data.commands.undo();
 
-      expect(data.commands.toString(), '[Switch, (EndLeg), EndSet]');
+      expect(data.commands.toString(), '[(Switch), EndLeg, Switch, EndSet]');
 
-      expect(data.leader!.name, 'B');
-      expect(data.leader!.points.sets, 0);
-      expect(data.leader!.points.currentLegs, 1);
+      expect(data.totalLeader?.name, 'A');
+      expect(data.leaderPoints, (0, 0));
       data.commands.undo();
 
-      expect(data.commands.toString(), '[(Switch), EndLeg, EndSet]');
+      expect(data.commands.toString(), '[Switch, EndLeg, Switch, EndSet]');
 
-      expect(data.leader!.name, 'A');
-      expect(data.leader!.points.currentLegs, 0);
-      data.commands.undo();
-
-      expect(data.commands.toString(), '[Switch, EndLeg, EndSet]');
-
-      expect(data.leader!.name, 'A');
+      expect(data.totalLeader?.name, 'A');
     });
   });
 }

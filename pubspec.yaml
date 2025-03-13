@@ -4,7 +4,7 @@ homepage: "https://da-kai.github.io/DartDart/"
 repository: "https://github.com/da-Kai/DartDart"
 publish_to: 'none'
 
-version: 0.8.0
+version: 0.9.0
 version_alias: prototype
 
 environment:
@@ -14,6 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:

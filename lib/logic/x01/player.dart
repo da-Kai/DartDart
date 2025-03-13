@@ -29,52 +29,40 @@ abstract class PlayerData {
 
   Iterable<T> mapPlayer<T>(T Function(Player) toElement, {int skip = 0});
 
-  void forEach(void Function(Player) action);
-
-  static PlayerData get(List<String> player, PlayerFactory factory) {
+  static PlayerData get(List<String> playernames) {
+    List<Player> player = playernames.map((name) => Player(name)).toList();
     if (player.length == 1) {
-      return _SinglePlayerData(player.first, factory);
+      return _SinglePlayerData(player.first);
     } else {
-      return _MultiPlayerData(player, factory);
+      return _MultiPlayerData(player);
     }
   }
 
   Player find(String name);
-
-  void organize(List<String> player, String current);
-
-  List<String> reorder(int Function(Player, Player) order);
 }
 
 class _MultiPlayerData implements PlayerData {
-  final PlayerFactory _playerFactory;
-  final List<String> _players;
-
-  final List<Player> _playerList = [];
+  final List<Player> _playerList;
 
   int _currentPlayer = 0;
 
-  _MultiPlayerData(this._players, this._playerFactory) {
+  _MultiPlayerData(this._playerList) {
     reset();
   }
 
   @override
   void reset() {
-    _playerList.clear();
-    for(var plyName in _players) {
-      var player = _playerFactory(plyName);
-      _playerList.add(player);
-    }
     _currentPlayer = 0;
   }
 
   int _getIndex(int delta) {
-    if(_playerList.isEmpty) return _currentPlayer;
+    if(_playerList.isEmpty) return -1;
     return (_currentPlayer+delta) % _playerList.length;
   }
 
   Player _byDelta(int delta) {
-    return _playerList[_getIndex(delta)];
+    final playerIndex = _getIndex(delta);
+    return playerIndex == -1 ? Player('ERR') : _playerList[playerIndex];
   }
 
   @override
@@ -111,54 +99,21 @@ class _MultiPlayerData implements PlayerData {
   }
 
   @override
-  void organize(List<String> player, String curPly) {
-    if (player.length != _playerList.length) {
-      throw Exception("Player list is not of same Length! can't organize.");
-    }
-    for (var name in player) {
-      var ply = find(name);
-      _playerList.remove(ply);
-      _playerList.add(ply);
-    }
-    _currentPlayer = 0;
-    while (curPly == current.name) {
-      _currentPlayer++;
-    }
-  }
-
-  @override
-  List<String> reorder(int Function(Player, Player) order) {
-    var current = _playerList.map((p) => p.name).toList();
-    _playerList.sort(order);
-    return current;
-  }
-
-  @override
   Player find(String name) {
     return _playerList.firstWhere((p) => p.name == name);
-  }
-
-  @override
-  void forEach(void Function(Player) action) {
-    _playerList.forEach(action);
   }
 }
 
 class _SinglePlayerData implements PlayerData {
-  final PlayerFactory _playerFactory;
-  final String _playerName;
-
   @override
-  late Player current;
+  final Player current;
 
-  _SinglePlayerData(this._playerName, this._playerFactory) {
+  _SinglePlayerData(this.current) {
     reset();
   }
 
   @override
-  void reset() {
-    current = _playerFactory(_playerName);
-  }
+  void reset() {}
 
   @override
   bool get isSinglePlayer => true;
@@ -196,23 +151,10 @@ class _SinglePlayerData implements PlayerData {
   }
 
   @override
-  void organize(List<String> player, String current) {
-    return;
-  }
-
-  @override
   Player find(String name) {
     if (name != current.name) {
       throw Exception('Player name unknown!');
     }
     return current;
-  }
-
-  @override
-  void forEach(void Function(Player) action) => action(current);
-
-  @override
-  List<String> reorder(int Function(Player, Player) order) {
-    return [current.name];
   }
 }
