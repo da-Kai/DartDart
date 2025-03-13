@@ -5,6 +5,8 @@ import 'package:dart_dart/logic/x01/common.dart';
 
 typedef Check<T> = bool Function(T a);
 
+const maxPlayers = 6;
+
 enum InOut {
   straight(180, 1),
   double(170, 2),
@@ -63,6 +65,10 @@ class GameSettingFactory {
     }
 
     return GameSettings(game, gameIn, gameOut, s, l, playerNames);
+  }
+
+  bool isPlayerValid(String name) {
+    return name.isNotEmpty && playerNames.length < maxPlayers && isNameFree(name);
   }
 
   bool isNameFree(String name) {

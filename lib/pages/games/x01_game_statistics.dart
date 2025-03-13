@@ -1,3 +1,4 @@
+import 'package:dart_dart/logic/common/style_meta.dart';
 import 'package:dart_dart/logic/x01/flow_chart.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/logic/x01/statistics.dart';
@@ -95,12 +96,10 @@ class _GameProgress extends StatelessWidget {
     final game = state.widget.settings.game;
     final gameFlow = state.widget.stats.gameFlow;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final List<Color> playerColors = [
-      Colors.red.withAlpha(128),
-      Colors.blue.withAlpha(128),
-      Colors.green.withAlpha(128),
-      Colors.yellow.withAlpha(128)
-    ];
+
+    final List<Color> playerColors = colorScheme.brightness == Brightness.light //
+        ? PlayerColors.light //
+        : PlayerColors.dark;
 
     final lineChartData =
         FlowChart.from(game, gameFlow.playerScores, playerColors);
@@ -139,6 +138,15 @@ class _PlayerStatsView extends StatelessWidget {
     final data = state.widget.stats.playerStats;
     final colorScheme = Theme.of(context).colorScheme;
 
+    final List<Color> playerColors = colorScheme.brightness == Brightness.light //
+        ? PlayerColors.light //
+        : PlayerColors.dark;
+
+    Color playerColor(String name) {
+      final int index = data.entries.toList().indexWhere((element) => element.key == name);
+      return playerColors[index];
+    }
+
     return Container(
         padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
@@ -157,7 +165,8 @@ class _PlayerStatsView extends StatelessWidget {
                 sixtyPlus: '60+',
                 oneTwentyPlus: '120+',
                 oneEighty: '180=',
-                checkout: 'Checkout'),
+                checkout: 'Checkout'
+            ),
             Padding(
               padding: EdgeInsets.only(top: 40.0),
               child: VerticalDivider(
@@ -183,6 +192,7 @@ class _PlayerStatsView extends StatelessWidget {
                           oneEighty: player.value.oneEighty.toString(),
                           checkout:
                               '${(player.value.checkoutRate * 100).toStringAsFixed(1)}%',
+                          color: playerColor(player.key)
                         ),
                     ],
                   ),
@@ -204,6 +214,7 @@ class _StatsColumn extends StatelessWidget {
   final String oneTwentyPlus;
   final String oneEighty;
   final String checkout;
+  final Color? color;
 
   const _StatsColumn(
       {required this.name,
@@ -214,7 +225,8 @@ class _StatsColumn extends StatelessWidget {
       required this.sixtyPlus,
       required this.oneTwentyPlus,
       required this.oneEighty,
-      required this.checkout});
+      required this.checkout,
+      this.color});
 
   Container getHeaderBean(String? name, ColorScheme colorScheme) {
     final String nameVal = name ?? '';
@@ -225,9 +237,17 @@ class _StatsColumn extends StatelessWidget {
             color: colorScheme.primary,
           );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
       decoration: deco,
-      child: Text(nameVal, style: FontConstants.subtitle),
+      child: Row(
+        children: [
+          Text(nameVal, style: FontConstants.subtitle),
+          Padding(
+              padding: EdgeInsets.only(left: 5.0, top: 2.0, bottom: 2.0),
+              child: color == null ? Container() : Icon(Icons.circle, color: color),
+          )
+        ],
+      )
     );
   }
 

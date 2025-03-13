@@ -35,6 +35,8 @@ class _X01PageState extends State<X01Setting> {
     return (true, null);
   }
 
+  bool _canAddPlayer() => _data.playerNames.length < maxPlayers;
+
   void _removePlayer(String ply) => setState(() => _data.playerNames.remove(ply));
 
   void _addPlayer(String player) => setState(() => _data.playerNames.add(player));
@@ -490,22 +492,29 @@ class _PlayerSettingContainer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                onPressed: () {
-                  _PlayerNameDialog(
-                    context: context,
-                    validate: state.validate,
-                  ).open().then((newPly) {
-                    if (newPly != null) {
-                      state._addPlayer(newPly);
-                    }
-                  });
-                },
-                icon: Icon(
-                  Icons.add,
-                  color: colorScheme.onPrimaryContainer,
-                ),
-              )
+              state._canAddPlayer()
+                  ? IconButton(
+                  onPressed: () {
+                    _PlayerNameDialog(
+                      context: context,
+                      validate: state.validate,
+                    ).open().then((newPly) {
+                      if (newPly != null) {
+                        state._addPlayer(newPly);
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.add,
+                    color: colorScheme.onPrimaryContainer,
+                  )
+                ) : IconButton(
+                      onPressed: null,
+                      icon: Icon(
+                        Icons.block,
+                        color: colorScheme.onPrimaryContainer.withAlpha(127),
+                      ),
+                  )
             ],
           ),
         ],
