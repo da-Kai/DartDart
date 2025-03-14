@@ -464,7 +464,7 @@ class _NextButton extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
         ),
-        child: data.hasGameEnded ? const Text('end') : const Text('next'),
+        child: data.willGameEnd ? const Text('done') : const Text('next'),
       ),
     );
   }
