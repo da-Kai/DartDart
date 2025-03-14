@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/style_meta.dart';
+import 'package:dart_dart/style/x01/style_meta.dart';
 import 'package:dart_dart/logic/x01/flow_chart.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/logic/x01/statistics.dart';
@@ -275,7 +275,12 @@ class _StatsColumn extends StatelessWidget {
       decoration: deco,
       child: Row(
         children: [
-          Text(nameVal, style: FontConstants.subtitle),
+          Text(nameVal,
+            overflow: TextOverflow.ellipsis,
+            style: FontConstants.text.copyWith(
+              color: colorScheme.onPrimary,
+            ),
+          ),
           Padding(
               padding: EdgeInsets.only(left: 5.0, top: 2.0, bottom: 2.0),
               child: getColorIcon(),
