@@ -50,8 +50,8 @@ Future<void> addPlayer(WidgetTester tester, String playerName) async {
 }
 
 void main() {
-  group('Test X01', () {
-    testWidgets('Smoke Test Home Screen', (WidgetTester tester) async {
+  group('Smoke Test X01', () {
+    testWidgets('2 Player Game', (WidgetTester tester) async {
       await tester.pumpWidget(const DartDart());
 
       await rotate(tester);
@@ -124,11 +124,15 @@ void main() {
       await press(tester, HitNumber.two, HitMultiplier.double);
 
       expect(find.byIcon(Icons.check), findsOneWidget);
-      await tester.tap(find.text('next'));
+      await tester.tap(find.text('done'));
       await tester.pumpAndSettle();
 
       /// Finish
       expect(find.text('Statistics'), findsOneWidget);
+      expect(find.text('1/1'), findsOneWidget);
+      expect(find.text('0/0'), findsOneWidget);
+      expect(find.text('50.0%'), findsOneWidget);
+      expect(find.text('140.33'), findsAtLeast(2));
     });
   });
 }

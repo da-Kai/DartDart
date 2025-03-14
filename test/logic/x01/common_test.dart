@@ -124,7 +124,7 @@ void main() {
 
       builder.thrown(Hit.get(HitNumber.ten, HitMultiplier.single));
       expect(builder.score, 60);
-      expect(builder.overthrown, false);
+      expect(builder.overthrown, true);
       expect(builder.done, true);
       expect(builder.valid, false);
       expect(builder.isCheckout, false);
