@@ -65,10 +65,10 @@ class PlayerGameStats {
 
           if (turnNum < 3) {
             firstNineSum += sum;
-            firstNineCnt += turn.count;
+            firstNineCnt += 1;
           }
           totalSum += sum;
-          totalCount += turn.count;
+          totalCount += 1;
 
           if (sum >= 60) {
             sixtyPlusCnt++;

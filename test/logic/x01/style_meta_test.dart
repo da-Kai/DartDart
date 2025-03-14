@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/style_meta.dart';
+import 'package:dart_dart/style/x01/style_meta.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -21,23 +21,13 @@ class FlowChart {
         turnCount++;
       }
 
-      /*
-      for (final leg in flow.scoreFlowPerLeg) {
-        for (final score in leg) {
-          final spot = FlSpot(turnCount.toDouble(), score.toDouble());
-          dataPoints.add(spot);
-          turnCount++;
-        }
-      }
-      */
-
       lineBarsData.add(LineChartBarData(
         spots: dataPoints,
         isCurved: true,
         barWidth: 5.0,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
-        color: playerColors[playerIndex % playerColors.length].withAlpha(128),
+        color: playerColors[playerIndex % playerColors.length].withAlpha(170),
       ));
 
       playerIndex++;

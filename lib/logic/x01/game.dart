@@ -51,8 +51,6 @@ class X01GameData {
     initialScore = settings.points;
   }
 
-
-
   int legsWonInTotal(Player? ply) {
     if (ply == null) return 0;
     int legs = 0;
@@ -235,6 +233,14 @@ class GameController {
 
   bool get hasGameEnded => winner != null;
 
+  bool get willGameEnd {
+    if (!turnBuilder.isCheckout) {
+      return false;
+    }
+    final points = gameData.points(curPly.name);
+    return points.$2 + 1 == settings.legs && points.$1 + 1 == settings.sets;
+  }
+
   void onThrow(Hit hit) {
     if (turnBuilder.done) return;
     var action = Throw(turnBuilder, hit, turnBuilder.count);
@@ -252,8 +258,8 @@ class GameController {
     }
     final playerPoints = gameData.points(curPly.name);
 
-    if (playerPoints.$2+1 == settings.legs) {
-      if (playerPoints.$1+1 == settings.sets) {
+    if (playerPoints.$2 + 1 == settings.legs) {
+      if (playerPoints.$1 + 1 == settings.sets) {
         return EndGame.from(playerData, gameData, turnBuilder);
       }
       return EndSet.from(playerData, gameData, turnBuilder);
@@ -306,7 +312,10 @@ class TurnBuilder {
   bool get done =>
       _currentTurn.count == 3 || isCheckout || invalid || overthrown;
 
-  bool get overthrown => startScore < _currentTurn.sum();
+  bool get overthrown {
+    final sum = _currentTurn.sum();
+    return startScore < sum || (startScore == sum && !isCheckout);
+  }
 
   bool get valid => _curCheck.isValid;
 
@@ -348,7 +357,7 @@ class TurnBuilder {
 
   //Public
   void thrown(Hit hit, {int? pos}) {
-    _currentTurn.thrown(hit, pos: pos??count);
+    _currentTurn.thrown(hit, pos: pos ?? count);
     _updateCheck();
   }
 

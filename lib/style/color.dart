@@ -23,7 +23,7 @@ class ColorConstants {
   static const Color textLight = Color.fromRGBO(251, 246, 236, 1.0);
 
   static const Color backgroundDark = Color.fromRGBO(33, 33, 33, 1.0);
-  static const Color backgroundLight = Color.fromRGBO(203, 211, 220, 1.0);
+  static const Color backgroundLight = Color.fromRGBO(250, 245, 240, 1.0);
   static const Color backgroundBeige2 = Color.fromRGBO(209, 195, 166, 1.0);
   static const Color backgroundBeige = Color.fromRGBO(247, 244, 237, 1.0);
 

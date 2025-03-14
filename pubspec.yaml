@@ -4,11 +4,12 @@ homepage: "https://da-kai.github.io/DartDart/"
 repository: "https://github.com/da-Kai/DartDart"
 publish_to: 'none'
 
-version: 0.9.0
+version: 0.9.1
 version_alias: prototype
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.27.0'
 
 dependencies:
   flutter:

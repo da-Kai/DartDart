@@ -1,4 +1,4 @@
-import 'package:dart_dart/logic/common/style_meta.dart';
+import 'package:dart_dart/style/x01/style_meta.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/player.dart';
@@ -200,7 +200,7 @@ class _PlayersList extends StatelessWidget {
                   ),
                   margin: const EdgeInsets.all(5),
                   padding: const EdgeInsets.symmetric(
-                      vertical: 5.0, horizontal: 5.0),
+                      vertical: 5.0, horizontal: 10.0),
                   child: Row(
                     children: [
                       SizedBox(
@@ -464,7 +464,7 @@ class _NextButton extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
         ),
-        child: data.hasGameEnded ? const Text('end') : const Text('next'),
+        child: data.willGameEnd ? const Text('done') : const Text('next'),
       ),
     );
   }
