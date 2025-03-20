@@ -13,6 +13,6 @@ class FontConstants {
   );
   static const TextStyle text = TextStyle(
     fontFamily: 'mitr',
-    fontSize: 16,
+    fontSize: 14,
   );
 }

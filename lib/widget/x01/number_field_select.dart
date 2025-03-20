@@ -27,10 +27,34 @@ class _FieldSelectState extends State<FieldSelect> {
     );
 
     final List<List<HitNumber>> hitNumbers = [
-      [HitNumber.one, HitNumber.two, HitNumber.three, HitNumber.four, HitNumber.five],
-      [HitNumber.six, HitNumber.seven, HitNumber.eight, HitNumber.nine, HitNumber.ten],
-      [HitNumber.eleven, HitNumber.twelve, HitNumber.thirteen, HitNumber.fourteen, HitNumber.fifteen],
-      [HitNumber.sixteen, HitNumber.seventeen, HitNumber.eighteen, HitNumber.nineteen, HitNumber.twenty],
+      [
+        HitNumber.one,
+        HitNumber.two,
+        HitNumber.three,
+        HitNumber.four,
+        HitNumber.five
+      ],
+      [
+        HitNumber.six,
+        HitNumber.seven,
+        HitNumber.eight,
+        HitNumber.nine,
+        HitNumber.ten
+      ],
+      [
+        HitNumber.eleven,
+        HitNumber.twelve,
+        HitNumber.thirteen,
+        HitNumber.fourteen,
+        HitNumber.fifteen
+      ],
+      [
+        HitNumber.sixteen,
+        HitNumber.seventeen,
+        HitNumber.eighteen,
+        HitNumber.nineteen,
+        HitNumber.twenty
+      ],
       [HitNumber.bull, HitNumber.miss],
     ];
 
@@ -70,28 +94,25 @@ class _FieldSelectState extends State<FieldSelect> {
                   ),
                 ],
               ),
-              Divider(
-                color: colorScheme.scrim,
-                height: 15.0,
-                thickness: 1.5,
-              ),
-              Column(
-                children: hitNumbers
-                    .map<Row>((numRow) => Row(
-                          children: numRow.map<Widget>((hitNum) => HitButton(
-                                  style: buttonStyle,
-                              onPressed: (hit) {
-                                widget.onSelect(hit);
-                                setState(() {
-                                  hitMultiplier = HitMultiplier.single;
-                                });
-                              },
-                              hitMult: hitMultiplier,
-                              hitNum: hitNum))
-                              .toList(),
-                        ))
-                    .toList(),
-              ),
+              const Padding(padding: EdgeInsets.symmetric(vertical: 5.0)),
+              Row(),
+              for (final hitnumer in hitNumbers)
+                Row(
+                  children: [
+                    for (final hitNum in hitnumer)
+                      HitButton(
+                        style: buttonStyle,
+                        onPressed: (hit) {
+                          widget.onSelect(hit);
+                          setState(() {
+                            hitMultiplier = HitMultiplier.single;
+                          });
+                        },
+                        hitMult: hitMultiplier,
+                        hitNum: hitNum,
+                      )
+                  ],
+                ),
             ],
           )),
     );
@@ -104,7 +125,11 @@ class _MultiplierButton extends StatelessWidget {
   final HitMultiplier current;
   final ButtonStyle style;
 
-  const _MultiplierButton({required this.style, required this.onPressed, required this.hitMultiplier, required this.current});
+  const _MultiplierButton(
+      {required this.style,
+      required this.onPressed,
+      required this.hitMultiplier,
+      required this.current});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +139,8 @@ class _MultiplierButton extends StatelessWidget {
       margin: const EdgeInsets.all(2.5),
       padding: EdgeInsets.zero,
       child: ElevatedButton(
-        onPressed: current == hitMultiplier ? null : () => onPressed(hitMultiplier),
+        onPressed:
+            current == hitMultiplier ? null : () => onPressed(hitMultiplier),
         style: style,
         child: Text(hitMultiplier.text),
       ),
@@ -132,7 +158,12 @@ class HitButton extends StatelessWidget {
     return Hit.get(hitNum, hitMult);
   }
 
-  const HitButton({super.key, required this.style, required this.onPressed, required this.hitMult, required this.hitNum});
+  const HitButton(
+      {super.key,
+      required this.style,
+      required this.onPressed,
+      required this.hitMult,
+      required this.hitNum});
 
   @override
   Widget build(BuildContext context) {
