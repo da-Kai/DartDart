@@ -5,8 +5,9 @@
 DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It allows you to keep track of your dart games.
 
 <p align="center">
-  <img src="docs/Screenshot_20250226_194409.png" width=256pt style="margin-right: 10px;"/>
-  <img src="docs/Screenshot_20250226_194438.png" width=256pt />
+  <img src="docs/screenshot_x01_settings.png" width=30% />
+  <img src="docs/screenshot_x01_game.png" width=30% style="margin-left: 10pt; margin-right: 10pt;" />
+  <img src="docs/screenshot_x01_stats.png" width=30% />
 </p>
 
 ### X01
