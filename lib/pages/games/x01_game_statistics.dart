@@ -79,7 +79,9 @@ class _X01StatsState extends State<X01Statistics> {
                 ),
                 Expanded(
                   flex: 5,
-                  child: _GameProgress(data: widget.settings.game, gameFlow: widget.stats.gameFlow),
+                  child: _GameProgress(
+                      data: widget.settings.game,
+                      gameFlow: widget.stats.gameFlow),
                 )
               ]),
             )));
@@ -104,46 +106,47 @@ class _GameProgressState extends State<_GameProgress> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final legCount = widget.gameFlow.legCount;
 
-    final List<Color> playerColors = colorScheme.brightness == Brightness.light //
-        ? PlayerColors.light //
-        : PlayerColors.dark;
+    final List<Color> playerColors =
+        colorScheme.brightness == Brightness.light //
+            ? PlayerColors.light //
+            : PlayerColors.dark;
 
-    final lineChartData =
-      FlowChart.from(widget.data, widget.gameFlow.playerScores, currentLeg, playerColors);
+    final lineChartData = FlowChart.from(
+        widget.data, widget.gameFlow.playerScores, currentLeg, playerColors);
 
     return Container(
-      padding: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: colorScheme.backgroundShade,
-      ),
-      child: Column(
-        children: [
-          legCount <= 1 ? Container() :
-          Slider(
-              value: currentLeg.toDouble(),
-              divisions: legCount-1,
-              max: (legCount-1).toDouble(),
-              min: 0,
-              label: '${currentLeg+1}. Leg',
-              onChanged: (val) {
-            setState(() {
-              currentLeg = val.toInt();
-            });
-          }),
-          Expanded(
-              child: SingleChildScrollView(
-                clipBehavior: Clip.hardEdge,
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: lineChartData.dataPoints * 50,
-                  child: LineChart(lineChartData.chartData),
-                ),
-              )),
-        ],
-      )
-    );
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.0),
+          color: colorScheme.backgroundShade,
+        ),
+        child: Column(
+          children: [
+            legCount <= 1
+                ? Container()
+                : Slider(
+                    value: currentLeg.toDouble(),
+                    divisions: legCount - 1,
+                    max: (legCount - 1).toDouble(),
+                    min: 0,
+                    label: '${currentLeg + 1}. Leg',
+                    onChanged: (val) {
+                      setState(() {
+                        currentLeg = val.toInt();
+                      });
+                    }),
+            Expanded(
+                child: SingleChildScrollView(
+              clipBehavior: Clip.hardEdge,
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: lineChartData.dataPoints * 50,
+                child: LineChart(lineChartData.chartData),
+              ),
+            )),
+          ],
+        ));
   }
 }
 
@@ -157,12 +160,14 @@ class _PlayerStatsView extends StatelessWidget {
     final data = state.widget.stats.playerStats;
     final colorScheme = Theme.of(context).colorScheme;
 
-    final List<Color> playerColors = colorScheme.brightness == Brightness.light //
-        ? PlayerColors.light //
-        : PlayerColors.dark;
+    final List<Color> playerColors =
+        colorScheme.brightness == Brightness.light //
+            ? PlayerColors.light //
+            : PlayerColors.dark;
 
     Color playerColor(String name) {
-      final int index = data.entries.toList().indexWhere((element) => element.key == name);
+      final int index =
+          data.entries.toList().indexWhere((element) => element.key == name);
       return playerColors[index];
     }
 
@@ -184,13 +189,12 @@ class _PlayerStatsView extends StatelessWidget {
                 sixtyPlus: '60+',
                 oneTwentyPlus: '120+',
                 oneEighty: '180=',
-                checkout: 'Checkout'
+                checkout: 'Checkout',
+                alignment: CrossAxisAlignment.end,
+                isFaded: true
             ),
             Padding(
-              padding: EdgeInsets.only(top: 40.0),
-              child: VerticalDivider(
-                indent: 5.0,
-              ),
+              padding: EdgeInsets.only(top: 40.0, right: 10.0),
             ),
             Expanded(
               child: SizedBox(
@@ -201,19 +205,20 @@ class _PlayerStatsView extends StatelessWidget {
                     children: [
                       for (final player in data.entries)
                         _StatsColumn(
-                          name: player.key,
-                          winner: player.key == state.widget.stats.winner,
-                          setsLegs: '${player.value.sets}/${player.value.legs}',
-                          nineAvg: player.value.nineAvg.toStringAsFixed(2),
-                          avg: player.value.avg.toStringAsFixed(2),
-                          max: player.value.max.toString(),
-                          sixtyPlus: player.value.sixtyPlus.toString(),
-                          oneTwentyPlus: player.value.oneTwentyPlus.toString(),
-                          oneEighty: player.value.oneEighty.toString(),
-                          checkout:
-                              '${(player.value.checkoutRate * 100).toStringAsFixed(1)}%',
-                          color: playerColor(player.key)
-                        ),
+                            name: player.key,
+                            winner: player.key == state.widget.stats.winner,
+                            setsLegs:
+                                '${player.value.sets}/${player.value.legs}',
+                            nineAvg: player.value.nineAvg.toStringAsFixed(2),
+                            avg: player.value.avg.toStringAsFixed(2),
+                            max: player.value.max.toString(),
+                            sixtyPlus: player.value.sixtyPlus.toString(),
+                            oneTwentyPlus:
+                                player.value.oneTwentyPlus.toString(),
+                            oneEighty: player.value.oneEighty.toString(),
+                            checkout:
+                                '${(player.value.checkoutRate * 100).toStringAsFixed(1)}%',
+                            color: playerColor(player.key)),
                     ],
                   ),
                 ),
@@ -236,24 +241,31 @@ class _StatsColumn extends StatelessWidget {
   final String checkout;
   final Color? color;
   final bool winner;
+  final CrossAxisAlignment alignment;
+  final bool isFaded;
 
-  final Shadow shadow = const Shadow(color: Colors.black, blurRadius: 0.0, offset: Offset(0.0, 1.0));
+  final Shadow shadow = const Shadow(
+      color: Colors.black, blurRadius: 0.0, offset: Offset(0.0, 1.0));
 
-  const _StatsColumn(
-      {required this.name,
-      required this.setsLegs,
-      required this.nineAvg,
-      required this.avg,
-      required this.max,
-      required this.sixtyPlus,
-      required this.oneTwentyPlus,
-      required this.oneEighty,
-      required this.checkout,
-      this.color, this.winner = false});
+  const _StatsColumn({
+    required this.name,
+    required this.setsLegs,
+    required this.nineAvg,
+    required this.avg,
+    required this.max,
+    required this.sixtyPlus,
+    required this.oneTwentyPlus,
+    required this.oneEighty,
+    required this.checkout,
+    this.color,
+    this.winner = false,
+    this.alignment = CrossAxisAlignment.center,
+    this.isFaded = false,
+  });
 
   Widget getColorIcon() {
     if (color == null) {
-      return Container();
+      return Icon(Icons.circle, color: Colors.transparent);
     }
     if (winner) {
       return Icon(Icons.emoji_events, color: color, shadows: [shadow]);
@@ -271,43 +283,47 @@ class _StatsColumn extends StatelessWidget {
             color: colorScheme.primary,
           );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-      decoration: deco,
-      child: Row(
-        children: [
-          Text(nameVal,
-            overflow: TextOverflow.ellipsis,
-            style: FontConstants.text.copyWith(
-              color: colorScheme.onPrimary,
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        decoration: deco,
+        child: Row(
+          children: [
+            Text(
+              nameVal,
+              overflow: TextOverflow.ellipsis,
+              style: FontConstants.text.copyWith(
+                color: colorScheme.onPrimary,
+              ),
             ),
-          ),
-          Padding(
+            Padding(
               padding: EdgeInsets.only(left: 5.0, top: 2.0, bottom: 2.0),
               child: getColorIcon(),
-          )
-        ],
-      )
-    );
+            )
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextStyle text = FontConstants.text.copyWith(
+      fontStyle: isFaded ? FontStyle.italic : FontStyle.normal,
+      color: colorScheme.onSurface.withAlpha(isFaded? 150 : 255),
+    );
 
-    return Column(spacing: 8.0, children: [
+    return Column(spacing: 8.0, crossAxisAlignment: alignment, children: [
       getHeaderBean(name, colorScheme),
-      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0)),
-      Text(setsLegs),
       Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
-      Text(nineAvg),
-      Text(avg),
-      Text(max),
+      Text(setsLegs, style: text),
       Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
-      Text(sixtyPlus),
-      Text(oneTwentyPlus),
-      Text(oneEighty),
+      Text(nineAvg, style: text),
+      Text(avg, style: text),
+      Text(max, style: text),
       Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
-      Text(checkout),
+      Text(sixtyPlus, style: text),
+      Text(oneTwentyPlus, style: text),
+      Text(oneEighty, style: text),
+      Padding(padding: const EdgeInsets.symmetric(vertical: 2.0)),
+      Text(checkout, style: text),
     ]);
   }
 }

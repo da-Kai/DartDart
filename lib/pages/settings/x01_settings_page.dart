@@ -396,6 +396,36 @@ class _PlayerSettingContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    IconButton getAddButton() {
+      if (state._canAddPlayer()) {
+        return IconButton(
+          onPressed: () {
+            _PlayerNameDialog(
+              context: context,
+              validate: state.validate,
+            ).open().then((newPly) {
+              if (newPly != null) {
+                state._addPlayer(newPly);
+              }
+            });
+          },
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          icon: Icon(
+            Icons.add,
+            color: colorScheme.onPrimaryContainer,
+          ),
+        );
+      } else {
+        return IconButton(
+          onPressed: null,
+          icon: Icon(
+            Icons.block,
+            color: colorScheme.onPrimaryContainer.withAlpha(127),
+          ),
+        );
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
@@ -483,38 +513,11 @@ class _PlayerSettingContainer extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Divider(
-              color: colorScheme.onPrimaryContainer,
-              height: 0,
-              thickness: 1,
-            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              state._canAddPlayer()
-                  ? IconButton(
-                  onPressed: () {
-                    _PlayerNameDialog(
-                      context: context,
-                      validate: state.validate,
-                    ).open().then((newPly) {
-                      if (newPly != null) {
-                        state._addPlayer(newPly);
-                      }
-                    });
-                  },
-                  icon: Icon(
-                    Icons.add,
-                    color: colorScheme.onPrimaryContainer,
-                  )
-                ) : IconButton(
-                      onPressed: null,
-                      icon: Icon(
-                        Icons.block,
-                        color: colorScheme.onPrimaryContainer.withAlpha(127),
-                      ),
-                  )
+              getAddButton()
             ],
           ),
         ],
