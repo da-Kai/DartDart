@@ -10,6 +10,8 @@ DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intend
   <img src="docs/screenshot_x01_stats.png" width=30% />
 </p>
 
+## Game modes
+
 ### X01
 
 Play a classic game of 301, 501 or 701.
@@ -20,6 +22,11 @@ The App helps with tracking the Scores and gives suggestions for Checkouts.
 ### *Round the Clock (Planned)*
 
 ## Build
+
+### Prerequirements
+
+- Flutter SDK (3.x oder neuer): https://docs.flutter.dev/get-started/install
+- Android Studio (mit Flutter/Dart Plugins) für Android‑Builds
 
 1. Get Dependencies
     ```shell
