@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/da-Kai/DartDart/graph/badge.svg?token=xliIughqt1)](https://codecov.io/gh/da-Kai/DartDart)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10087/badge)](https://www.bestpractices.dev/projects/10087)
 
 # <img src="assets/icons/icon-colored.svg" width=25pt height=25pt></img> DartDart
 
