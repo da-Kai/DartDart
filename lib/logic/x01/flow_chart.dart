@@ -16,14 +16,14 @@ class FlowChart {
       final List<FlSpot> dataPoints = [];
       int turnCount = 0;
       for (final score in flow.scoreFlowPerLeg[leg]) {
-        final spot = FlSpot(turnCount.toDouble(), score.toDouble());
+        final spot = FlSpot(turnCount.toDouble(), game.val - score.toDouble());
         dataPoints.add(spot);
         turnCount++;
       }
 
       lineBarsData.add(LineChartBarData(
         spots: dataPoints,
-        isCurved: true,
+        isCurved: false,
         barWidth: 5.0,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
@@ -113,5 +113,6 @@ class FlowChart {
       gridData: FlGridData(show: false),
       titlesData: titlesData,
       borderData: FlBorderData(show: false),
-      lineBarsData: data);
+      lineBarsData: data
+  );
 }
