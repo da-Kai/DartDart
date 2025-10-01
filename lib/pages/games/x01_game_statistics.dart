@@ -38,7 +38,7 @@ class _X01StatsState extends State<X01Statistics> {
 
     return PopScope(
         canPop: false,
-        onPopInvoked: (didPop) {
+        onPopInvokedWithResult: (didPop, result) {
           if (didPop) {
             return;
           }

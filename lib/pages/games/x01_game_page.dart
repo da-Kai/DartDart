@@ -40,7 +40,7 @@ class _X01PageState extends State<X01Game> {
 
     return PopScope(
         canPop: false,
-        onPopInvoked: (didPop) {
+        onPopInvokedWithResult: (didPop, result) {
           if (didPop) {
             return;
           }
