@@ -40,6 +40,16 @@ class _X01PageState extends State<X01Game> {
 
     return PopScope(
         canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
+          if (data.canUndo) {
+            setState(() {
+              data.undo();
+            });
+          }
+        },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(

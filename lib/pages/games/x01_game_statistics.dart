@@ -38,6 +38,13 @@ class _X01StatsState extends State<X01Statistics> {
 
     return PopScope(
         canPop: false,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            return;
+          }
+          Navigator.pop(context);
+          widget.onUndo();
+        },
         child: Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
