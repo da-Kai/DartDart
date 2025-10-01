@@ -35,6 +35,7 @@ local.properties
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/copilot.*.xml
 *.iws
 *.iml
 *.ipr
