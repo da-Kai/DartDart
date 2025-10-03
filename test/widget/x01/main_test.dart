@@ -132,7 +132,7 @@ void main() {
       expect(find.text('1/1'), findsOneWidget);
       expect(find.text('0/0'), findsOneWidget);
       expect(find.text('50.0%'), findsOneWidget);
-      expect(find.text('140.33'), findsAtLeast(2));
+      expect(find.text('140.3'), findsAtLeast(2));
     });
   });
 }

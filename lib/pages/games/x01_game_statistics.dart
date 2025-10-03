@@ -216,9 +216,9 @@ class _PlayerStatsView extends StatelessWidget {
                             winner: player.key == state.widget.stats.winner,
                             setsLegs:
                                 '${player.value.sets}/${player.value.legs}',
-                            nineAvg: player.value.nineAvg.toStringAsFixed(2),
-                            avg: player.value.avg.toStringAsFixed(2),
-                            max: player.value.max.toString(),
+                            nineAvg: player.value.nineAvg.toStringAsFixed(1),
+                            avg: player.value.avg.toStringAsFixed(1),
+                            max: player.value.max.toStringAsFixed(1),
                             sixtyPlus: player.value.sixtyPlus.toString(),
                             oneTwentyPlus:
                                 player.value.oneTwentyPlus.toString(),
