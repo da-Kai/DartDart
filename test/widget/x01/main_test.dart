@@ -14,6 +14,10 @@ Future<void> press(WidgetTester tester, HitNumber number, HitMultiplier multipli
   final multButton = find.text(hit.multiplier.text);
   await tester.tap(multButton);
   await tester.pumpAndSettle();
+  
+  // Wait for the timer to complete (for single tap detection)
+  await tester.pump(const Duration(milliseconds: 500));
+  await tester.pumpAndSettle();
 
   final buttons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
   final button = buttons.firstWhere((b) => b.hit == hit);
