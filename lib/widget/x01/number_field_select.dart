@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dart_dart/logic/constant/fields.dart';
 import 'package:flutter/material.dart';
 
@@ -160,26 +161,91 @@ class _MultiplierButton extends StatelessWidget {
       height: 50,
       margin: const EdgeInsets.all(2.5),
       padding: EdgeInsets.zero,
-      child: GestureDetector(
+      child: _MultiplierButtonWithGestures(
+        onPressed: () => onPressed(hitMultiplier),
         onDoubleTap: () => onDoubleTap(hitMultiplier),
         onLongPress: () => onDoubleTap(hitMultiplier),
-        child: ElevatedButton(
-          onPressed:
-              current == hitMultiplier && !isLocked ? null : () => onPressed(hitMultiplier),
-          style: style.copyWith(
-            backgroundColor: isLocked 
-                ? WidgetStateProperty.all(Colors.orange) 
-                : style.backgroundColor,
-          ),
+        style: style,
+        text: hitMultiplier.text,
+        isLocked: isLocked,
+      ),
+    ));
+  }
+}
+
+class _MultiplierButtonWithGestures extends StatefulWidget {
+  final VoidCallback onPressed;
+  final VoidCallback onDoubleTap;
+  final VoidCallback onLongPress;
+  final ButtonStyle style;
+  final String text;
+  final bool isLocked;
+
+  const _MultiplierButtonWithGestures({
+    required this.onPressed,
+    required this.onDoubleTap,
+    required this.onLongPress,
+    required this.style,
+    required this.text,
+    required this.isLocked,
+  });
+
+  @override
+  State<_MultiplierButtonWithGestures> createState() => _MultiplierButtonWithGesturesState();
+}
+
+class _MultiplierButtonWithGesturesState extends State<_MultiplierButtonWithGestures> {
+  Timer? _tapTimer;
+  int _tapCount = 0;
+
+  @override
+  void dispose() {
+    _tapTimer?.cancel();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    _tapCount++;
+    if (_tapCount == 1) {
+      _tapTimer = Timer(const Duration(milliseconds: 300), () {
+        if (_tapCount == 1) {
+          widget.onPressed();
+        }
+        _tapCount = 0;
+      });
+    } else if (_tapCount == 2) {
+      _tapTimer?.cancel();
+      widget.onDoubleTap();
+      _tapCount = 0;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _handleTap,
+      onLongPress: () {
+        widget.onLongPress();
+      },
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: widget.isLocked 
+              ? Colors.orange 
+              : widget.style.backgroundColor?.resolve({}),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Center(
           child: Text(
-            hitMultiplier.text,
+            widget.text,
             style: TextStyle(
-              fontWeight: isLocked ? FontWeight.bold : FontWeight.normal,
+              color: widget.style.foregroundColor?.resolve({}),
+              fontWeight: widget.isLocked ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
 
