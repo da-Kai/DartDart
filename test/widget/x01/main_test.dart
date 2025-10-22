@@ -139,4 +139,79 @@ void main() {
       expect(find.text('140.3'), findsAtLeast(2));
     });
   });
+
+  group('Multiplier Lock Tests', () {
+    testWidgets('Single tap changes multiplier', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FieldSelect(onSelect: (hit) {}),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('x3'));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+
+      final hitButtons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
+      final tripleButtons = hitButtons.where((b) => b.hitMult == HitMultiplier.triple);
+      expect(tripleButtons.length, greaterThan(0));
+    });
+
+    testWidgets('Double tap locks multiplier', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FieldSelect(onSelect: (hit) {}),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('x3'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('x3'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('x3'), findsOneWidget);
+    });
+
+    testWidgets('Long press locks multiplier', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FieldSelect(onSelect: (hit) {}),
+          ),
+        ),
+      );
+
+      await tester.longPress(find.text('x3'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('x3'), findsOneWidget);
+    });
+
+    testWidgets('Locked multiplier persists', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FieldSelect(onSelect: (hit) {}),
+          ),
+        ),
+      );
+
+      await tester.longPress(find.text('x3'));
+      await tester.pumpAndSettle();
+
+      final hitButtons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
+      final twentyButton = hitButtons.firstWhere((b) => b.hitNum == HitNumber.twenty);
+      await tester.tap(find.byWidget(twentyButton));
+      await tester.pumpAndSettle();
+
+      final updatedHitButtons = find.byType(HitButton).evaluate().map((e) => e.widget as HitButton);
+      final tripleButtons = updatedHitButtons.where((b) => b.hitMult == HitMultiplier.triple);
+      expect(tripleButtons.length, greaterThan(0));
+    });
+  });
 }
