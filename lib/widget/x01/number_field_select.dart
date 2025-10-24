@@ -14,6 +14,7 @@ class FieldSelect extends StatefulWidget {
 class _FieldSelectState extends State<FieldSelect> {
   HitMultiplier hitMultiplier = HitMultiplier.single;
   bool isMultiplierLocked = false;
+  HitMultiplier? lockedMultiplier;
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +61,23 @@ class _FieldSelectState extends State<FieldSelect> {
       [HitNumber.bull, HitNumber.miss],
     ];
 
-    void setHitMultiplier(HitMultiplier hm) {
-      setState(() {
-        hitMultiplier = hm;
-      });
-    }
+  void setHitMultiplier(HitMultiplier hm) {
+    setState(() {
+      hitMultiplier = hm;
+    });
+  }
 
     void toggleMultiplierLock(HitMultiplier hm) {
       setState(() {
-        isMultiplierLocked = !isMultiplierLocked;
-        if (isMultiplierLocked) {
+        if (isMultiplierLocked && lockedMultiplier == hm) {
+          // Unlock if tapping the same locked multiplier
+          isMultiplierLocked = false;
+          lockedMultiplier = null;
+        } else {
+          // Lock the new multiplier
+          isMultiplierLocked = true;
           hitMultiplier = hm;
+          lockedMultiplier = hm;
         }
       });
     }
@@ -91,7 +98,7 @@ class _FieldSelectState extends State<FieldSelect> {
                     onDoubleTap: toggleMultiplierLock,
                     hitMultiplier: HitMultiplier.single,
                     current: hitMultiplier,
-                    isLocked: isMultiplierLocked && hitMultiplier == HitMultiplier.single,
+                    isLocked: isMultiplierLocked && lockedMultiplier == HitMultiplier.single,
                   ),
                   _MultiplierButton(
                     style: buttonStyle,
@@ -99,7 +106,7 @@ class _FieldSelectState extends State<FieldSelect> {
                     onDoubleTap: toggleMultiplierLock,
                     hitMultiplier: HitMultiplier.double,
                     current: hitMultiplier,
-                    isLocked: isMultiplierLocked && hitMultiplier == HitMultiplier.double,
+                    isLocked: isMultiplierLocked && lockedMultiplier == HitMultiplier.double,
                   ),
                   _MultiplierButton(
                     style: buttonStyle,
@@ -107,7 +114,7 @@ class _FieldSelectState extends State<FieldSelect> {
                     onDoubleTap: toggleMultiplierLock,
                     hitMultiplier: HitMultiplier.triple,
                     current: hitMultiplier,
-                    isLocked: isMultiplierLocked && hitMultiplier == HitMultiplier.triple,
+                    isLocked: isMultiplierLocked && lockedMultiplier == HitMultiplier.triple,
                   ),
                 ],
               ),
@@ -207,7 +214,7 @@ class _MultiplierButtonWithGesturesState extends State<_MultiplierButtonWithGest
   void _handleTap() {
     _tapCount++;
     if (_tapCount == 1) {
-      _tapTimer = Timer(const Duration(milliseconds: 300), () {
+      _tapTimer = Timer(const Duration(milliseconds: 150), () {
         if (_tapCount == 1) {
           widget.onPressed();
         }
