@@ -70,11 +70,9 @@ class _FieldSelectState extends State<FieldSelect> {
     void toggleMultiplierLock(HitMultiplier hm) {
       setState(() {
         if (isMultiplierLocked && lockedMultiplier == hm) {
-          // Unlock if tapping the same locked multiplier
           isMultiplierLocked = false;
           lockedMultiplier = null;
         } else {
-          // Lock the new multiplier
           isMultiplierLocked = true;
           hitMultiplier = hm;
           lockedMultiplier = hm;
@@ -214,7 +212,7 @@ class _MultiplierButtonWithGesturesState extends State<_MultiplierButtonWithGest
   void _handleTap() {
     _tapCount++;
     if (_tapCount == 1) {
-      _tapTimer = Timer(const Duration(milliseconds: 150), () {
+      _tapTimer = Timer(const Duration(milliseconds: 200), () {
         if (_tapCount == 1) {
           widget.onPressed();
         }
@@ -231,6 +229,9 @@ class _MultiplierButtonWithGesturesState extends State<_MultiplierButtonWithGest
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _handleTap,
+      onDoubleTap: () {
+        widget.onDoubleTap();
+      },
       onLongPress: () {
         widget.onLongPress();
       },
