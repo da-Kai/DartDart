@@ -63,16 +63,21 @@ class _FieldSelectState extends State<FieldSelect> {
 
   void setHitMultiplier(HitMultiplier hm) {
     setState(() {
-      hitMultiplier = hm;
+      if (!isMultiplierLocked) {
+        hitMultiplier = hm;
+      }
     });
   }
 
     void toggleMultiplierLock(HitMultiplier hm) {
       setState(() {
-        if (isMultiplierLocked && lockedMultiplier == hm) {
+        if (isMultiplierLocked) {
+          // If already locked, unlock and switch to new multiplier
           isMultiplierLocked = false;
           lockedMultiplier = null;
+          hitMultiplier = hm;
         } else {
+          // If not locked, lock the new multiplier
           isMultiplierLocked = true;
           hitMultiplier = hm;
           lockedMultiplier = hm;
@@ -220,7 +225,6 @@ class _MultiplierButtonWithGesturesState extends State<_MultiplierButtonWithGest
       });
     } else if (_tapCount == 2) {
       _tapTimer?.cancel();
-      widget.onDoubleTap();
       _tapCount = 0;
     }
   }
