@@ -38,7 +38,7 @@ jobs:
           mkdir -p artifact
           tar --xz -cvf ./artifact/dart-dart.tar.xz ./web
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: dart-dart-android
           path: build/artifact
