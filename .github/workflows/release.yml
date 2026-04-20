@@ -21,7 +21,7 @@ jobs:
 
       - name: Get version
         id: read-yaml
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const yaml = require('js-yaml');
@@ -48,7 +48,7 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk build/artifact/dart-dart.apk
 
       - name: Create draft Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: "v${{steps.read-yaml.outputs.version}}"
           name: "v${{steps.read-yaml.outputs.version}} \"${{steps.read-yaml.outputs.alias}}\""
