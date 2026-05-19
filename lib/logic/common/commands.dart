@@ -7,7 +7,7 @@ abstract class Command {
   void undo();
 
   bool get hasNext => next != null;
-  bool get hasPrevious => next != null;
+  bool get hasPrevious => previous != null;
 }
 
 /// History of a games actions.

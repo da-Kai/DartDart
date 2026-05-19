@@ -450,7 +450,7 @@ class _PlayerSettingContainer extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: ReorderableListView(
-                onReorder: state.reorderPlayers,
+                onReorderItem: state.reorderPlayers,
                 children: [
                   for (final player in state._data.playerNames)
                     ListTile(

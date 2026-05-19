@@ -88,8 +88,8 @@ class PlayerGameStats {
     return PlayerGameStats(player, isWinner, //
         sets: setWins,
         legs: legWins,
-        nineAvg: firstNineSum / firstNineCnt,
-        avg: totalSum / totalCount,
+        nineAvg: firstNineCnt == 0 ? 0.0 : firstNineSum / firstNineCnt,
+        avg: totalCount == 0 ? 0.0 : totalSum / totalCount,
         max: maxTurn,
         sixtyPlus: sixtyPlusCnt,
         oneTwentyPlus: oneTwentyPlusCnt,
