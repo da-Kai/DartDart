@@ -43,6 +43,16 @@ class _X01PageState extends State<X01Game> {
     _data.undo();
   }
 
+  Future<void> _onClosePressed() async {
+    final bool quit = await _CancelGame.open(context);
+    if (!mounted) {
+      return;
+    }
+    if (quit) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -70,20 +80,14 @@ class _X01PageState extends State<X01Game> {
             backgroundColor: colorScheme.surface,
             title: Text(data.settings.game.text),
             leading: IconButton(
-              onPressed: () {
-                _CancelGame.open(context).then((quit) {
-                  if (quit) {
-                    Navigator.pop(context);
-                  }
-                });
-              },
+              onPressed: _onClosePressed,
               icon: const Icon(Icons.close),
             ),
             centerTitle: true,
             actions: [
               ListenableBuilder(
                 listenable: _data,
-                builder: (_, __) => Row(
+                builder: (_, _) => Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
@@ -124,19 +128,19 @@ class _PortraitView extends StatelessWidget {
       children: [
         ListenableBuilder(
           listenable: data,
-          builder: (_, __) => Visibility(
+          builder: (_, _) => Visibility(
             visible: data.isMultiPlayer,
             child: _PlayersList(state),
           ),
         ),
         ListenableBuilder(
           listenable: data,
-          builder: (_, __) => _CurrentPlayer(state),
+          builder: (_, _) => _CurrentPlayer(state),
         ),
         PointSelector(onSelect: (hit) => data.onThrow(hit)),
         ListenableBuilder(
           listenable: data,
-          builder: (_, __) => _NextButton(state),
+          builder: (_, _) => _NextButton(state),
         ),
       ],
     );
@@ -166,19 +170,19 @@ class _LandscapeView extends StatelessWidget {
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
             ListenableBuilder(
               listenable: data,
-              builder: (_, __) => Visibility(
+              builder: (_, _) => Visibility(
                 visible: data.isMultiPlayer,
                 child: _PlayersList(state),
               ),
             ),
             ListenableBuilder(
               listenable: data,
-              builder: (_, __) => _CurrentPlayer(state),
+              builder: (_, _) => _CurrentPlayer(state),
             ),
             const Spacer(),
             ListenableBuilder(
               listenable: data,
-              builder: (_, __) => _NextButton(state),
+              builder: (_, _) => _NextButton(state),
             ),
           ]),
         ),
