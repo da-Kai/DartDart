@@ -138,7 +138,7 @@ class Hit {
     return abbreviation;
   }
 
-  int operator +(covariant other) {
+  int operator +(Object other) {
     if (other is Hit) return value + other.value;
     if (other is int) return value + other;
     throw UnimplementedError();

@@ -1,13 +1,17 @@
 [![codecov](https://codecov.io/gh/da-Kai/DartDart/graph/badge.svg?token=xliIughqt1)](https://codecov.io/gh/da-Kai/DartDart)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10087/badge)](https://www.bestpractices.dev/projects/10087)
 
 # <img src="assets/icons/icon-colored.svg" width=25pt height=25pt></img> DartDart
 
 DartDart, The Dart-Scoreboard App, is built using flutter and dart and is intended to be simple, modern and ad-free. It allows you to keep track of your dart games.
 
 <p align="center">
-  <img src="docs/Screenshot_20250226_194409.png" width=256pt style="margin-right: 10px;"/>
-  <img src="docs/Screenshot_20250226_194438.png" width=256pt />
+  <img src="docs/screenshot_x01_settings.png" width=30% />
+  <img src="docs/screenshot_x01_game.png" width=30% style="margin-left: 10pt; margin-right: 10pt;" />
+  <img src="docs/screenshot_x01_stats.png" width=30% />
 </p>
+
+## Game modes
 
 ### X01
 
@@ -19,6 +23,11 @@ The App helps with tracking the Scores and gives suggestions for Checkouts.
 ### *Round the Clock (Planned)*
 
 ## Build
+
+### Prerequirements
+
+- Flutter SDK (3.x oder neuer): https://docs.flutter.dev/get-started/install
+- Android Studio (mit Flutter/Dart Plugins) für Android‑Builds
 
 1. Get Dependencies
     ```shell

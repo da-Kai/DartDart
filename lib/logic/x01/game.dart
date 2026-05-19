@@ -1,5 +1,6 @@
 import 'package:dart_dart/logic/common/commands.dart';
 import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:flutter/foundation.dart';
 import 'package:dart_dart/logic/x01/checkout.dart';
 import 'package:dart_dart/logic/x01/commands.dart';
 import 'package:dart_dart/logic/x01/common.dart';
@@ -157,7 +158,7 @@ class X01GameData {
 }
 
 /// Represents a single Game
-class GameController {
+class GameController with ChangeNotifier {
   final GameSettings settings;
   final CommandStack commands = CommandStack();
 
@@ -245,11 +246,13 @@ class GameController {
     if (turnBuilder.done) return;
     var action = Throw(turnBuilder, hit, turnBuilder.count);
     commands.execute(action);
+    notifyListeners();
   }
 
   void next() {
     final command = _nextCommand();
     commands.execute(command);
+    notifyListeners();
   }
 
   Command _nextCommand() {
@@ -269,10 +272,12 @@ class GameController {
 
   void undo() {
     commands.undo();
+    notifyListeners();
   }
 
   void redo() {
     commands.redo();
+    notifyListeners();
   }
 
   bool get canUndo {
