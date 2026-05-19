@@ -10,33 +10,43 @@ import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
 
 class X01Game extends StatefulWidget {
-  late final GameController data;
+  final GameSettings settings;
 
-  X01Game({super.key, required GameSettings settings}) {
-    data = GameController(settings);
-  }
+  const X01Game({super.key, required this.settings});
 
   @override
   State<X01Game> createState() => _X01PageState();
 }
 
 class _X01PageState extends State<X01Game> {
+  late GameController _data;
+
+  GameController get data => _data;
+
+  @override
+  void initState() {
+    super.initState();
+    _data = GameController(widget.settings);
+  }
+
+  @override
+  void dispose() {
+    _data.dispose();
+    super.dispose();
+  }
+
   void thrown(Hit hit) {
-    setState(() {
-      widget.data.onThrow(hit);
-    });
+    _data.onThrow(hit);
   }
 
   void undo() {
-    setState(() {
-      widget.data.undo();
-    });
+    _data.undo();
   }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameController data = widget.data;
+    final GameController data = _data;
 
     return PopScope(
         canPop: false,
@@ -45,9 +55,7 @@ class _X01PageState extends State<X01Game> {
             return;
           }
           if (data.canUndo) {
-            setState(() {
-              data.undo();
-            });
+            data.undo();
           }
         },
         child: Scaffold(
@@ -65,9 +73,7 @@ class _X01PageState extends State<X01Game> {
               onPressed: () {
                 _CancelGame.open(context).then((quit) {
                   if (quit) {
-                    setState(() {
-                      Navigator.pop(context);
-                    });
+                    Navigator.pop(context);
                   }
                 });
               },
@@ -75,34 +81,30 @@ class _X01PageState extends State<X01Game> {
             ),
             centerTitle: true,
             actions: [
-              IconButton(
-                icon: const Icon(Icons.undo),
-                onPressed: data.canUndo
-                    ? () {
-                        setState(() {
-                          data.undo();
-                        });
-                      }
-                    : null,
+              ListenableBuilder(
+                listenable: _data,
+                builder: (_, __) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.undo),
+                      onPressed: data.canUndo ? () => data.undo() : null,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.redo),
+                      onPressed: data.canRedo ? () => data.redo() : null,
+                    ),
+                  ],
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.redo),
-                onPressed: data.canRedo
-                    ? () {
-                        setState(() {
-                          data.redo();
-                        });
-                      }
-                    : null,
-              )
             ],
           ),
           body: OrientationBuilder(builder: (context, orientation) {
             return orientation == Orientation.portrait
                 ? //
-                _PortraitView(this, setState)
+                _PortraitView(this)
                 : //
-                _LandscapeView(this, setState);
+                _LandscapeView(this);
           }),
         ));
   }
@@ -110,28 +112,32 @@ class _X01PageState extends State<X01Game> {
 
 class _PortraitView extends StatelessWidget {
   final _X01PageState state;
-  final Function update;
 
-  const _PortraitView(this.state, this.update);
+  const _PortraitView(this.state);
 
   @override
   Widget build(BuildContext context) {
-    final GameController data = state.widget.data;
+    final GameController data = state.data;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Visibility(
-          visible: data.isMultiPlayer,
-          child: _PlayersList(state),
+        ListenableBuilder(
+          listenable: data,
+          builder: (_, __) => Visibility(
+            visible: data.isMultiPlayer,
+            child: _PlayersList(state),
+          ),
         ),
-        _CurrentPlayer(state),
-        PointSelector(onSelect: ((hit) {
-          update(() {
-            data.onThrow(hit);
-          });
-        })),
-        _NextButton(state, update),
+        ListenableBuilder(
+          listenable: data,
+          builder: (_, __) => _CurrentPlayer(state),
+        ),
+        PointSelector(onSelect: (hit) => data.onThrow(hit)),
+        ListenableBuilder(
+          listenable: data,
+          builder: (_, __) => _NextButton(state),
+        ),
       ],
     );
   }
@@ -139,13 +145,12 @@ class _PortraitView extends StatelessWidget {
 
 class _LandscapeView extends StatelessWidget {
   final _X01PageState state;
-  final Function update;
 
-  const _LandscapeView(this.state, this.update);
+  const _LandscapeView(this.state);
 
   @override
   Widget build(BuildContext context) {
-    final GameController data = state.widget.data;
+    final GameController data = state.data;
 
     return Row(
       children: [
@@ -153,23 +158,28 @@ class _LandscapeView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              PointSelector(onSelect: ((hit) {
-                update(() {
-                  data.onThrow(hit);
-                });
-              })),
+              PointSelector(onSelect: (hit) => data.onThrow(hit)),
             ],
           ),
         ),
         Expanded(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Visibility(
-              visible: data.isMultiPlayer,
-              child: _PlayersList(state),
+            ListenableBuilder(
+              listenable: data,
+              builder: (_, __) => Visibility(
+                visible: data.isMultiPlayer,
+                child: _PlayersList(state),
+              ),
             ),
-            _CurrentPlayer(state),
+            ListenableBuilder(
+              listenable: data,
+              builder: (_, __) => _CurrentPlayer(state),
+            ),
             const Spacer(),
-            _NextButton(state, update),
+            ListenableBuilder(
+              listenable: data,
+              builder: (_, __) => _NextButton(state),
+            ),
           ]),
         ),
       ],
@@ -185,8 +195,8 @@ class _PlayersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final PlayerData data = state.widget.data.playerData;
-    final X01GameData gameData = state.widget.data.gameData;
+    final PlayerData data = state.data.playerData;
+    final X01GameData gameData = state.data.gameData;
 
     return Row(
       children: <Widget>[
@@ -298,7 +308,7 @@ class _CurrentPlayer extends StatelessWidget {
   late final GameController game;
 
   _CurrentPlayer(this.state) {
-    game = state.widget.data;
+    game = state.data;
   }
 
   @override
@@ -436,14 +446,13 @@ class _CancelGame {
 
 class _NextButton extends StatelessWidget {
   final _X01PageState state;
-  final Function update;
 
-  const _NextButton(this.state, this.update);
+  const _NextButton(this.state);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final GameController data = state.widget.data;
+    final GameController data = state.data;
     final TurnBuilder gameData = data.turnBuilder;
 
     return Container(
@@ -453,20 +462,16 @@ class _NextButton extends StatelessWidget {
         onPressed: !gameData.done
             ? null
             : () {
-                update(() {
-                  data.next();
-                });
+                data.next();
                 if (data.hasGameEnded) {
-                  update(() {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => //
-                                X01Statistics(
-                                    stats: data.getStats(),
-                                    settings: data.settings,
-                                    onUndo: state.undo)));
-                  });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => //
+                              X01Statistics(
+                                  stats: data.getStats(),
+                                  settings: data.settings,
+                                  onUndo: state.undo)));
                 }
               },
         style: ElevatedButton.styleFrom(
