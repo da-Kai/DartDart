@@ -231,10 +231,14 @@ class _PlayerNameDialog {
         });
       },
     ).then((value) {
-      if (canceled) return null;
-      var nextPly = textController.value.text;
-      var (valid, _) = validate(nextPly);
-      return valid ? nextPly : null;
+      String? result;
+      if (!canceled) {
+        var nextPly = textController.value.text;
+        var (valid, _) = validate(nextPly);
+        result = valid ? nextPly : null;
+      }
+      textController.dispose();
+      return result;
     });
   }
 }
