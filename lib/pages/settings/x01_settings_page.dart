@@ -237,7 +237,9 @@ class _PlayerNameDialog {
         var (valid, _) = validate(nextPly);
         result = valid ? nextPly : null;
       }
-      textController.dispose();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        textController.dispose();
+      });
       return result;
     });
   }

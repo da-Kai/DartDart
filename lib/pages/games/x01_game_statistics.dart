@@ -189,11 +189,6 @@ class _PlayerStatsView extends StatelessWidget {
             ? PlayerColors.light //
             : PlayerColors.dark;
 
-    Color playerColor(String name) {
-      final int index =
-          data.entries.toList().indexWhere((element) => element.key == name);
-      return playerColors[index];
-    }
 
     final Map<String, Color> playerColorMap = {
       for (var (i, e) in data.entries.indexed) e.key: playerColors[i]
