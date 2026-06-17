@@ -407,14 +407,15 @@ class _PointIcons extends StatelessWidget {
 
   static const double _iconHeight = 22.0;
   static const double _iconWidth = 28.0;
+  static const int _currentAlpha = 180;
+  static const int _targetAlpha = 90;
 
   String _asset(int count) {
-    final String asset = switch (count.clamp(1, 3)) {
+    return switch (count.clamp(1, 3)) {
       1 => 'assets/icons/fontIcons/oneLeg.svg',
       2 => 'assets/icons/fontIcons/twoLegs.svg',
       _ => 'assets/icons/fontIcons/threeLegs.svg',
     };
-    return asset;
   }
 
   Widget _icon({
@@ -469,8 +470,9 @@ class _PointIcons extends StatelessWidget {
     if (game.settings.isFirstWins) return const SizedBox.shrink();
 
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color currentColor = colorScheme.onPrimaryContainer.withAlpha(180);
-    final Color targetColor = colorScheme.onSurface.withAlpha(90);
+    final Color currentColor =
+        colorScheme.onPrimaryContainer.withAlpha(_currentAlpha);
+    final Color targetColor = colorScheme.onSurface.withAlpha(_targetAlpha);
     final (sets, legs) = game.curPlyPoints;
 
     if (game.settings.isLegsOnly) {
