@@ -406,20 +406,60 @@ class _PointIcons extends StatelessWidget {
   const _PointIcons({required this.game});
 
   static const double _iconHeight = 22.0;
+  static const double _iconWidth = 28.0;
 
-  Widget _icon(int count, Color color) {
-    if (count <= 0) return const SizedBox.shrink();
+  String _asset(int count) {
     final String asset = switch (count.clamp(1, 3)) {
       1 => 'assets/icons/fontIcons/oneLeg.svg',
       2 => 'assets/icons/fontIcons/twoLegs.svg',
       _ => 'assets/icons/fontIcons/threeLegs.svg',
     };
+    return asset;
+  }
+
+  Widget _icon({
+    required String keyName,
+    required int count,
+    required Color color,
+  }) {
+    if (count <= 0) return const SizedBox.shrink();
+    return SvgPicture.asset(
+      _asset(count),
+      key: ValueKey(keyName),
+      height: _iconHeight,
+      width: _iconWidth,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
+
+  Widget _progressIcon({
+    required String keyPrefix,
+    required int current,
+    required int target,
+    required Color currentColor,
+    required Color targetColor,
+  }) {
+    if (target <= 0) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3.0),
-      child: SvgPicture.asset(
-        asset,
+      child: SizedBox(
+        width: _iconWidth,
         height: _iconHeight,
-        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            _icon(
+              keyName: '${keyPrefix}_target',
+              count: target,
+              color: targetColor,
+            ),
+            _icon(
+              keyName: '${keyPrefix}_current',
+              count: current,
+              color: currentColor,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -428,18 +468,38 @@ class _PointIcons extends StatelessWidget {
   Widget build(BuildContext context) {
     if (game.settings.isFirstWins) return const SizedBox.shrink();
 
-    final color = Theme.of(context).colorScheme.onPrimaryContainer.withAlpha(180);
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentColor = colorScheme.onPrimaryContainer.withAlpha(180);
+    final targetColor = colorScheme.onSurface.withAlpha(90);
     final (sets, legs) = game.curPlyPoints;
 
     if (game.settings.isLegsOnly) {
-      return _icon(legs, color);
+      return _progressIcon(
+        keyPrefix: 'leg_points',
+        current: legs,
+        target: game.settings.legs,
+        currentColor: currentColor,
+        targetColor: targetColor,
+      );
     }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _icon(sets, color),
-        _icon(legs, color),
+        _progressIcon(
+          keyPrefix: 'set_points',
+          current: sets,
+          target: game.settings.sets,
+          currentColor: currentColor,
+          targetColor: targetColor,
+        ),
+        _progressIcon(
+          keyPrefix: 'leg_points',
+          current: legs,
+          target: game.settings.legs,
+          currentColor: currentColor,
+          targetColor: targetColor,
+        ),
       ],
     );
   }
