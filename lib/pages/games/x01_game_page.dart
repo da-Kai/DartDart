@@ -407,11 +407,14 @@ class _PointIcons extends StatelessWidget {
 
   static const double _iconHeight = 22.0;
   static const double _iconWidth = 28.0;
+  // Higher opacity keeps earned points prominent while the full requirement stays subdued.
   static const int _currentAlpha = 180;
   static const int _targetAlpha = 90;
 
-  String _assetForPositiveCount(int count) {
-    assert(count > 0);
+  String _assetForCount(int count) {
+    if (count <= 0) {
+      throw RangeError.range(count, 1, null, 'count');
+    }
     return switch (count > 3 ? 3 : count) {
       1 => 'assets/icons/fontIcons/oneLeg.svg',
       2 => 'assets/icons/fontIcons/twoLegs.svg',
@@ -426,7 +429,7 @@ class _PointIcons extends StatelessWidget {
   }) {
     if (count <= 0) return const SizedBox.shrink();
     return SvgPicture.asset(
-      _assetForPositiveCount(count),
+      _assetForCount(count),
       key: ValueKey(keyName),
       height: _iconHeight,
       width: _iconWidth,
