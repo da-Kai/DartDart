@@ -1,5 +1,4 @@
 import 'package:dart_dart/logic/constant/fields.dart';
-import 'package:dart_dart/logic/x01/game.dart';
 import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/main.dart';
 import 'package:dart_dart/pages/games/x01_game_page.dart';
@@ -49,6 +48,20 @@ Future<void> addPlayer(WidgetTester tester, String playerName) async {
   final findOkButton = find.text('OK');
   expect(findOkButton, findsOneWidget);
   await tester.tap(findOkButton);
+  await tester.pumpAndSettle();
+}
+
+Future<void> winLeg(WidgetTester tester) async {
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await tester.tap(find.text('next'));
+  await tester.pumpAndSettle();
+
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.nineteen, HitMultiplier.triple);
+  await press(tester, HitNumber.two, HitMultiplier.double);
+  await tester.tap(find.text('next'));
   await tester.pumpAndSettle();
 }
 
@@ -177,14 +190,13 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final dynamic pageState = tester.state(find.byType(X01Game));
-      final GameController game = pageState.data as GameController;
+      await tester.tap(find.text('FIELD'));
+      await tester.pumpAndSettle();
 
-      game.gameData.currentSet.setWinner(game.curPly.name);
-      game.gameData.pushSet();
-      game.gameData.currentSet.currentLeg.setWinner(game.curPly.name);
-      pageState.setState(() {});
-      await tester.pump();
+      await winLeg(tester);
+      await winLeg(tester);
+      await winLeg(tester);
+      await winLeg(tester);
 
       expect(find.byKey(const ValueKey('set_points_target')), findsOneWidget);
       expect(find.byKey(const ValueKey('set_points_current')), findsOneWidget);

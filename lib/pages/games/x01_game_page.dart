@@ -468,9 +468,9 @@ class _PointIcons extends StatelessWidget {
   Widget build(BuildContext context) {
     if (game.settings.isFirstWins) return const SizedBox.shrink();
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final currentColor = colorScheme.onPrimaryContainer.withAlpha(180);
-    final targetColor = colorScheme.onSurface.withAlpha(90);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color currentColor = colorScheme.onPrimaryContainer.withAlpha(180);
+    final Color targetColor = colorScheme.onSurface.withAlpha(90);
     final (sets, legs) = game.curPlyPoints;
 
     if (game.settings.isLegsOnly) {
