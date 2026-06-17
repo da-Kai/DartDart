@@ -413,8 +413,15 @@ class _PointIcons extends StatelessWidget {
 
   String _assetForCount(int count) {
     if (count <= 0) {
-      throw RangeError.range(count, 1, null, 'count');
+      throw RangeError.range(
+        count,
+        1,
+        null,
+        'count',
+        'Icon count must be at least 1',
+      );
     }
+    // The icon set only contains 1/2/3-mark assets, so higher counts reuse the 3-mark icon.
     return switch (count > 3 ? 3 : count) {
       1 => 'assets/icons/fontIcons/oneLeg.svg',
       2 => 'assets/icons/fontIcons/twoLegs.svg',
