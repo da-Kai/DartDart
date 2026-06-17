@@ -51,7 +51,7 @@ Future<void> addPlayer(WidgetTester tester, String playerName) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> winLeg(WidgetTester tester) async {
+Future<void> winLegForCurrentPlayer(WidgetTester tester) async {
   await press(tester, HitNumber.twenty, HitMultiplier.triple);
   await press(tester, HitNumber.twenty, HitMultiplier.triple);
   await press(tester, HitNumber.twenty, HitMultiplier.triple);
@@ -193,10 +193,10 @@ void main() {
       await tester.tap(find.text('FIELD'));
       await tester.pumpAndSettle();
 
-      await winLeg(tester);
-      await winLeg(tester);
-      await winLeg(tester);
-      await winLeg(tester);
+      await winLegForCurrentPlayer(tester);
+      await winLegForCurrentPlayer(tester);
+      await winLegForCurrentPlayer(tester);
+      await winLegForCurrentPlayer(tester);
 
       expect(find.byKey(const ValueKey('set_points_target')), findsOneWidget);
       expect(find.byKey(const ValueKey('set_points_current')), findsOneWidget);

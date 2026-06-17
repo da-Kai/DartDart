@@ -410,8 +410,9 @@ class _PointIcons extends StatelessWidget {
   static const int _currentAlpha = 180;
   static const int _targetAlpha = 90;
 
-  String _asset(int count) {
-    return switch (count.clamp(1, 3)) {
+  String _assetForPositiveCount(int count) {
+    assert(count > 0);
+    return switch (count > 3 ? 3 : count) {
       1 => 'assets/icons/fontIcons/oneLeg.svg',
       2 => 'assets/icons/fontIcons/twoLegs.svg',
       _ => 'assets/icons/fontIcons/threeLegs.svg',
@@ -425,7 +426,7 @@ class _PointIcons extends StatelessWidget {
   }) {
     if (count <= 0) return const SizedBox.shrink();
     return SvgPicture.asset(
-      _asset(count),
+      _assetForPositiveCount(count),
       key: ValueKey(keyName),
       height: _iconHeight,
       width: _iconWidth,
