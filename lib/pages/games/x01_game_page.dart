@@ -8,6 +8,7 @@ import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class X01Game extends StatefulWidget {
   final GameSettings settings;
@@ -327,11 +328,6 @@ class _CurrentPlayer extends StatelessWidget {
       fontWeight: FontWeight.bold,
     );
 
-    final TextStyle scoreStyle = titleStyle.copyWith(
-      fontWeight: FontWeight.normal,
-      fontStyle: FontStyle.italic,
-    );
-
     return Container(
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
@@ -352,10 +348,7 @@ class _CurrentPlayer extends StatelessWidget {
                   game.curPly.name,
                   style: titleStyle,
                 ),
-                Text(
-                  game.curPoints,
-                  style: scoreStyle,
-                ),
+                _PointIcons(game: game),
                 const Spacer(flex: 2),
                 game.turnBuilder.isCheckout
                     ? //
@@ -403,6 +396,53 @@ class _CurrentPlayer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PointIcons extends StatelessWidget {
+  final GameController game;
+
+  const _PointIcons({required this.game});
+
+  static const double _iconHeight = 22.0;
+
+  static const Map<int, String> _assets = {
+    1: 'assets/icons/fontIcons/oneLeg.svg',
+    2: 'assets/icons/fontIcons/twoLegs.svg',
+    3: 'assets/icons/fontIcons/threeLegs.svg',
+  };
+
+  Widget _icon(int count, Color color) {
+    if (count <= 0) return const SizedBox.shrink();
+    final String asset = _assets[count.clamp(1, 3)]!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3.0),
+      child: SvgPicture.asset(
+        asset,
+        height: _iconHeight,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (game.settings.isFirstWins) return const SizedBox.shrink();
+
+    final color = Theme.of(context).colorScheme.onPrimaryContainer.withAlpha(180);
+    final (sets, legs) = game.curPlyPoints;
+
+    if (game.settings.isLegsOnly) {
+      return _icon(legs, color);
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _icon(sets, color),
+        _icon(legs, color),
+      ],
     );
   }
 }
