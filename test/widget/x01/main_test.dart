@@ -1,5 +1,7 @@
 import 'package:dart_dart/logic/constant/fields.dart';
+import 'package:dart_dart/logic/x01/settings.dart';
 import 'package:dart_dart/main.dart';
+import 'package:dart_dart/pages/games/x01_game_page.dart';
 import 'package:dart_dart/widget/x01/board_select.dart';
 import 'package:dart_dart/widget/x01/number_field_select.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,20 @@ Future<void> addPlayer(WidgetTester tester, String playerName) async {
   final findOkButton = find.text('OK');
   expect(findOkButton, findsOneWidget);
   await tester.tap(findOkButton);
+  await tester.pumpAndSettle();
+}
+
+Future<void> simulateLegWinSequence(WidgetTester tester) async {
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await tester.tap(find.text('next'));
+  await tester.pumpAndSettle();
+
+  await press(tester, HitNumber.twenty, HitMultiplier.triple);
+  await press(tester, HitNumber.nineteen, HitMultiplier.triple);
+  await press(tester, HitNumber.two, HitMultiplier.double);
+  await tester.tap(find.text('next'));
   await tester.pumpAndSettle();
 }
 
@@ -133,6 +149,59 @@ void main() {
       expect(find.text('0/0'), findsOneWidget);
       expect(find.text('50.0%'), findsOneWidget);
       expect(find.text('140.3'), findsAtLeast(2));
+    });
+  });
+
+  group('Point icons', () {
+    testWidgets('shows gray leg target before any leg is won',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: X01Game(
+          settings: GameSettings(
+            Games.threeOOne,
+            InOut.straight,
+            InOut.double,
+            1,
+            3,
+            ['Player01'],
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('leg_points_target')), findsOneWidget);
+      expect(find.byKey(const ValueKey('leg_points_current')), findsNothing);
+      expect(find.byKey(const ValueKey('set_points_target')), findsNothing);
+    });
+
+    testWidgets('shows current set and leg points on top of gray targets',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: X01Game(
+          settings: GameSettings(
+            Games.threeOOne,
+            InOut.straight,
+            InOut.double,
+            3,
+            3,
+            ['Player01'],
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('FIELD'));
+      await tester.pumpAndSettle();
+
+      await simulateLegWinSequence(tester);
+      await simulateLegWinSequence(tester);
+      await simulateLegWinSequence(tester);
+      await simulateLegWinSequence(tester);
+
+      expect(find.byKey(const ValueKey('set_points_target')), findsOneWidget);
+      expect(find.byKey(const ValueKey('set_points_current')), findsOneWidget);
+      expect(find.byKey(const ValueKey('leg_points_target')), findsOneWidget);
+      expect(find.byKey(const ValueKey('leg_points_current')), findsOneWidget);
     });
   });
 }

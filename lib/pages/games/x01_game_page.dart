@@ -8,6 +8,7 @@ import 'package:dart_dart/style/color.dart';
 import 'package:dart_dart/style/font.dart';
 import 'package:dart_dart/widget/x01/point_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class X01Game extends StatefulWidget {
   final GameSettings settings;
@@ -327,11 +328,6 @@ class _CurrentPlayer extends StatelessWidget {
       fontWeight: FontWeight.bold,
     );
 
-    final TextStyle scoreStyle = titleStyle.copyWith(
-      fontWeight: FontWeight.normal,
-      fontStyle: FontStyle.italic,
-    );
-
     return Container(
       padding: const EdgeInsets.all(5),
       margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
@@ -352,10 +348,7 @@ class _CurrentPlayer extends StatelessWidget {
                   game.curPly.name,
                   style: titleStyle,
                 ),
-                Text(
-                  game.curPoints,
-                  style: scoreStyle,
-                ),
+                _PointIcons(game: game),
                 const Spacer(flex: 2),
                 game.turnBuilder.isCheckout
                     ? //
@@ -403,6 +396,124 @@ class _CurrentPlayer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PointIcons extends StatelessWidget {
+  final GameController game;
+
+  const _PointIcons({required this.game});
+
+  static const double _iconHeight = 22.0;
+  static const double _iconWidth = 28.0;
+  // Higher opacity keeps earned points prominent while the full requirement stays subdued.
+  static const int _currentAlpha = 180;
+  static const int _targetAlpha = 90;
+
+  String _assetForCount(int count) {
+    if (count <= 0) {
+      throw RangeError.range(
+        count,
+        1,
+        null,
+        'count',
+        'Icon count must be at least 1',
+      );
+    }
+    // The icon set only contains 1/2/3-mark assets, so higher counts reuse the 3-mark icon.
+    return switch (count > 3 ? 3 : count) {
+      1 => 'assets/icons/fontIcons/oneLeg.svg',
+      2 => 'assets/icons/fontIcons/twoLegs.svg',
+      _ => 'assets/icons/fontIcons/threeLegs.svg',
+    };
+  }
+
+  Widget _icon({
+    required String keyName,
+    required int count,
+    required Color color,
+  }) {
+    if (count <= 0) return const SizedBox.shrink();
+    return SvgPicture.asset(
+      _assetForCount(count),
+      key: ValueKey(keyName),
+      height: _iconHeight,
+      width: _iconWidth,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
+
+  Widget _progressIcon({
+    required String keyPrefix,
+    required int current,
+    required int target,
+    required Color currentColor,
+    required Color targetColor,
+  }) {
+    if (target <= 0) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3.0),
+      child: SizedBox(
+        width: _iconWidth,
+        height: _iconHeight,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            _icon(
+              keyName: '${keyPrefix}_target',
+              count: target,
+              color: targetColor,
+            ),
+            _icon(
+              keyName: '${keyPrefix}_current',
+              count: current,
+              color: currentColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (game.settings.isFirstWins) return const SizedBox.shrink();
+
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color currentColor =
+        colorScheme.onPrimaryContainer.withAlpha(_currentAlpha);
+    final Color targetColor = colorScheme.onSurface.withAlpha(_targetAlpha);
+    final (sets, legs) = game.curPlyPoints;
+
+    if (game.settings.isLegsOnly) {
+      return _progressIcon(
+        keyPrefix: 'leg_points',
+        current: legs,
+        target: game.settings.legs,
+        currentColor: currentColor,
+        targetColor: targetColor,
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _progressIcon(
+          keyPrefix: 'set_points',
+          current: sets,
+          target: game.settings.sets,
+          currentColor: currentColor,
+          targetColor: targetColor,
+        ),
+        _progressIcon(
+          keyPrefix: 'leg_points',
+          current: legs,
+          target: game.settings.legs,
+          currentColor: currentColor,
+          targetColor: targetColor,
+        ),
+      ],
     );
   }
 }
