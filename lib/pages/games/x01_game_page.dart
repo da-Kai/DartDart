@@ -407,15 +407,13 @@ class _PointIcons extends StatelessWidget {
 
   static const double _iconHeight = 22.0;
 
-  static const Map<int, String> _assets = {
-    1: 'assets/icons/fontIcons/oneLeg.svg',
-    2: 'assets/icons/fontIcons/twoLegs.svg',
-    3: 'assets/icons/fontIcons/threeLegs.svg',
-  };
-
   Widget _icon(int count, Color color) {
     if (count <= 0) return const SizedBox.shrink();
-    final String asset = _assets[count.clamp(1, 3)]!;
+    final String asset = switch (count.clamp(1, 3)) {
+      1 => 'assets/icons/fontIcons/oneLeg.svg',
+      2 => 'assets/icons/fontIcons/twoLegs.svg',
+      _ => 'assets/icons/fontIcons/threeLegs.svg',
+    };
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3.0),
       child: SvgPicture.asset(
