@@ -37,11 +37,15 @@ enum HitNumber {
   /// Get [HitNumber] object by its segment.
   ///
   /// Returns [HitNumber.unthrown] if segment is null or [HitNumber.miss] if the segment is invalid.
+  static final Map<int, HitNumber> _bySegment = {
+    for (final v in HitNumber.values) v.segment: v
+  };
+
   static HitNumber bySegment(int? segment) {
     if (segment == null) {
       return HitNumber.unthrown;
     } else {
-      return HitNumber.values.firstWhere((hitNum) => hitNum.segment == segment, orElse: () => HitNumber.miss);
+      return _bySegment[segment] ?? HitNumber.miss;
     }
   }
 

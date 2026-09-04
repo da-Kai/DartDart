@@ -59,18 +59,19 @@ class InitTurn extends X01Turn {
 
 class GameTurn extends X01Turn {
   final X01Turn previous;
+  late final int _cachedScore;
 
   GameTurn(
       {super.first = Hit.miss,
       super.second = Hit.miss,
       super.third = Hit.miss,
       required super.check,
-      required this.previous});
+      required this.previous}) {
+    _cachedScore = previous.getScore() - calcScore();
+  }
 
   @override
-  int getScore() {
-    return previous.getScore() - calcScore();
-  }
+  int getScore() => _cachedScore;
 }
 
 typedef PlayerFactory = Player Function(String);
