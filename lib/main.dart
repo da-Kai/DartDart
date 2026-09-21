@@ -26,7 +26,7 @@ class DartDart extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       home: const HomePage(title: 'Dart Dart'),
     );
   }

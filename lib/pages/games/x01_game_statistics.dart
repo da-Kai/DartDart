@@ -107,19 +107,36 @@ class _GameProgress extends StatefulWidget {
 
 class _GameProgressState extends State<_GameProgress> {
   int currentLeg = 0;
+  late List<FlowChart> _cachedCharts;
+  Brightness? _cachedBrightness;
+
+  void _buildCharts(List<Color> playerColors) {
+    final legCount = widget.gameFlow.legCount;
+    _cachedCharts = List.generate(
+        legCount,
+        (i) => FlowChart.from(
+            widget.data, widget.gameFlow.playerScores, i, playerColors));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final brightness = Theme.of(context).colorScheme.brightness;
+    if (brightness != _cachedBrightness) {
+      _cachedBrightness = brightness;
+      final playerColors = brightness == Brightness.light
+          ? PlayerColors.light
+          : PlayerColors.dark;
+      _buildCharts(playerColors);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final legCount = widget.gameFlow.legCount;
 
-    final List<Color> playerColors =
-        colorScheme.brightness == Brightness.light //
-            ? PlayerColors.light //
-            : PlayerColors.dark;
-
-    final lineChartData = FlowChart.from(
-        widget.data, widget.gameFlow.playerScores, currentLeg, playerColors);
+    final lineChartData = _cachedCharts[currentLeg];
 
     return Container(
         padding: const EdgeInsets.all(10.0),
@@ -172,11 +189,10 @@ class _PlayerStatsView extends StatelessWidget {
             ? PlayerColors.light //
             : PlayerColors.dark;
 
-    Color playerColor(String name) {
-      final int index =
-          data.entries.toList().indexWhere((element) => element.key == name);
-      return playerColors[index];
-    }
+
+    final Map<String, Color> playerColorMap = {
+      for (var (i, e) in data.entries.indexed) e.key: playerColors[i]
+    };
 
     return Container(
         padding: const EdgeInsets.all(10.0),
@@ -225,7 +241,7 @@ class _PlayerStatsView extends StatelessWidget {
                             oneEighty: player.value.oneEighty.toString(),
                             checkout:
                                 '${(player.value.checkoutRate * 100).toStringAsFixed(1)}%',
-                            color: playerColor(player.key)),
+                            color: playerColorMap[player.key]!),
                     ],
                   ),
                 ),

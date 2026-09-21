@@ -66,6 +66,8 @@ class _X01PageState extends State<X01Game> {
           }
           if (data.canUndo) {
             data.undo();
+          } else {
+            _onClosePressed();
           }
         },
         child: Scaffold(
@@ -309,15 +311,13 @@ class _ThrowBean extends StatelessWidget {
 
 class _CurrentPlayer extends StatelessWidget {
   final _X01PageState state;
-  late final GameController game;
 
-  _CurrentPlayer(this.state) {
-    game = state.data;
-  }
+  const _CurrentPlayer(this.state);
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final GameController game = state.data;
     final curTurn = game.turnBuilder;
 
     final TextStyle titleStyle = TextStyle(
@@ -468,14 +468,16 @@ class _NextButton extends StatelessWidget {
             : () {
                 data.next();
                 if (data.hasGameEnded) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => //
-                              X01Statistics(
-                                  stats: data.getStats(),
-                                  settings: data.settings,
-                                  onUndo: state.undo)));
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => //
+                                X01Statistics(
+                                    stats: data.getStats(),
+                                    settings: data.settings,
+                                    onUndo: state.undo)));
+                  });
                 }
               },
         style: ElevatedButton.styleFrom(

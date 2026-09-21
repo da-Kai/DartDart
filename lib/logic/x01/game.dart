@@ -290,6 +290,7 @@ class GameController with ChangeNotifier {
   }
 
   GameStats getStats() {
+    assert(winner != null, 'getStats() called before game ended');
     return GameStats(gameData._sets, winner!.name, _playerNames, settings.game);
   }
 }
