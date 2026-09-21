@@ -16,6 +16,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.9
   fl_chart: ^1.2.0
+  flutter_svg: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +52,9 @@ flutter_launcher_icons:
 flutter:
   assets:
     - 'assets/images/dart_board-1024.png'
+    - 'assets/icons/fontIcons/oneLeg.svg'
+    - 'assets/icons/fontIcons/twoLegs.svg'
+    - 'assets/icons/fontIcons/threeLegs.svg'
   uses-material-design: true
   fonts:
     - family: dartdart
